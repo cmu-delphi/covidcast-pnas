@@ -1,0 +1,20 @@
+\begin{thebibliography}{1}
+
+\bibitem{belkin2002using}
+M Belkin, P Niyogi, Using manifold stucture for partially labeled
+  classification in {\em Advances in neural information processing systems}.
+\newblock pp. 929--936 (2002).
+
+\bibitem{berard1994embedding}
+P B{\'e}rard, G Besson, S Gallot, Embedding riemannian manifolds by their heat
+  kernel.
+\newblock {\em\protect\JournalTitle{Geometric \& Functional Analysis GAFA}}
+  \textbf{4}, 373--398 (1994).
+
+\bibitem{coifman2005geometric}
+RR Coifman, et~al., Geometric diffusions as a tool for harmonic analysis and
+  structure definition of data: Diffusion maps.
+\newblock {\em\protect\JournalTitle{Proceedings of the National Academy of
+  Sciences of the United States of America}} \textbf{102}, 7426--7431 (2005).
+
+\end{thebibliography}
