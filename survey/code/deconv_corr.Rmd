@@ -12,16 +12,18 @@ library(covidcast)
 library(dplyr)
 library(ggplot2)
 
+start_day <- "2020-04-15"
+end_day <- "2021-04-15"
+geo_type <- "state"
+cli <- covidcast_signal(data_source = "fb-survey",
+                        signal = "smoothed_wcli",
+                        start_day, end_day, geo_type)
+cmt <- covidcast_signal(data_source = "fb-survey",
+                        signal = "smoothed_whh_cmnty_cli",
+                        start_day, end_day, geo_type)
 cases <- covidcast_signal(data_source = "usa-facts",
-                           signal = "confirmed_7dav_incidence_prop",
-                           start_day = "2020-04-15",
-                           end_day = "2021-04-15", 
-                           geo_type = "state")
-survey <- covidcast_signal(data_source = "fb-survey",
-                           signal = "smoothed_whh_cmnty_cli",
-                           start_day = "2020-04-15",
-                           end_day = "2021-04-15", 
-                           geo_type = "state")
+                          signal = "confirmed_7dav_incidence_prop",
+                        start_day, end_day, geo_type)
 
 deconv <- read.csv("deconv_data.csv")
 deconv <- as.covidcast_signal(deconv, signal = deconv$signal[1])
@@ -32,13 +34,13 @@ deconv$time_value <- as.Date(deconv$time_value)
 
 ```{r}
 # Compute correlation per time, over all counties
-cor_geowise1 <- covidcast_cor(deconv, survey, by = "time_value")
-cor_geowise2 <- covidcast_cor(cases, survey, by = "time_value")
-cor_geowise <- rbind(cor_geowise1, cor_geowise2)
-cor_geowise$signal = as.factor(
-  c(rep("deconv-survey", nrow(cor_geowise1)),
-    rep("cases-survey", nrow(cor_geowise2))))
-                            
+by = "time_value"
+cor_geowise <- rbind(
+  data.frame(covidcast_cor(cli, deconv, by = by), signal = "cli-deconv"),
+  data.frame(covidcast_cor(cmt, deconv, by = by), signal = "cmt-deconv"),
+  data.frame(covidcast_cor(cli, cases, by = by), signal = "cli-cases"),
+  data.frame(covidcast_cor(cmt, cases, by = by), signal = "cmt-cases"))
+
 ggplot(cor_geowise, aes(x = time_value, y = value)) +
   geom_line(aes(color = signal)) +
   scale_x_date(date_breaks = "3 months", date_labels = "%b %Y",
@@ -52,12 +54,12 @@ ggplot(cor_geowise, aes(x = time_value, y = value)) +
 
 ```{r}
 # Compute correlation per location, over all time
-cor_timewise1 <- covidcast_cor(deconv, survey, by = "geo_value")
-cor_timewise2 <- covidcast_cor(cases, survey, by = "geo_value")
-cor_timewise <- rbind(cor_timewise1, cor_timewise2)
-cor_timewise$signal = as.factor(
-  c(rep("deconv-survey", nrow(cor_timewise1)),
-    rep("cases-survey", nrow(cor_timewise2))))
+by <- "geo_value"
+cor_timewise <- rbind(
+  data.frame(covidcast_cor(cli, deconv, by = by), signal = "cli-deconv"),
+  data.frame(covidcast_cor(cmt, deconv, by = by), signal = "cmt-deconv"),
+  data.frame(covidcast_cor(cli, cases, by = by), signal = "cli-cases"),
+  data.frame(covidcast_cor(cmt, cases, by = by), signal = "cmt-cases"))
                             
 ggplot(cor_timewise, aes(value)) +
   geom_density(aes(color = signal, fill = signal), alpha = 0.4) +
@@ -70,39 +72,38 @@ ggplot(cor_timewise, aes(value)) +
 
 ```{r}
 # Loop over values for dt, and compute correlations per state
-dt_vec <- (-20):10
-cor_timewise_list1 <- vector("list", length(dt_vec))
+dt_vec <- (-20):20
+by <- "geo_value"
+cor_timewise_list <- vector("list", length(dt_vec))
 for (i in 1:length(dt_vec)) {
-  cor_timewise_list1[[i]] <- covidcast_cor(deconv, survey, dt_x = dt_vec[i],
-                               by = "geo_value")
-  cor_timewise_list1[[i]]$dt <- dt_vec[i]
+  cor_timewise_list[[i]] <- rbind(
+    data.frame(covidcast_cor(cli, deconv, dt_x = dt_vec[i], by = by), 
+               dt = dt_vec[i], signal = "cli-deconv"),
+    data.frame(covidcast_cor(cmt, deconv, dt_x = dt_vec[i], by = by), 
+               dt = dt_vec[i], signal = "cmt-deconv"),
+    data.frame(covidcast_cor(cli, cases, dt_x = dt_vec[i], by = by), 
+               dt = dt_vec[i], signal = "cli-cases"),
+    data.frame(covidcast_cor(cmt, cases, dt_x = dt_vec[i], by = by), 
+               dt = dt_vec[i], signal = "cmt-cases"),
+    data.frame(covidcast_cor(cli, cmt, dt_x = dt_vec[i], by = by), 
+               dt = dt_vec[i], signal = "cli-cmt"))
 }
 
-# Stack into one big data frame, and then plot the median correlation by dt
-cor_timewise_dt1 <- do.call(rbind, cor_timewise_list1)
-cor_timewise_dt1 %>%
-  group_by(dt) %>%
+# Stack into one big data frame, and then plot the mean correlation by dt
+cor_timewise_dt <- do.call(rbind, cor_timewise_list)
+cor_timewise_dt %>%
+  group_by(dt, signal) %>%
   summarize(value = mean(value, na.rm = TRUE), .groups = "drop_last") %>%
-  ggplot(aes(x = dt, y = value)) + geom_line() + geom_point() +
+  ggplot(aes(x = dt, y = value)) + 
+  geom_line(aes(color = signal)) + geom_point(aes(color = signal)) +
   labs(x = "dt", y = "Correlation") + theme_bw() +
   theme(legend.position = "bottom", legend.title = element_blank())
-```
 
-```{r}
-# Loop over values for dt, and compute correlations per state
-cor_timewise_list2 <- vector("list", length(dt_vec))
-for (i in 1:length(dt_vec)) {
-  cor_timewise_list2[[i]] <- covidcast_cor(cases, survey, dt_x = dt_vec[i],
-                               by = "geo_value")
-  cor_timewise_list2[[i]]$dt <- dt_vec[i]
-}
-
-# Stack into one big data frame, and then plot the median correlation by dt
-cor_timewise_dt2 <- do.call(rbind, cor_timewise_list2)
-cor_timewise_dt2 %>%
-  group_by(dt) %>%
-  summarize(value = mean(value, na.rm = TRUE), .groups = "drop_last") %>%
-  ggplot(aes(x = dt, y = value)) + geom_line() + geom_point() +
+cor_timewise_dt %>%
+  group_by(dt, signal) %>%
+  summarize(value = median(value, na.rm = TRUE), .groups = "drop_last") %>%
+  ggplot(aes(x = dt, y = value)) + 
+  geom_line(aes(color = signal)) + geom_point(aes(color = signal)) +
   labs(x = "dt", y = "Correlation") + theme_bw() +
   theme(legend.position = "bottom", legend.title = element_blank())
 ```
