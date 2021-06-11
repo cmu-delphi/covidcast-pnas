@@ -1,0 +1,11 @@
+data_source,geo_availability
+chng,"3038 counties, all MSAs, all HRRs, 54 state-like, all HHS, nation"
+doctor-visits,"2524 counties, 385 MSAs, all HRRs, 52 state-like"
+hospital-admissions,"1135 counties, 334 MSAs, 292 HRRs, 51 state-like, all HHS, nation"
+quidel,"2063 counties, 358 MSAs, 300 HRRs, 51 state-like"
+safegraph,"3230 counties, all MSAs, all HRRs, 56 state-like, all HHS, nation"
+fb-survey,"1536 counties, 382 MSAs, all HRRs, 52 state-like, nation"
+ght,"381 MSAs, all HRRs, 51 state-like, all DMAs"
+google-symptoms,"109 counties, 64 MSAs, 115 HRRs, 44 state-like, all HHS, nation"
+jhu-csse,"3282 counties, all MSAs, all HRRs, 56 state-like, all HHS, nation"
+nchs-mortality,52 state-like
