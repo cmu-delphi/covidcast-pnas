@@ -8,7 +8,8 @@
 
 \input{../../common/prelim.tex}
 
-\title{Can COVID-19 Indicators Improve Forecasts and Hotspot Prediction?}
+\title{Can Auxiliary Indicators Improve COVID-19 Forecasts and Hotspot
+  Prediction?} 
 
 % Use letters for affiliations, numbers to show equal authorship (if applicable) and to indicate the corresponding author
 \author[a,c,1]{Author One}
@@ -150,8 +151,6 @@ backtesting of forecasters.
 % understand an indicator's usefulness for forecasting requires
 % accounting for the unfortunate reality of data latency.
 
-
-
 % Examining the importance of additional features for prediction is a core question
 % in inferential statistics, and there are many ways to examine this question
 % under a variety of assumptions. For time series, work in
@@ -188,108 +187,58 @@ backtesting of forecasters.
 \subsection{Signals and Locations}
 
 The indicators we focus on provide information not generally available from
-standard public health reporting. The COVID Tracking and Impact Survey (CTIS),
-run by the Delphi group in partnership with Facebook, reaches roughly 50,000
-respondents across the United States daily, and provides information on
-symptoms, social distancing, and other attitudes and behaviors related to
-COVID. The particular indicator we examine, which we refer to as \fb, is the
-estimated percentage of people who know someone with COVID-like illness in their
-the local community. 
+standard public health reporting. Among the many available in Delphi's COVIDcast
+API, we consider the following five auxiliary indicators: 
+\begin{itemize}
+\item Change Healthcare COVID-like illness (CHNG-CLI): The percentage of
+  outpatient visits that are primarily about COVID-related symptoms, based on
+  de-identified Change Healthcare claims data.
+\item Change Healthcare COVID (CHNG-COVID): The percentage of outpatient visits
+  with confirmed COVID-19, based on the same claims data.
+\item COVID Tracking and Impact Survey CLI-in-community (CTIS-CLI-in-community): 
+  The estimated percentage of the population who knows someone who is sick,
+  based on Delphi's surveys of Facebook users.
+\item Doctor Visits COVID-like illness (DV-CLI): The same as CHNG-CLI, but
+  computed based on de-identified medical insurance claims from other health
+  systems partners.  
+\item Google Search Trends for anosmia and ageusia (Google-AA): A measure of 
+  COVID-19 related Google search volume for queries related to anosmia (loss of
+  smell), ageusia (loss of taste), or both.  
+\end{itemize}
+In short, we choose these indicators because, conceptually speaking, they
+measure aspects of an individual's disease progression that would plausibly
+precede the occurence of (at worst, co-occur  with) the report of a positive
+COVID-19 test, through standard public health reporting streams.  
 
-In some ways, this can be seen as a
-proxy for the strength of social contacts between infected and susceptible
-populations, a key feature for disease modeling~\cite{Zhang1481} The Google
-indicator, which we refer to as \gs, tracks the local intensity of Google searches related to lack-of-smell
-(anosmia) or lack-of-taste (ageusia), both of which have been connected to
-COVID19~\cite{KlopfenAnosmia,vaira2020anosmia}. Two
-indicators are derived from de-identified insurance claims data from Change Healthcare, a large
-healthcare technology company that aggregates data from many providers. The
-first signal, which we refer to as \chngcov, is the estimated percentage of outpatient doctor visits with
-confirmed COVID-19 diagnosis (potentially collected earlier than the related
-report to the local health authority), while the second, which we
-refer to as \chngcli, is the estimated percentage of outpatient
-visits with COVID-like illness. Finally, \attn{describe \dv~indicator, perhaps best described in conjunction with \chngcov}.  The hope is that each
-of these signals serves as a ``leading indicator'' of future COVID cases,
-improving the forecastibility of COVID cases and hotspots. For more details on
-these and other indicators, see the companion paper.
+For more details on the five indicators (including how these are precisely
+computed from the underlying data streams) we refer to
+\url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html},
+which documents all of the COVIDcast signals, as well our companion paper on 
+COVIDcast API and database. For CTIS in particular, we refer to our companion 
+paper on this survey. For the Google Search Trends data set, see
+\cite{GoogleSymptoms}, and \cite{Klopfen:2020, Vaira:2020} for articles on the
+relevance of anosmia and ageusia.  
 
-% RJT: We should refer to the companion (indicators) paper for more details.
-% Also, I'm wondering what the point of the table (below) is?  Does it offer new
-% info in addition to the paragraph?  If it's just a nice visual cue, then we
-% can turn the above paragraph into a bullet point list, one bullet per signal,
-% and cut the table. @DM/JB: Let me know what you think.
-% DJM: agreed, table gone for now. I'll leave the bullet decision for later.
+As for geographic resolution, we consider the prediction of COVID-19 case rates
+and hotspots (to be precisely defined shortly) aggregated at the level of an
+individual hospital referral region (HRR). HRRs correspond to groups of counties
+in the United States within the same hospital referral system. The Dartmouth
+Atlas of Healthcare Policy~\cite{DartmouthHRR}, defines these 306 regions based
+on a number of characteristics. They are contiguous regions containing at least
+one city where major procedures (cardiovascular or neurological) are
+performed. Each HRR has a minimum population of about 120,000, and the majority
+of hospital services for that population are performed by hospitals within the
+region. Some HRRs are quite large (such as the one containing Los Angeles, which
+has about 10 million people), but generally HRRs are much more homogenous in
+size than the (approximately) 3200 counties are, and offer a nice middle ground
+in between counties and states. 
 
-% \begin{table}
-% \begin{tabular}{@{}p{1in}p{1in}p{1in}p{3in}@{}}
-%  \toprule
-%     Data source &   Signal name &   Abbreviation    &  
-%         Description\cite{DelphiAPI}\\
-%  \midrule
-%    \attn{COVIDcast Survey via Facebook} &   Smoothed CLI-in-community & FBCLI &
-%         Estimated percentage of people reporting illness in their local community,
-%         including their household   \\
-%     Change Healthcare   &   Smoothed adjusted oupatient CLI  &   CHCLI   &
-%         Estimated percentage of outpatient doctor visits primarily about
-%         COVID-related symptoms, with day-of-week effects removed  \\
-%     Change Healthcare   &   Smoothed adjusted oupatient COVID  &   CHCOV &
-%         Estimated percentage of outpatient doctor visits with confirmed
-%         COVID-19, with day-of-week effects removed  \\
-%     Google Symptoms     & Smoothed sum of anosmia and ageusia   &   GSSAA   &
-%         The sum of Google search volume for anosmia and ageusia related searches,
-%         in an arbitrary units that are normalized for overall search users\\
-%  \bottomrule
-% \end{tabular}
-% \caption{Syndromic signals available in COVIDcast.\label{tab:signals-used}}
-% \end{table}
-
-
-
-% RJT: We need to explain WHY HRRs.  This is not familiar to basically anybody!
-% It's an invention of academics who work in healthcare policy, from Dartmouth.
-% We should cite them: https://www.dartmouthatlas.org/faq/.  Here's the
-% rationale for us using them: 
-% - They are groups of counties driven by the same hospital referral system.
-% - They are somewhat homogenous population-wise.  Don't have a long tail of 
-% many HRRs with small populations (like counties).  We should check this!  And
-% could even the distribution vs the distribution with respect to counties (or
-% some other comparison point). 
-% - They would be more relevant to **hospitalization forecasting** given their
-% definition, but our indicators should provide bigger boosts to case forecasts.
-% (Hospitalizations | cases shouldn't have much dependence with indicators.
-% Here I'm using this as in X | Y, i.e., X conditional on Y).
-% - But to the extent that case projections inform hospitalization projects,
-% this is still quite relevant & sensible to use HRRs. 
-% @DM/JB: Please take a stab at this.
-% DJM: stabbed.
-
-As for geographic resolution, we consider prediction of COVID case rates (and
-hotspots) aggregated at the level of an individual hospital referral region
-(HRR). HRRs correspond to groups of counties within the same hospital referral
-system. The Dartmouth Atlas of Healthcare Policy~\cite{DartmouthHRR}, defines
-these 306 regions based on a number of characteristics. They are contiguous
-regions containing at least one city where major cardiovascular or neurological
-precedures are performed. Each HRR has a minimum population of about 120,000, and
-the majority of hospital services for that population are performed by hospitals
-within the region. Some HRRs are quite large (Los Angeles has
-about 10 million), but generally HRRs are much more homogenous than the
-$\sim$3100 counties 
-would be but at much higher resolution than states. They would be more relevant for
-hospitalization forecasting, given their definition. We have chosen to focus on
-forecasting cases at this resolution because the indicators should provide a
-bigger boost. Once we observe case information, there should not be much
-dependence of future
-hospitalizations on the indicators, but predicting cases should provide more timely
-warnings of future hospitalization needs as opposed to waiting for the case
-numbers. 
-
-\begin{figure}
-  \centering
-  \includegraphics[width=\linewidth]{fig/hrr_pop_histogram.pdf}
-  \caption{Histogram of population size for HRR. Note that the $x$-axis is on
-    the log scale.}
-  \label{fig:hrr-histogram}
-\end{figure}
+HRRs, by their definition, would be most relevant for hospitalization
+forecasting.  We have chosen to focus on forecasting cases at this resolution 
+because the indicators that we consider should intuitively be more useful in
+latter task.  Predicting case rates and case hotspots at the HRR level is still
+a reasonable goal, especially predicted case information could then be fed
+downstream into hospitalization forecasting models. 
 
 \subsection{Vintage Training Data}
 
