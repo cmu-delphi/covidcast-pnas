@@ -68,7 +68,7 @@ itself and cited in the text.
 \thispagestyle{firststyle}
 \ifthenelse{\boolean{shortarticle}}{\ifthenelse{\boolean{singlecolumn}}{\abscontentformatted}{\abscontent}}{}
 
-\dropcap{T}racking and forecasting indicators from public health reporting1
+\dropcap{T}racking and forecasting indicators from public health reporting
 streams---such as confirmed cases and deaths in the COVID-19 pandemic---is
 crucial for understanding disease spread, formulating public policy responses,
 and anticipating future public health resource needs.  In a companion paper, we
@@ -80,11 +80,11 @@ associated R \cite{CovidcastR} and Python \cite{CovidcastPy} packages for
 convenient data fetching and processing tools. In the current paper, we aim to
 quantify the utility provided by a core set of these indicators for two
 fundamental prediction tasks: probabilistic forecasting of COVID-19 case 
-rates and prediction of future COVID-19 hotspots (where we define a hotspot by a
-relative increase in COVID-19 cases, to be spelled out precisely later). 
+rates and prediction of future COVID-19 case hotspots (defined by the event that
+a relative increase in COVID-19 cases exceeds a certain threshold). 
 
-At the outset, we should be clear that our intent in this paper is \emph{not} to
-provide an authoritative take on cutting-edge COVID-19 forecasting methods.
+At the outset, we should be clear that our intent in this paper is \textit{not}
+to provide an authoritative take on cutting-edge COVID-19 forecasting methods.
 Instead, our purpose here is to provide a rigorous, quantitative assessment of
 the utility that several auxiliary indicators---such as those derived from
 internet surveys or medical insurance claims---provide in tasks that involve
@@ -105,13 +105,13 @@ models similar to those we consider in what follows.
 
 In our companion paper, we analyze correlations between various indicators and   
 COVID case rates. These correlations are natural summaries of the
-contemporaneous association between an indicator and COVID cases, but they fall
+contemporaneous association between an indicator and COVID cases, but they fall 
 short of delivering a satisfactory answer to the question that motivates the
 current article: is the information contained in an indicator demonstrably
 useful for the prediction tasks we care about? For such a question, lagged
 correlations (e.g., measuring the correlation between an indicator and COVID
 case rates several days in the future) move us in the right direction, but still
-do not move us all the way there. The question about \emph{utility for
+do not move us all the way there. The question about \textit{utility for 
   prediction} is focused on a much higher standard than simply asking 
 about correlations; to be useful in forecast or hotspot models, an indicator
 must provide relevant information that is not otherwise contained in past values
@@ -131,10 +131,10 @@ rates calculated ``after the fact'' (computed retrospectively, using the
 finalized values of this signal) will not deliver an honest answer to the    
 question of whether this signal would have been useful in real time. Instead,
 we build predictive models using only the data that would have been available
-\emph{as of} the prediction date, and compare the ensuing predictions in terms
-of accuracy. This leverages our group's {\tt evalcast} R package, which plugs
-into the COVIDcast API's data versioning system, and facilitates honest
-backtesting of forecasters.
+\textit{as of} the prediction date, and compare the ensuing predictions in terms 
+of accuracy. To do so, we leverage Delphi's \texttt{evalcast} R package 
+\cite{EvalcastR}, which plugs into the COVIDcast API's data versioning system,  
+and facilitates honest backtesting. 
 
 % Furthermore, adopting this practically-oriented forecasting
 % perspective to indicator evaluation requires one to confront
@@ -186,9 +186,16 @@ backtesting of forecasters.
 
 \subsection{Signals and Locations}
 
+We consider prediction of future COVID-19 case rates or case hotspots (to be
+defined precisely shortly).  By case rate, we mean the case count per 100,000
+people (the standard in epidemiology).  We use reported case data aggregated by 
+JHU CSSE \cite{Dong:2020}, which is accessible through the COVIDcast API, like
+the auxiliary indicators that we use to supplement the basic purely
+autoregressive models.   
+
 The indicators we focus on provide information not generally available from
-standard public health reporting. Among the many available in Delphi's COVIDcast
-API, we consider the following five auxiliary indicators: 
+standard public health reporting. Among the many indicators in the API, we
+consider the following five:
 \begin{itemize}
 \item Change Healthcare COVID-like illness (CHNG-CLI): The percentage of
   outpatient visits that are primarily about COVID-related symptoms, based on
@@ -208,7 +215,7 @@ API, we consider the following five auxiliary indicators:
 In short, we choose these indicators because, conceptually speaking, they
 measure aspects of an individual's disease progression that would plausibly
 precede the occurence of (at worst, co-occur  with) the report of a positive
-COVID-19 test, through standard public health reporting streams.  
+COVID-19 test, through standard public health reporting streams.
 
 For more details on the five indicators (including how these are precisely
 computed from the underlying data streams) we refer to
@@ -220,78 +227,62 @@ paper on this survey. For the Google Search Trends data set, see
 relevance of anosmia and ageusia.  
 
 As for geographic resolution, we consider the prediction of COVID-19 case rates
-and hotspots (to be precisely defined shortly) aggregated at the level of an
-individual hospital referral region (HRR). HRRs correspond to groups of counties
-in the United States within the same hospital referral system. The Dartmouth
-Atlas of Healthcare Policy~\cite{DartmouthHRR}, defines these 306 regions based
-on a number of characteristics. They are contiguous regions containing at least
-one city where major procedures (cardiovascular or neurological) are
-performed. Each HRR has a minimum population of about 120,000, and the majority
-of hospital services for that population are performed by hospitals within the
-region. Some HRRs are quite large (such as the one containing Los Angeles, which
-has about 10 million people), but generally HRRs are much more homogenous in
-size than the (approximately) 3200 counties are, and offer a nice middle ground
-in between counties and states. 
+and hotspots aggregated at the level of an individual \textit{hospital referral
+  region} (HRR). HRRs correspond to groups of counties in the United States
+within the same hospital referral system. The Dartmouth Atlas of Healthcare 
+Policy~\cite{DartmouthHRR}, defines these 306 regions based on a number of
+characteristics. They are contiguous regions containing at least one city where
+major procedures (cardiovascular or neurological) are performed.  Most hospital
+services for the population in an HRR are performed by hospitals within the
+region.  Each HRR has a minimum population of about 120,000; some HRRs are quite
+large (such as the one containing Los Angeles, which has about 10 million
+people), but generally HRRs are much more homogenous in size than the
+(approximately) 3200 counties are, and they serve as a nice middle ground in 
+between counties and states. 
 
-HRRs, by their definition, would be most relevant for hospitalization
-forecasting.  We have chosen to focus on forecasting cases at this resolution 
-because the indicators that we consider should intuitively be more useful in
-latter task.  Predicting case rates and case hotspots at the HRR level is still
-a reasonable goal, especially predicted case information could then be fed
-downstream into hospitalization forecasting models. 
+HRRs, by their definition, would be most relevant for forecasting hospital
+admissions.  We have chosen to focus on cases (forecasting and predicting
+hotspots) at this resolution since the indicators considered should be more
+useful in predicting case versus hospitalization activity, the latter being
+intuitively more closely connected (in time) to the events that are measured by
+the given five indicators. Predicting case rates (and hotspots) at the HRR level
+is still a reasonable goal in its own right; and moreover, it could be used to
+feed predicted case information into downstream hospitalization models.
 
 \subsection{Vintage Training Data}
 
-% RJT: We need to fill this out.  I'm convinced we need to promote "as of"
-% training as our main point of study.  We need to explain why this is so
-% important.  And we can and should present results with finalized data in the
-% appendix.  I guess we can wait until we get the experiments in to fill out
-% this section, because it might influence the prose we use here, or we could
-% also start writing this right away. And we can refer to the companion
-% (indicators) paper, which also describes the revision tracking feature in the
-% API.  @DM/JB: Your call, whether to start writing this or wait.
-% DJM: drafted
+In this paper, all models are fit using only ``vintage'' training data. This
+means that for a given prediction date, say September 1, 2020, we train models
+using only the data that would have been available to us \textit{as of}
+September 1.  Essentially, we ``rewind'' the clock to September 1, and query the
+COVIDcast API to get the latest data that it would have had available at
+that point in time.  This is made possible by the COVIDcast API's comprehensive
+data versioning system (described in more detail in our companion paper).  We
+also use the \texttt{evalcast} R package \cite{EvalcastR}, which streamlines the
+process of training arbitrary prediction models over a sequence of prediction
+dates, by automatically constructing the (properly-versioned) sequence of
+vintage training data sets.  
 
-In this manuscript, all models are estimated using only ``vintage training
-data''. This means that for a given forecast date, say November 1st 2020, we
-estimate our models using only the data that would have been available to us on
-November 1st. Essentially, the training data
-is rewound appropriately to dates in the past. It is likely, for example, that
-no data would actually exist 
-for the forecast date on the forecast date because there is some latency between
-the time signals are reported and the dates for which they are reported.
-Similarly, any future revisions made to the indicators or case numbers would
-not have been present on the forecast date, and so would not be available to the
-forecaster. Figure~\ref{fig:vintage} shows three signals for the Los Angeles HRR
-with a hypothetical forecast date of November 1. On November 1, no signals are
-available for October 31. The cases data is one day latent while the Facebook
-survey is 2 days latent. Doctor's visits are 3 days latent while also exhibiting
-revisions.  
-By training our models in this way, the evaluations are more realistic in the sense
-that we are accurately mimicking the difficulty faced by real-time epidemic
-forecasters. The COVIDcast API maintains all versions of the data, thereby allowing
-these sorts of synthetic forecasting exercises. For more details about data
-versioning, see the companion paper.
+Vintage training data means different things, in practice, for different
+signals. The three signals based on medical claims, CHNG-CLI, CHNG-COVID, and
+DV-CLI, are most often 3-5 days latent, and subject to a considerable degree of
+revision or ``backfill'' after their initial publication date.  The survey-based
+signal, CTIS-CLI-in-community, is 2 days latent, and rarely undergoes any 
+revision at all.  The target itself, reported case rates (or a binary hotspot
+variable, defined based on reported case rates), is 1 day latent, and exhibits
+frequent, unpredictable revisions (sometimes clear anomalies) after initial
+publication.  Compared to the revision pattern in the medical claims signals,
+which are appears to be much more systematic, the revision pattern in the case
+rates signal can be highly erratic, resulting in big spikes as reporting
+backlogs are cleared, changes in case definitions are made, other corrections
+are applied, etc.
 
-\begin{figure}
-  \centering
-  \includegraphics[width=\linewidth]{fig/vintage.pdf}
-  \caption{Changes in availability and revisions for three signals in the Los
-    Angeles HRR. The vertical black line indicates a hypothetical forecast date
-    of November 1 while the colored lines get progressively darker as we collect
-  later and later vintages of data.}
-  \label{fig:vintage}
-\end{figure}
+TODO What is ground truth??
+TODO Better example of backfill in DV-CLI?
 
 \subsection{Analysis Tasks}
 
 %\subsubsection{Forecasting Commonalities} % PNAS wants Title Caps for everything 
-
-% RJT: Just a quick few quick comments for now on the text below.  
-% Also, shouldn't we
-% point out it's relationship to quantile score, and give it's equivalent form
-% there?
-% DJM: done.
 
 On every day between \attn{July 1 and December 31}, we make two types of
 forecasts for each of the 306 hospital referral regions in the United States:
@@ -505,6 +496,10 @@ forecasting and hotspots
 
 
 \section{Results}
+
+Code to reproduce all examples (which uses the
+\texttt{evalcast} R package and fetches data directly from the API) can be
+found at \url{TODO}.
 
 \subsection{Primary Results}
 
