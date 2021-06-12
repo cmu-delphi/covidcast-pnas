@@ -23,12 +23,20 @@
 \leadauthor{Lead author last name} 
 
 % Please add a significance statement to explain the relevance of your work
-\significancestatement{Authors must submit a 120-word maximum statement about
-  the significance of their research paper written at a level understandable to
-  an undergraduate educated scientist outside their field of speciality. The
-  primary goal of the significance statement is to explain the relevance of the
-  work in broad context to a broad readership. The significance statement
-  appears in the paper itself and is required for all research papers.} 
+% TODO write one. This is the indicator's one.
+\significancestatement{To study the COVID-19 pandemic, its effects on society,
+  and measures for reducing its spread, researchers need detailed data on the
+  course of the pandemic. Standard public health data streams suffer
+  inconsistent reporting and frequent, unexpected revisions. They also miss
+  other aspects of a population's behavior, worthy of consideration. We
+  present an open database of COVID signals in the United States, measured at
+  the county level and updated daily. These include traditionally reported COVID
+  cases and deaths, and many others: signals based on measures of mobility,
+  social distancing, internet search trends, self-reported symptoms, and
+  patterns COVID-related activity in de-identified medical insurance claims. The
+  database provides all signals in a common, easy-to-use format, empowering both
+  public health research and operational decision-making.
+}
 
 % Please include corresponding author, author contribution and author
 % declaration information 
@@ -69,11 +77,10 @@ phenomena. The signals (a term we use synonomously with ``indicators'') in this
 database are accessible through the COVIDcast API \cite{CovidcastAPI}, with
 associated R \cite{CovidcastR} and Python \cite{CovidcastPy} packages for
 convenient data fetching and processing tools. In the current paper, we aim to
-quantify the additional utility provided by a core set of these indicators for
-two fundamental prediction tasks: probabilistic forecasting of COVID-19 case
-rates and prediction of future COVID-19 hotspots (where a hotspot is defined by
-the event that the relative increase in COVID-19 cases in a given location
-exceeds a certain threshold).
+quantify the utility provided by a core set of these indicators for two
+fundamental prediction tasks: probabilistic forecasting of COVID-19 case 
+rates and prediction of future COVID-19 hotspots (where we define a hotspot by a
+relative increase in COVID-19 cases, to be spelled out precisely later). 
 
 At the outset, we should be clear that our intent in this paper is \emph{not} to
 provide an authoritative take on cutting-edge COVID-19 forecasting methods.
@@ -93,7 +100,7 @@ regularization or nonlinearities. That said, analyses of forecasts submitted to
 the COVID-19 Forecast Hub \cite{ForecastHub} by a large community of modelers
 have shown that simple, robust models have consistently been among the
 best-performing over the pandemic \cite{Cramer:2021}, including time series
-models similar to those we consider in what follows.
+models similar to those we consider in what follows.  
 
 In our companion paper, we analyze correlations between various indicators and   
 COVID case rates. These correlations are natural summaries of the
@@ -105,68 +112,64 @@ correlations (e.g., measuring the correlation between an indicator and COVID
 case rates several days in the future) move us in the right direction, but still
 do not move us all the way there. The question about \emph{utility for
   prediction} is focused on a much higher standard than simply asking 
-about correlations; to be useful in forecasting or hotspot prediction, an 
-indicator must provide relevant information that is not otherwise contained in 
-past values of the case rate itself. We address this in the most direct way
-possible, by inpsecting the difference in predictive performance of simple 
-autoregressive models trained with and without access to past values of a 
-particular indicator.  
+about correlations; to be useful in forecast or hotspot models, an indicator
+must provide relevant information that is not otherwise contained in past values
+of the case rate series itself. We will assess this in the most direct way
+possible: by inpsecting the difference in predictive performance of simple
+autoregressive models trained with and without access to past values of a
+particular indicator.   
 
-There is a second and more subtle issue in evaluating predictive utility that
-deserves explicit mention, as it will play a key role in our
-analysis. Indicators computed from surveillance streams will often be subject to
+There is another, more subtle issue in evaluating predictive utility that 
+deserves explicit mention, as it will play a key role in our analysis.
+Signals computed from surveillance streams will often be subject to  
 latency and/or revision. For example, a signal based on aggregated medical
 insurance claims may be available after just a few days, but it can then be
 substantially revised over the next several weeks as additional claims are
-submitted and processed late. Correlations between such a signal and case rates 
-calculated ``after the fact'' (meaning, we look retrospectively and use the
-finalized values of this indicator) will not deliver an honest answer to the
-question of whether this indicator would have been useful in real time. Instead, 
-we build predictive models using only the data that would have been available 
+submitted and/or processed late. Correlations between such a signal and case
+rates calculated ``after the fact'' (computed retrospectively, using the
+finalized values of this signal) will not deliver an honest answer to the    
+question of whether this signal would have been useful in real time. Instead,
+we build predictive models using only the data that would have been available
 \emph{as of} the prediction date, and compare the ensuing predictions in terms
 of accuracy. This leverages our group's {\tt evalcast} R package, which plugs
 into the COVIDcast API's data versioning system, and facilitates honest
-backtesting of forecasters.   
+backtesting of forecasters.
+
+% Furthermore, adopting this practically-oriented forecasting
+% perspective to indicator evaluation requires one to confront
+% fundamental limitations inherent to public health surveillance
+% systems.  In particular, many reporting systems are plagued by
+% latency, with delays in reporting that can sometimes span
+% multiple weeks.  Latency manifests itself in different ways in different data sources.  Some data sources may only make a signal available one week after the date it describes; other
+% data sources may provide immediate imperfect initial estimates, which are
+% gradually ``backfilled'' over a period of days, weeks, or months (in which previous estimates are updated as new
+% data trickle in).  And few of
+% these latency patterns are stable or predictable, with holidays,
+% extreme weather events, and changes in the reporting process all
+% affecting the dynamics of the delay process.  To fully and accurately
+% understand an indicator's usefulness for forecasting requires
+% accounting for the unfortunate reality of data latency.
 
 
 
+% Examining the importance of additional features for prediction is a core question
+% in inferential statistics, and there are many ways to examine this question
+% under a variety of assumptions. For time series, work in
+% this area can be traced at least to Granger causality~\cite{GrangerCausality} and
+% related multivariate extensions~\cite{GewekeTimeSeries} under the condition 
+% that the series are linearly related autoregressions among other assumptions.
+% These techniques are especially popular in econometrics and neuroscience~\cite{mccracken2007asymptotics,NeuroscienceGranger}.
 
-
-Furthermore, adopting this practically-oriented forecasting
-perspective to indicator evaluation requires one to confront
-fundamental limitations inherent to public health surveillance
-systems.  In particular, many reporting systems are plagued by
-latency, with delays in reporting that can sometimes span
-multiple weeks.  Latency manifests itself in different ways in different data sources.  Some data sources may only make a signal available one week after the date it describes; other
-data sources may provide immediate imperfect initial estimates, which are
-gradually ``backfilled'' over a period of days, weeks, or months (in which previous estimates are updated as new
-data trickle in).  And few of
-these latency patterns are stable or predictable, with holidays,
-extreme weather events, and changes in the reporting process all
-affecting the dynamics of the delay process.  To fully and accurately
-understand an indicator's usefulness for forecasting requires
-accounting for the unfortunate reality of data latency.
-
-
-
-Examining the importance of additional features for prediction is a core question
-in inferential statistics, and there are many ways to examine this question
-under a variety of assumptions. For time series, work in
-this area can be traced at least to Granger causality~\cite{GrangerCausality} and
-related multivariate extensions~\cite{GewekeTimeSeries} under the condition 
-that the series are linearly related autoregressions among other assumptions.
-These techniques are especially popular in econometrics and neuroscience~\cite{mccracken2007asymptotics,NeuroscienceGranger}.
-
-We choose to take a
-predictive angle, which is simple but also fairly robust, compared to various
-other classical inferential approaches. In fact, drawing rigorous inference based on
-predictions, without (or with lean) assumptions, is an active field of
-research~\cite{dai2021significance,fryer2021shapley,zhang2020floodgate,williamson2020unified}.
-Nonetheless, the predictive approach directly examines the target of interest: do
-these signals help to produce forecasts? Furthermore, directly comparing
-forecast errors without strong assumptions through tests of predictive accuracy
-are common in epidemiology, econometrics, and other
-fields~\cite{DieboldMarianoTest,DieboldRetrospective}. 
+% We choose to take a
+% predictive angle, which is simple but also fairly robust, compared to various
+% other classical inferential approaches. In fact, drawing rigorous inference based on
+% predictions, without (or with lean) assumptions, is an active field of
+% research~\cite{dai2021significance,fryer2021shapley,zhang2020floodgate,williamson2020unified}.
+% Nonetheless, the predictive approach directly examines the target of interest: do
+% these signals help to produce forecasts? Furthermore, directly comparing
+% forecast errors without strong assumptions through tests of predictive accuracy
+% are common in epidemiology, econometrics, and other
+% fields~\cite{DieboldMarianoTest,DieboldRetrospective}. 
 
 % - then make the broad point that "feature importance" is a core question in
 % statistics, and there are many ways to look at it and lots of literature (cite
@@ -179,11 +182,6 @@ fields~\cite{DieboldMarianoTest,DieboldRetrospective}.
 % Lukas Janson's recent paper, Eugene + Aaditya's recent paper?).  Larry has put
 % some references in the bib.  Put more if we can find them, especially on time
 % series. 
-
-% RJT: 
-% What is a leading indicator?
-% Conceptual vs empirical.  
-
 
 \section{Methods}
 
