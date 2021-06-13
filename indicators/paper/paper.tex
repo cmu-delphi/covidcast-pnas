@@ -269,25 +269,24 @@ tracking cases and deaths). Many external sources do not keep a public or
 conveniently accessible record of revisions of their data.
 
 For many purposes it is sufficient to use the most recently issued observation
-for any time value, and thus the COVIDcast API reports the most recent issue by
-default. However, for some applications it is crucial to know what was known
-\textit{as of} a specific date. For example, an epidemic forecasting model will
-be called upon to make its forecasts based on preliminary data about recent
-trends, and so when it is trained using historical data, it should be trained
-using the initial versions of that data, not updates that would have been
-received later. Furthermore, these revision records allow models to be modified
-to account for noise and bias in early data versions, or to exclude data that is
-too new to be considered stable, and to ``rewind'' time and simulate how these
-revised models would have performed using only the versions of data available
-\textit{as of} those times.
+at any a given time value, and the COVIDcast API returns the most recent issue
+as its default. However, for some applications it is crucial to know what was
+known \textit{as of} a specific date. For example, an epidemic forecasting model
+will be called upon to make its forecasts based on preliminary data about recent
+trends, so when it is trained using historical data, it should be trained using
+the initial versions of that data, not updates that would have been received
+later. Moreover, these revision records allow models to be modified to account
+for noise and bias in early data versions, or to exclude data that is too new to
+be considered stable, and to ``rewind'' time and simulate how these revised
+models would have performed using only the versions of data available \textit{as
+of} those times.
 
 Research on data revisions in the context of influenza-like illness has shown
 that backfill can significantly alter forecast performance \cite{Brooks:2018,
-  Reich:2019}, and that training to use preliminary data can reduce this
-influence \cite{Brooks:2018, Brooks:2020}. This is also investigated in our
-companion paper on forecasting, where we observe that training and validating
-models on finalized data yields overly optimistic estimates of true test-time
-performance.  
+  Reich:2019}, and that careful training on preliminary data can reduce this
+influence \cite{Brooks:2020}. We also investigate this in our companion paper on
+forecasting, where we observe that training and validating models on finalized 
+data yields overly optimistic estimates of true test-time performance.    
 
 \subsection{Public API}
 
@@ -343,7 +342,8 @@ glitches and delays as traditional public health surveillance streams, and that
 they provide information about public behavior and attitudes that are not
 available from any other source. Code to reproduce all examples (which uses the
 \texttt{covidcast} R package and fetches data directly from the API) can be
-found at \url{TODO}.
+found at
+\url{https://www.github.com/cmu-delphi/covidcast-pnas/indicators/code/}. 
 
 \subsection{Tracking Trends}
 
