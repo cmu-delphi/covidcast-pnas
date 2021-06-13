@@ -425,7 +425,9 @@ where we use the notation \smash{$Y^\Delta_{\ell,t} = (Y_{\ell,t} - Y_{\ell,
     t-7})/(Y_{\ell,t-7})$}. In other words, $Z_{t,\ell}=1$ if the number of
 newly reported cases over the past 7 days has increased by at least 25\%
 compared to the preceding week.  When this occurs, we say location $\ell$ is a
-\textit{hotspot} at time $t$.  
+\textit{hotspot} at time $t$.  Empirically, this rule labels about 27\% of
+location-time pairs as hotspots, during the prediction period (June 13--December
+31, 2020).  
 
 We treat hotspot prediction as a binary classification problem and use a setup 
 altogether quite similar to the forecasting setup described previously.
@@ -457,84 +459,53 @@ make arbitrary calls for a hotspot (or lack thereof) based on small counts.
 
 \subsection{Evaluation Metrics}
 
-We evaluate forecasts for each forecast date and horizon using the weighted
-interval score. Weighted interval score (WIS), a well-known quantile-based
-approximation of the commonly-used continuous ranked probability
-score~\cite{gneiting-proper-score}. WIS is a proper score, meaning that lower
-scores imply better forecasters, and can be thought of as a distributional
-generalization of absolute error. The CDC has embraced this metric in the
-context of epidemic forecasting and especially for COVID-19~\cite{wis-paper}.
-Essentially, pairs of quantile forecasts are treated as a central  interval. For
-example, the 0.1 and 0.9 quantiles create an 80\% interval that should, if the
-forecaster is well-calibrated, contain the truth about 80\% of the time. A
-forecaster whose 80\% interval contains the truth less frequently is overly
-confident, while one whose interval contains the truth more frequently (say, by
-using an infinitely-wide interval) is failing to take a stand on the future
-outcome.  
+For forecasting, we evaluate the probabilistic forecasts produced by the
+quantile models \eqref{eq:forecast_ar}, \eqref{eq:forecast_ar_x} using
+\textit{weighted interval score} (WIS), which is a well-known quantile-based
+scoring rule; see, e.g., \cite{Gneiting:2007}.  WIS is a proper score, which
+means that its expectation is minimized by the true quantiles of the target
+variable.  The use of WIS in scoring COVID-19 forecasts is discussed by
+\cite{Bracher:2021}; and WIS serves as the primary metric for forecast
+evaluation in the COVID-19 Forecast Hub.
 
-Here, denoting $K$ predicted intervals along with the median  as
-$\{\alpha_K/2,\ldots,\alpha_2/2,\  
-\alpha_1/2,\ 0.5, 1-\alpha_1/2,\ 1-\alpha_2/2,\ldots, 1-\alpha_K/2\}$, the associated
-forecasts as $\{l_K,\ldots, l_2,\ l_1,\ m,\ u_1,\ u_2,\ldots, u_K \}$, and the observed
-value (after the forecast was made) as $y$, this metric can be expressed as
-\attn{someone please check this} 
-\begin{align*}
- \operatorname{WIS}_K &= \frac{1}{K}|m -y | + \frac{2}{K+1}\sum_{k=1}^K 
-\frac{1}{\alpha_k}(u_k - l_k)\\ &\quad + \sum_{k=1}^K  
-(l_k - y)\indicator{y < l_k} +
-(y - u_k)\indicator{y> u_k},
-\end{align*}
-where $\indicator{a} = 1$ if $a$ is true and $0$ otherwise. Essentially, this
-metric decomposes into 4 parts: (1) a penalty for the median, the point forecast
-or best guess, being far from the truth; (2) a penalty for the width of each
-interval ($u_k - l_k$); (3)  a penalty for overprediction, when the observed
-value falls below $l_k$ and hence underneath the interval; and (4) a
-corresponding penalty for underprediction. Weighted interval score can also be
-written in terms of an average of the quantile or ``pinball'' losses. Setting $\tau_1 =
-\alpha_K/2,\ \ldots,\ \tau_{K+1} = 0.5,\ \ldots,\ \tau_{2K+1} = 1-\alpha_K/2$ and
-similarly rewriting $q_1 = l_K,\ \ldots,\ q_{K+1}=m,\ \ldots,\ q_{2K+1}=u_K$, then
-\begin{align*}
-  \operatorname{WIS}_K &= \frac{2}{2K+1} \sum_{k=1}^{2K+1}
-                         \left(\indicator{y \leq q_k} -\tau_k\right)
-                         (q_k - y).
-\end{align*}
-While this second expression does not have the convenient decomposition
-discussed above, the pinball loss is precisely the objective function that
-quantile regression minimizes. So, mathematically, quantile regression should
-give parameter estimates that minimize the in-sample weighted interval score.
-% DJM: In trying to figure out where 'pinball' comes from, it looks like the
-% preprint of the massively cited Koenker and Hallock (2001) JEP article. See
-% http://www.econ.uiuc.edu/~roger/research/intro/rq.pdf. They say that tilting
-% the absolute value is `pinball logic' which is not a connection I would have
-% ever made. The language doesn't seem to have made it to the final version.
-% Maybe there's an earlier reference?
+WIS is typically defined for quantile-based forecasts where the quantile levels
+are symmetric around 0.5.  This is the case for our choice in
+\eqref{eq:quantile_levels}.  Let $F$ be a forecaster comprised of predicted
+quantiles $q_\tau$ parametrized by a quantile level $\tau$.  In the symmetric
+case, this is equivalent to a collection of central prediction intervals
+$(\ell_\alpha, u_\alpha)$, parametrized by an exclusion probability $\alpha$. 
+The WIS of the forecaster $F$, evaluated at the target variable $Y$, is defined
+by  
+\begin{equation}
+\label{eq:wis_intervals}
+\WIS(F,Y) = \sum_\alpha \Big\{\alpha(u_\alpha - \ell_\alpha) + 2 \cdot
+\dist(Y, [\ell_\alpha, u_\alpha])\Big\},  
+\end{equation}
+where $\dist(a, S)$ is the distance between a point $a$ and set $S$ (the
+smallest distance between $a$ and an element of $S$).  Note that, corresponding 
+to \eqref{eq:quantile_levels}, the exclusion probabilities are $\alpha \in
+\{0.05, 0.2, 0.5, 1\}$, resulting in 4 terms in the above sum.  By 
+straightforward algebra, it is not hard to see WIS has an alternative 
+representation in terms of the predicted quantiles themselves,
+\begin{equation}
+\label{eq:wis_quantiles}
+\WIS(F,Y) = 2 \sum_\tau \phi_\tau(Y - q_\tau), 
+\end{equation}
+where $\phi_\tau(x) = \tau |x|$ for $x \geq 0$ and $\phi_\tau(x) = (1-\tau)
+|x|$ for $x<0$, which is often called the ``tilted absolute'' loss.  While
+\eqref{eq:wis_quantiles} is more general (it can accomodate asymmetric quantile
+levels), the first definition \eqref{eq:wis_intervals} is usually preferred in
+presentation, because the score nicely decouples into a ``sharpness'' component
+(first term in each summand) and ``under/overprediction'' component (second term
+in each summand).  The second form given in \eqref{eq:wis_quantiles} is
+especially noteworthy in our current study as it reveals WIS is the same as the
+quantile regression loss that we use to train our forecast models (in other
+words, our models are fit to optimize WIS average over the training set).   
 
-
-When comparing the aggregate performance of the baseline quantile autoregression
-without additional signals with 
-the indicator-assisted quantile autoregression forecasters, we first
-normalize the individual weighted interval scores by the weighted interval
-score of a boneheaded model: predicting all future values to be the same as the
-most recent observation. The dummy model uses the errors such a forecast has
-made in-sample to form the other quantiles. We normalize by 
-the dummy model to account for the fact that different locations or
-time periods have different magnitudes of COVID-19 incidence (even after
-scaling by population). Performing well by this metric means that a particular
-forecaster is doing well at all locations and time periods. Without the scaling,
-a forecaster that is good at locations and time periods with relatively high
-case numbers but poor everywhere else could appear preferable. 
-
-For hotspots, we use the area under the curve (AUC) computed by examining the
-true-positive and false-negative rates across HRRs at each horizon and forecast
-date. That is, for a particular forecast date and a particular horizon, we ask,
-how many true hotspots were called hotspots compared to the total number of
-hotspots (specificity). The false-negative rate (sensitivity) is the ratio of
-correctly classified non-hotspots to the total number of non-hotspots. A perfect
-classifier would have both sensitivity and specificity equal to 1. Plotting the
-sensitivity on the $y$-axis and $1-$specificity on the $x$-axis where each point
-is a forecast date produces an ROC curve for each classifier. We compute the
-area under this curve for each forecast horizon to compare the cases-only model
-to those adding indicators. 
+For hotspot prediction, we evaluate the probabilistic classifiers produced by
+the logistic models \eqref{eq:hotspot_ar}, \eqref{eq:hotspot_ar_x} using the
+area under the curve (AUC) of their true positive versus false positive rate
+curve (which is traced out by varying the discrimination threshold). 
 
 \subsection{Other Considerations}
 
