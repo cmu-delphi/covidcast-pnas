@@ -272,21 +272,24 @@ The survey-based signal, CTIS-CLI-in-community, is 2 days latent, and rarely
 undergoes any revision at all.  The target variable itself, reported COVID-19
 case rates, is 1 day latent, and exhibits frequent, unpredictable revisions
 (sometimes clear anomalies) after initial publication.  Compared to the revision
-pattern in the medical claims signals, which are appears to be much more
-systematic in nature, the revision pattern in the case rates signal can be
-highly erratic. Big spikes or other anomalies can occur in the data as reporting
-backlogs are cleared, changes in case definitions are made, etc. Groups like JHU 
-CSSE then work tirelessly to correct such anomalies (e.g., back-distribute a
-huge spike when a reporting backlog is cleared), resulting in highly nontrivial
-and unpredictable revisions.  
-
-TODO Should we discuss the use of ``bad'' case rates as ground truth?? 
-
-TODO Discuss Google-AA.  We're using all finalized data, but explain why we're
-OK with this ... (they never backfill).
+pattern in the medical claims signals, which are much more systematic in nature,
+revisions in case reports can be highly erratic. Big spikes or other anomalies
+can occur in the data as reporting backlogs are cleared, changes in case
+definitions are made, etc. Groups like JHU CSSE then work tirelessly to correct
+such anomalies after first publication (e.g., they will attempt to
+back-distribute a spike when a reporting backlog is cleared, by working with a
+local authority to figure out how this should best be done), which can result
+in very nontrivial and often unpredictable revisions.      
 
 TODO For a figure, use Jacob's ``famous'' example of backfill in DV-CLI?   
 \url{https://cmu-delphi.github.io/covidcast/talks/ml-summit/talk.html#(20)} 
+
+Lastly, our treatment of the Google-AA signal is different from the rest.
+Because Google's team did not start publishing this signal until early
+September, 2020, we do not have true vintage data before then.  However, this
+signal is never revised after initial publication (confirmed via personal
+communication with the Google team that produces this signal), so we simply use
+finalized values for it in our analysis.   
 
 \subsection{Analysis Tasks}
 
@@ -542,6 +545,8 @@ TODO Briefly describe that we zero-fill Google-AA.
 \paragraph{Spatial Heterogeneity}
 
 \paragraph{Backfill, Nowcasting}
+
+TODO Should we discuss the use of ``bad'' case rates as ground truth?? 
 
 \paragraph{\attn{Methods section graveyard, most for Appendix}}
 
