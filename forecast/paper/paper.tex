@@ -410,8 +410,7 @@ for an example forecast.
 \begin{figure}[tb!]
 \centering
 \includegraphics[width=\columnwidth]{fig/trajectory.pdf}
-\caption{Forecasts and observed cases for HRR x. TODO 
-  \attn{Create a figure here for 1 HRR. Show the fan for the quantiles.}}  
+\caption{TODO}
 \label{fig:trajectory}
 \end{figure}
 
@@ -460,22 +459,21 @@ make arbitrary calls for a hotspot (or lack thereof) based on small counts.
 \subsection{Evaluation Metrics}
 
 For forecasting, we evaluate the probabilistic forecasts produced by the
-quantile models \eqref{eq:forecast_ar}, \eqref{eq:forecast_ar_x} using
-\textit{weighted interval score} (WIS), which is a well-known quantile-based
-scoring rule; see, e.g., \cite{Gneiting:2007}.  WIS is a proper score, which
-means that its expectation is minimized by the true quantiles of the target
-variable.  The use of WIS in scoring COVID-19 forecasts is discussed by
-\cite{Bracher:2021}; and WIS serves as the primary metric for forecast
-evaluation in the COVID-19 Forecast Hub.
+quantile models in \eqref{eq:forecast_ar}, \eqref{eq:forecast_ar_x} using 
+\textit{weighted interval score} (WIS), a quantile-based scoring rule; see e.g.,
+\cite{Gneiting:2007}.  WIS is a proper score, meaning that its expectation
+is minimized by the population quantiles of the target variable.  The use of WIS
+in COVID-19 forecast scoring is discussed in \cite{Bracher:2021}; WIS is also
+the main evaluation metric used in the COVID-19 Forecast Hub.   
 
 WIS is typically defined for quantile-based forecasts where the quantile levels
 are symmetric around 0.5.  This is the case for our choice in
 \eqref{eq:quantile_levels}.  Let $F$ be a forecaster comprised of predicted
-quantiles $q_\tau$ parametrized by a quantile level $\tau$.  In the symmetric
-case, this is equivalent to a collection of central prediction intervals
-$(\ell_\alpha, u_\alpha)$, parametrized by an exclusion probability $\alpha$. 
-The WIS of the forecaster $F$, evaluated at the target variable $Y$, is defined
-by  
+quantiles $q_\tau$ parametrized by a quantile level $\tau$.  In the case of
+symmetric quantile levels, this is equivalent to a collection of central
+prediction intervals $(\ell_\alpha, u_\alpha)$, parametrized by an exclusion
+probability $\alpha$. The WIS of the forecaster $F$, evaluated at the target
+variable $Y$, is defined by:
 \begin{equation}
 \label{eq:wis_intervals}
 \WIS(F,Y) = \sum_\alpha \Big\{\alpha(u_\alpha - \ell_\alpha) + 2 \cdot
@@ -486,7 +484,7 @@ smallest distance between $a$ and an element of $S$).  Note that, corresponding
 to \eqref{eq:quantile_levels}, the exclusion probabilities are $\alpha \in
 \{0.05, 0.2, 0.5, 1\}$, resulting in 4 terms in the above sum.  By 
 straightforward algebra, it is not hard to see WIS has an alternative 
-representation in terms of the predicted quantiles themselves,
+representation in terms of the predicted quantiles themselves:
 \begin{equation}
 \label{eq:wis_quantiles}
 \WIS(F,Y) = 2 \sum_\tau \phi_\tau(Y - q_\tau), 
@@ -499,50 +497,63 @@ presentation, because the score nicely decouples into a ``sharpness'' component
 (first term in each summand) and ``under/overprediction'' component (second term
 in each summand).  The second form given in \eqref{eq:wis_quantiles} is
 especially noteworthy in our current study as it reveals WIS is the same as the
-quantile regression loss that we use to train our forecast models (in other
-words, our models are fit to optimize WIS average over the training set).   
+quantile regression loss that we use to train our forecasting models (i.e., our
+models are fit to optimize WIS averaged over the training set).    
 
 For hotspot prediction, we evaluate the probabilistic classifiers produced by
-the logistic models \eqref{eq:hotspot_ar}, \eqref{eq:hotspot_ar_x} using the
+the logistic models in \eqref{eq:hotspot_ar}, \eqref{eq:hotspot_ar_x} using the 
 area under the curve (AUC) of their true positive versus false positive rate
 curve (which is traced out by varying the discrimination threshold). 
+
+The primary aggregation scheme that we will use in model evaluation and
+comparisons will be to average WIS per forecaster per ahead value $a$, over all
+forecast dates $t$ and locations $\ell$; and similarly, to compute AUC per
+classifier and per ahead value $a$, over all forecast dates $t$ and locations
+$\ell$.
 
 \subsection{Other Considerations}
 
 \paragraph{Missing Data Imputation}
 
-TODO Briefly describe that we zero-fill Google-AA.
+Over the prediction period, all auxiliary indicators are available (in the
+proper vintage sense) for all locations and prediction times, except for the
+Google-AA signal, which is only observed for an average of 105 (of 306) HRRs.
+This is due to the fact that that the COVID-19 search trends data is released
+after applying differential privacy techniques \cite{Bavadekar:2020}, and a
+missing signal value means that the level of noise added in the differential
+privacy mechanism is high compared to the underyling search count.  In other
+words, values of the Google-AA signal are clearly \textit{not} missing at
+random.  It seems most appropriate to impute missing values by zero, and this 
+is what we do in our analysis.
 
-\paragraph{Spatial Heterogeneity}
+\paragraph{Backfill and Nowcasting}  
 
-\paragraph{Backfill, Nowcasting}
+As described previously, the auxiliary indicators defined in terms of medical
+claims, CHNG-CLI, CHNG-COVID, and DV-CLI, undergo a significant and systematic
+pattern of revision, or ``backfill'', after their initial publication.  Given
+their somewhat statistically-regular backfill profiles, it would be reasonable
+to attempt to estimate their finalized values based on vintage data---a problem
+we refer to as \textit{nowcasting}---as a pre-processing step before using them
+as features in the models in \eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar_x}. 
+Nowcasting is itself a highly nontrivial modeling problem, and we do not attempt
+it in this paper (though it is a topic of ongoing work in our research group).
+We do note, however, that this would likely improve the performance of the
+models involving claims-based indicators in particular.   
 
-TODO Should we discuss the use of ``bad'' case rates as ground truth?? 
+\paragraph{Spatial Heterogeneity} 
 
-\paragraph{\attn{Methods section graveyard, most for Appendix}}
-
-\begin{itemize}
-\item Discuss the "how many days does the indicator buy" interpretation here or below? 
-
-
-\item Do we explain why regularization/CV not really helpful for both
-forecasting and hotspots
-
-
-\item Implementation was via quantgen, cite here?
-
-\item some people don't like relative WIS beacuse it's no longer a
-``proper score''.  directly address that here?
-
-
-\item Do we talk about log loss?
-
-\item Do we explain that we are using infinite-backfilled data?
-
-
-\end{itemize}
-
-
+Some signals display a significant degree of spatial heterogeneity, by which we
+mean the values that they take at different geographic locations are not 
+comparable.  This is true of the Google-AA signal (due to the way in which the 
+underlying search trends time series is self-normalized, see
+\cite{GoogleSymptoms}) and of the claims-based signals (see the discussion in
+our companion paper on the API and database).  Such spatial heterogeneity likely
+hurts the performance of the predictive models that rely on these signals,
+since the models are trained by pooling data from all locations.  In this paper,
+we do not attempt to address this issue (it is again a topic of ongoing work in
+our research group), and we simply note that location-specific effects (or 
+pre-processing to remove spatial bias) would likely improve the performance of
+the models involving Google-AA and the claims-based indicators.
 
 \section{Results}
 
