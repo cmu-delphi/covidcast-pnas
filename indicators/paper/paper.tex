@@ -151,7 +151,7 @@ activity.
 
 \paragraph{Mobility Data} SafeGraph, a company that collects geospatial data
 from smartphone apps, calculates COVID-related mobility signals
-\cite{SafeGraphSD, SafeGraphPatterns} and makes it available to researchers
+\cite{SafeGraphSocial, SafeGraphPatterns} and makes it available to researchers 
 under a data use agreement; we aggregate (some of) these signals to the county
 level and make them publicly available.     
 
@@ -166,62 +166,63 @@ process them, and provide them in a common format for public access. This
 unifies both unique (not available anywhere else) and standard COVID data
 streams into a single common format, enabling efficient comparison and modeling.
 A summary of the data sources and signals in the API is in
-Table~\ref{data-sources}, and detailed documentation is available at
+Table~\ref{tab:sources_signals}, and detailed documentation is available at 
 \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}.
 
-\begin{table*}
-\centering
-\caption{Data sources available in Delphi's COVIDcast API \cite{CovidcastAPI},
-  as of date of publication. The first group of data sources are produced by
-  Delphi from data not otherwise available publicly (or only available in
-  limited form); the second group is mirrored from public sources.}
-\begin{tabular}{>{\raggedright}p{1.2in} p{4.0in} l >{\raggedright\arraybackslash}p{0.5in}}
-\toprule
-\textbf{Data source} & \textbf{Signals available} & \textbf{First date} &
+\begin{table*}[t]
+  \centering
+  \caption{Data sources available in Delphi's COVIDcast API \cite{CovidcastAPI},
+    as of date of publication. The first group of data sources are produced by
+    Delphi from data not otherwise available publicly (or only available in
+    limited form); the second group is mirrored from public sources.}
+  \begin{tabular}{>{\raggedright}p{1.2in} p{4.0in} l >{\raggedright\arraybackslash}p{0.5in}}
+    \toprule
+    \textbf{Data source} & \textbf{Signals available} & \textbf{First date} &
 \textbf{Resolution} \\\midrule
-  % Exclusive data
-  Change Healthcare & Percentage of outpatient visits with COVID diagnostic codes
-or codes indicating COVID-like symptoms. Based on de-identified claims data
-processed by Change Healthcare. & 2020-02-01 & County$^*$ \\
-  Doctor Visits & Percentage of outpatient visits primarily about COVID-like
+    % Exclusive data
+    Change Healthcare & Percentage of outpatient visits with COVID diagnostic
+codes or codes indicating COVID-like symptoms. Based on de-identified claims
+data processed by Change Healthcare. & 2020-02-01 & County$^*$ \\
+    Doctor Visits & Percentage of outpatient visits primarily about COVID-like
 symptoms, based on de-identified claims data provided by health system
 partners. & 2020-02-01 & County$^*$ \\
-  Hospital Admissions & Percentage of new hospital admissions with COVID
+    Hospital Admissions & Percentage of new hospital admissions with COVID
 diagnostic codes, based on de-identified claims data provided by health system
 partners. & 2020-02-01 & County$^{**}$\\
-  Quidel & Test positivity rates for COVID-19 antigen tests produced by
+    Quidel & Test positivity rates for COVID-19 antigen tests produced by
 Quidel. & 2020-05-26 & County$^{**}$ \\
-  SafeGraph & Mobility metrics, such as time away from home or visits to bars
+    SafeGraph & Mobility metrics, such as time away from home or visits to bars 
 and restaurants, based on cell phone mobility data collected by SafeGraph
-\cite{SafeGraphSD, SafeGraphPatterns}. & 2019-01-01 & County \\
- COVID Tracking and Impact Survey & COVID symptoms, social distancing behaviors,
-mental health, economic impact, behavior (e.g., mask-wearing, vaccination
-attitudes), and COVID testing signals based on daily surveys conducted
-nationally by Delphi through Facebook \cite{DelphiSurvey, Kreuter:2020}. &
-2020-04-06 & County$^{**}$ \\
-  \midrule
-    % Mirrored data from other sources
-  Health \& Human Services & Counts of hospital admissions due to confirmed or
+\cite{SafeGraphSocial, SafeGraphPatterns}. & 2019-01-01 & County \\
+    COVID Tracking and Impact Survey & COVID symptoms, social distancing
+behaviors, mental health, economic impact, behavior (e.g., mask-wearing,
+vaccination attitudes), and COVID testing signals based on daily surveys
+conducted nationally by Delphi through Facebook \cite{DelphiSurvey,
+Kreuter:2020}. & 2020-04-06 & County$^{**}$ \\
+    \midrule
+     % Mirrored data from other sources
+    Health \& Human Services & Counts of hospital admissions due to confirmed or 
 suspected COVID-19, as reported by the Department of Health \& Human Services. &
 2019-12-31 & State \\
-COVID Act Now & COVID-19 testing results, such as positivity rate and number of
- tests, compiled by COVID Act Now from CDC reporting. & 2020-03-02 & 
+    COVID Act Now & COVID-19 testing results, such as positivity rate and number
+of tests, compiled by COVID Act Now from CDC reporting. & 2020-03-02 &
 County$^*$ \\
-  Google Symptoms & Trends in Google search volume for terms related to anosmia
-and ageusia (loss of smell or taste), which correlate with COVID activity, based
-on data shared by Google \cite{GoogleSymptoms}. & 2020-02-13 & County$^{***}$ \\
-  Cases and Deaths & Confirmed COVID-19 cases and deaths, compiled by JHU CSSE
+    Google Symptoms & Trends in Google search volume for terms related to
+anosmia and ageusia (loss of smell or taste), which correlate with COVID
+activity, based on data shared by Google \cite{GoogleSymptoms}. & 2020-02-13 &
+County$^{***}$ \\
+    Cases and Deaths & Confirmed COVID-19 cases and deaths, compiled by JHU CSSE 
 \cite{Dong:2020} and by USAFacts \cite{USAFacts}. & 2020-01-22 & County \\
-  NCHS Mortality & Weekly totals of deaths broken down by cause, such as COVID,
-flu, or pneumonia, compiled by the National Center for Health Statistics [TODO
-cite]. & 2020-01-26 & State \\
+    NCHS Mortality & Weekly totals of deaths broken down by cause, such as
+COVID, flu, or pneumonia, compiled by the National Center for Health Statistics
+[TODO cite]. & 2020-01-26 & State \\
     \bottomrule
-\end{tabular}
-\addtabletext{$^*$Available at $>60$\% of counties; $^{**}$available at 20--60\%
-  of counties; $^{***}$available at $<20$\% of counties.  For some signals,
-  location availability varies over time, e.g., due to variable reporting
-  volume.}
-\label{data-sources}
+  \end{tabular}
+  \addtabletext{$^*$Available at $>60$\% of counties; $^{**}$available at
+    20--60\% of counties; $^{***}$available at $<20$\% of counties.  For some
+    signals, location availability varies over time, e.g., due to variable
+    reporting volume.}
+  \label{tab:sources_signals}
 \end{table*}
 
 \subsection{Signal Processing}
@@ -300,9 +301,9 @@ request data, format it as a data frame, plot and map it, and combine it with
 data from other sources.
 
 The R and Python package software is public and open-source, at
-\url{https://github.com/cmu-delphi/covidcast/}.  The underlying server software
-is itself also public and open-source, at
-\url{https://github.com/cmu-delphi/delphi-epidata/}.  Lastly, most data sources
+\url{https://github.com/cmu-delphi/covidcast/}.  The API server software is
+itself also public and open-source, at
+\url{https://github.com/cmu-delphi/delphi-epidata/}.  Lastly, most data sources 
 are provided under the Creative Commons Attribution license, and a small number
 have additional restrictions imposed by the data source; see
 \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_licensing.html}.
@@ -332,8 +333,8 @@ operational use in decision-making and forecasting, they have also facilitated
 numerous analyses studying the impacts of COVID-19 on the public, the
 effectiveness of policy interventions, and factors that influenced the spread of
 the pandemic \cite{Adjodah:2021, Pierri:2021, Jewell:2021, Chakrabarti:2020,
-  Doerr:2021}. The API currently serves hundreds of thousands of requests each
-day, to thousands of users worldwide.
+  Doerr:2021}. The API currently serves hundreds of thousands of requests to
+thousands of users, each day.
 
 In what follows, we present illustrative examples of the usefulness of some of
 the novel signals available in the API. These examples demonstrate that such
@@ -348,7 +349,7 @@ found at
 
 \subsection{Tracking Trends}
 
-\begin{figure}
+\begin{figure}[t]
   \centering
   \includegraphics[width=\columnwidth]{fig/time_trends_national.pdf}
   \caption{National trends, from April 2020 to April 2021, of four signals in
@@ -429,7 +430,6 @@ people):
 \end{enumerate}
 
 \begin{figure}[t]
-
   \includegraphics[width=\columnwidth]{fig/geo_wise_corr.pdf}
   \caption{Geo-wise correlations with case rates, from April 15, 2020 to April
     15, 2021, calculated over all counties for which all signals were available
@@ -528,7 +528,7 @@ reporting problems have occurred in many jurisdictions across the United States,
 making it valuable to cross-check against external sources not part of the same
 reporting systems.
 
-\begin{figure}
+\begin{figure}[t]
   \centering
   \includegraphics[width=\columnwidth]{fig/bexar_compare.pdf}
   \caption{Reported cases per day in Bexar County, Texas during the summer of
@@ -551,7 +551,7 @@ available for each issue date, which are generally the most tentative estimates,
 and appear to be significantly biased upward in Arizona in June 2020, and
 significantly biased downward in New York throughout June and July 2020.
 
-\begin{figure}
+\begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{fig/dv_as_of.pdf}
 \caption{Estimated percentage of doctor's visits due to COVID-like illness

@@ -2,10 +2,12 @@
 \def\cor{\mathrm{cor}}
 \def\Quantile{\mathrm{Quantile}}
 \def\logit{\mathrm{logit}}
+\newcommand{\indicator}[1]{\mathbf{1}\left(#1\right)}
 
 % Figures and tables
+\usepackage{xurl}
+\usepackage{microtype}
 \usepackage{booktabs}
-\usepackage{lscape} 
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{xcolor}
@@ -14,10 +16,6 @@
 \makeatletter 
 \renewcommand\@biblabel[1]{#1} 
 \makeatother
-
-
-
-\newcommand{\indicator}[1]{\mathbf{1}\left(#1\right)}
 
 % indicators
 \newcommand{\chngcli}{{\tt chng\_cli}}
