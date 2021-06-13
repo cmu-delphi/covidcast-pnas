@@ -93,15 +93,17 @@ as simple terms as possible, we center our study in the framework of a basic
 autoregressive model (in which COVID cases in the near future are predicted from  
 a linear combination of COVID cases in the near past), and ask whether the 
 inclusion of an auxiliary indicator as an additional feature in such a model
-improves predictive power. While forecasting carries a rich literature that
-offers a wide range of techniques, see e.g., \cite{Hyndman:2018}, we purposely
-constrain ourselves to very simple models, avoiding common enhancements such as
-order selection, correction of outliers/anomalies in the data, and inclusion of
-regularization or nonlinearities. That said, analyses of forecasts submitted to
-the COVID-19 Forecast Hub \cite{ForecastHub} by a large community of modelers
-have shown that simple, robust models have consistently been among the
-best-performing over the pandemic \cite{Cramer:2021}, including time series
-models similar to those we consider in what follows.  
+improves its predictions. 
+
+While forecasting carries a rich literature that offers a wide range of
+techniques, see e.g., \cite{Hyndman:2018}, we purposely constrain ourselves to
+very simple models, avoiding common enhancements such as order selection,
+correction of outliers/anomalies in the data, and inclusion of regularization or
+nonlinearities. That said, analyses of forecasts submitted to the COVID-19
+Forecast Hub \cite{ForecastHub} by a large community of modelers have shown that
+simple, robust models have consistently been among the best-performing over the
+pandemic \cite{Cramer:2021}, including time series models similar to those we
+consider in what follows.   
 
 In our companion paper, we analyze correlations between various indicators and   
 COVID case rates. These correlations are natural summaries of the
@@ -189,13 +191,13 @@ and facilitates honest backtesting.
 We consider prediction of future COVID-19 case rates or case hotspots (to be
 defined precisely shortly).  By case rate, we mean the case count per 100,000
 people (the standard in epidemiology).  We use reported case data aggregated by 
-JHU CSSE \cite{Dong:2020}, which is accessible through the COVIDcast API, like
-the auxiliary indicators that we use to supplement the basic purely
-autoregressive models.   
+JHU CSSE \cite{Dong:2020}, which is accessible through the COVIDcast API
+\cite{CovidcastAPI}, like the auxiliary indicators that we use to supplement the
+basic purely autoregressive models.   
 
 The indicators we focus on provide information not generally available from
-standard public health reporting. Among the many indicators in the API, we
-consider the following five:
+standard public health reporting. Among the many auxiliary indicators collected
+in the API, we study the following five:  
 \begin{itemize}
 \item Change Healthcare COVID-like illness (CHNG-CLI): The percentage of
   outpatient visits that are primarily about COVID-related symptoms, based on
@@ -272,11 +274,11 @@ case rates, is 1 day latent, and exhibits frequent, unpredictable revisions
 (sometimes clear anomalies) after initial publication.  Compared to the revision
 pattern in the medical claims signals, which are appears to be much more
 systematic in nature, the revision pattern in the case rates signal can be
-highly erratic, resulting in big spikes as reporting backlogs are cleared,
-changes in case definitions are made, other corrections are applied, etc.  
-
-TODO Are the above problems mentioned about case rates really to do with vintage 
-data, or would they still exist in finalized data?
+highly erratic. Big spikes or other anomalies can occur in the data as reporting
+backlogs are cleared, changes in case definitions are made, etc. Groups like JHU 
+CSSE then work tirelessly to correct such anomalies (e.g., back-distribute a
+huge spike when a reporting backlog is cleared), resulting in highly nontrivial
+and unpredictable revisions.  
 
 TODO Should we discuss the use of ``bad'' case rates as ground truth?? 
 
@@ -286,55 +288,76 @@ OK with this ... (they never backfill).
 TODO For a figure, use Jacob's ``famous'' example of backfill in DV-CLI?   
 \url{https://cmu-delphi.github.io/covidcast/talks/ml-summit/talk.html#(20)} 
 
-\subsection{Missing Data Imputation}
-
-TODO Briefly describe that we zero-fill Google-AA.
-
 \subsection{Analysis Tasks}
 
-The first task we consider---\textit{forecasting}---is to predict the HRR-level
-COVID-19 case incidence rates, averaged over some 7-day time period in the
-future (the average number of new daily reported cases per 100,000 people, over
-the 7-day period).  The second task---\textit{hotspot prediction}---is to
-predict a binary variable defined in terms of relative changes of the
-aforementioned target variable. Why define the target variable here via 7-day 
-averaging? The short answer is robustness: averaging stabilizes the case time
-series, and accounts for uninteresting artifacts like weekend-weekday
-differences in the series.  Note that we can of course equivalently view this
-(equivalent up to a constant factor) as predicting HRR-level COVID-19 case
-incidence rates \textit{summed} over some 7-day period in the future (the total
-number of new reported cases per 100,000 people, over the 7-day period), or
-predicting a binary variable defined in terms of its relative changes.
+\begin{table*}[t]
+  \centering
+  \caption{Summary of forecasting and hotspot prediction tasks considered in
+    this paper.}
+  \begin{tabular}{l p{2.75in} p{2.75in}}
+    \toprule
+    & \textbf{Forecasting} & \textbf{Hotspot prediction} \\
+    \midrule
+    Response variable & $Y_{\ell,t}$ (7-day trailing average of COVID-19 case
+ incidence rates, per location $\ell$ and time $t$) & $Z_{\ell,t} =
+\indicator{Y_{\ell,t} \geq 1.25 \cdot Y_{\ell, t-7}}$ (indicator that $Y_{\ell,t}$ 
+grows by more than 25\% relative to the preceding week) \\
+    Geographic resolution & Hospital referral region (HRR) & Hospital referral
+region (HRR) \\ 
+    Forecast period & June 6--December 31, 2020 & June 13--December 31, 2020 \\  
+    Model type & Quantile regression & Logistic regression \\
+    Evaluation metric & Weighted interval score (WIS) & Area under curve (AUC) \\
+    \bottomrule
+  \end{tabular}
+\label{tab:analysis_tasks}
+\end{table*}
 
 To fix notation, let $Y_{\ell,t}$ denote the 7-day trailing average of COVID-19
-case incidence rates in location (HRR) $\ell$ and at time (day) $t$.  In 
-forecasting, a time $t$, we seek to predict $Y_{\ell,t+a}$ for each ``ahead''
-value $a=7,\ldots,21$. Meanwhile, in hotspot prediction, we seek to predict
-$Z_{\ell,t+a}$, a binary indicator defined in terms of the relative difference 
-$(Y_{\ell,t+a}-Y_{\ell,t+a-7}) / Y_{\ell,t+a-7}$, again for each
-$a=7,\ldots,21$.   
+case incidence rates in location (HRR) $\ell$ and at time (day) $t$.  To be
+clear, this is the number of new daily reported cases per 100,000
+people, averaged over the 7-day period $t-6, \ldots t$. The first task we
+consider---\textit{forecasting}---is to predict $Y_{\ell,t+a}$ for each
+``ahead'' value $a=7,\ldots,21$.  The second task---\textit{hotspot
+  prediction}---is to predict a binary variable defined in terms of the relative
+change of $Y_{\ell,t+a}$ (relative to its value one week prior,
+$Y_{\ell,t+a-7}$), again for each $a=7,\ldots,21$.   
+
+Why do we define the response variables via 7-day averaging? The short answer 
+is robustness: averaging stabilizes the case time series, and accounts for 
+uninteresting artifacts like weekend-weekday differences in the series.  Note
+that we can of course equivalently view this (equivalent up to a constant
+factor) as predicting the HRR-level COVID-19 case incidence rate \textit{summed} 
+over some 7-day period in the future, and predicting a binary variable derived 
+from this. 
+
+In what follows, we cover more details on our two analysis
+tasks. Table~\ref{tab:analysis_tasks} presents a summary.   
+
+\paragraph{Dynamic Re-Training}
 
 For each prediction date $t$, we use a 21-day trailing window of data to train
 our forecast or hotspot prediction models (so, e.g., the trained models will
 differ from those at prediction date $t-1$).  This is done to account for
 (potential) nonstationarity.  For simplicity, the forecasting and hotspot
-prediction models are always fit to data across all HRRs (i.e., the coefficients
-in the models do not account for location-specific effects).  
+prediction models are always trained on data across all HRRs (i.e., the
+coefficients in the models do not account for location-specific effects).   
+
+\paragraph{Prediction Period}
 
 In our analysis, we let the prediction date $t$ run over each day in between
-early June and December 31, 2020.  The precise start date differs for
+early/mid June and December 31, 2020.  The precise start date differs for 
 forecasting and hotspots prediction; for each task it was chosen to be the
 earliest date at which the data needed to train all models was available, which
 ends up being (per our setup, with 21 days of training data, and lagged values
 of signals for features as we will detail shortly) June 6, 2020 for forecasting,
 and June 13, 2020 for hotspot prediction. (The bottleneck here is the
 CTIS-CLI-in-community signal, which does not exist before early April 2020, when
-the survey was first launched). The end date was chosen with a consideration
-again to align both tasks as best as possible, and because few hotspots exist
-post December 31, 2020, due to the general and gradual decline of the pandemic
-in 2021.
+the survey was first launched). The end date was chosen again with a
+consideration to align both tasks as best as possible, and because few hotspots
+exist post December 31, 2020, due to the general and gradual decline of the
+pandemic in 2021.
 
-\subsubsection{Task 1: Forecasting}
+\paragraph{Forecasting Models}
 
 Recall $Y_{t,\ell}$ denotes the 7-day trailing average of COVID-19 case
 incidence rates in location $\ell$ and at time $t$.  Separately for each
@@ -353,11 +376,11 @@ levels suggested by the COVID-19 Forecast Hub),
 \label{eq:quantile_levels}
 \tau \in \{0.025, 0.1, 0.25, 0.5, 0.75, 0.9, 0.975 \}.
 \end{equation}
-To estimate the coefficients, we use \textit{quantile regression}
-\cite{Koenker:1978, Koenker:2005, Koenker:2006} fit separately for each $\tau$,
+We fit \eqref{eq:forecast_ar} using \textit{quantile regression}
+\cite{Koenker:1978, Koenker:2005, Koenker:2006} separately for each $\tau$, 
 using data from all 306 HRRs, and within each HRR, using the most recent 21 days
-of training data.  To be clear, this gives 6,426 training samples for each
-quantile regression problem. 
+of training data.  This gives us 6,426 training samples for each quantile 
+regression problem.    
 
 In addition to the above ``pure'' autoregression model, we consider five
 probabilistic forecasting models of the form: 
@@ -370,16 +393,16 @@ probabilistic forecasting models of the form:
 where $X_{\ell,t}$ denotes any one of the five auxiliary indicators---CHNG-CLI, 
 CHNG-COVID, CTIS-CLI-in-community, DV-CLI, or Google-AA---at location $\ell$ and
 time $t$. Note that we apply the same lags (current value, along with the values
-7 and 14 days ago) for the auxiliary signals as we do for case rates. Estimation
-proceeds just as before: we use the same 7 quantile levels as in
-\eqref{eq:quantile_levels}, and again use quantile regression separately for
-each $\tau$, fit using data from all 306 HRRs and a trailing window of 21 days
-of training data.
+7 and 14 days ago) for the auxiliary indicators as we do for the case
+rates. Training then proceeds just as before: we use the same 7 quantile levels
+in \eqref{eq:quantile_levels}, and fit quantile regression separately for each 
+level $\tau$, using data from all 306 HRRs and a trailing window of 21 days of
+training data.
 
 At prediction time, in order to deal with possible crossing violations (a
 predicted quantile at level $\tau$ exceeds a predicted quantile at level $\tau'
 > \tau$), we apply a simple post-hoc sorting.  See Figure \ref{fig:trajectory}
-for example forecast. 
+for an example forecast. 
 
 \begin{figure}[tb!]
 \centering
@@ -389,7 +412,7 @@ for example forecast.
 \label{fig:trajectory}
 \end{figure}
 
-\subsubsection{Task 2: Hotspot Prediction}
+\paragraph{Hotspot Prediction Models}
 
 Define the binary indicator:
 $$
@@ -398,8 +421,8 @@ $$
 where we use the notation \smash{$Y^\Delta_{\ell,t} = (Y_{\ell,t} - Y_{\ell,
     t-7})/(Y_{\ell,t-7})$}. In other words, $Z_{t,\ell}=1$ if the number of
 newly reported cases over the past 7 days has increased by at least 25\%
-compared to the preceding week.  When this occurs, we call location $\ell$ a
-\textit{hotspot} at time $t$. 
+compared to the preceding week.  When this occurs, we say location $\ell$ is a
+\textit{hotspot} at time $t$.  
 
 We treat hotspot prediction as a binary classification problem and use a setup 
 altogether quite similar to the forecasting setup described previously.
@@ -415,8 +438,8 @@ logistic models of the form:
 \begin{multline}
 \label{eq:hotspot_ar_x}
 \logit(Z_{\ell,t+a} \,|\, Y_{\ell,s}, X_{\ell,s}, s \leq t)  
-= \\ \alpha^{a,\tau} + \sum_{j=0}^2 \beta^{a,\tau}_j Y_{\ell,t-7j} + 
-\sum_{j=0}^2 \gamma^{a,\tau}_j X_{\ell,t-7j},
+= \\ \alpha^{a,\tau} + \sum_{j=0}^2 \beta^{a,\tau}_j Y^\Delta_{\ell,t-7j} +  
+\sum_{j=0}^2 \gamma^{a,\tau}_j X^\Delta_{\ell,t-7j},
 \end{multline}
 where we use \smash{$X^\Delta_{\ell,t} = (X_{\ell,t} - X_{\ell,
     t-7})/(X_{\ell,t-7})$}, and again $X_{\ell,t}$ stands for any of the five  
@@ -510,8 +533,15 @@ is a forecast date produces an ROC curve for each classifier. We compute the
 area under this curve for each forecast horizon to compare the cases-only model
 to those adding indicators. 
 
+\subsection{Other Considerations}
 
+\paragraph{Missing Data Imputation}
 
+TODO Briefly describe that we zero-fill Google-AA.
+
+\paragraph{Spatial Heterogeneity}
+
+\paragraph{Backfill, Nowcasting}
 
 \paragraph{\attn{Methods section graveyard, most for Appendix}}
 
