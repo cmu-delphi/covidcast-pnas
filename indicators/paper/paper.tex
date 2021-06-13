@@ -129,42 +129,44 @@ We receive data daily from healthcare partners, technology companies, and from
 surveys conducted daily by Delphi in partnership with Facebook. These data
 sources provide information not available from standard public health reporting
 or other common sources, such as:
-\begin{description}
-\item[Health Insurance Claims] Based on de-identified medical insurance claims
-  from Change Healthcare and other health system partners, we release indicators
-  on the estimated percentage of covered outpatient visits and hospitalizations
-  that involved COVID diagnoses or symptoms.
-\item[Internet-Based Surveys] Conducted in partnership with Facebook, Delphi's
-  COVID Tracking and Impact Survey receives about 50,000 responses daily, and
-  has received over 20 million responses since April 2020 \cite{DelphiSurvey,
-    Kreuter:2020}. From the surveys, we construct indicators on symptoms,
-  social distancing, vaccination, and other attitudes and behaviors related to
-  COVID.
-\item[COVID Antigen Tests] Based on data from Quidel, a major manufacturer of
-  COVID antigen tests in the United States, we calculate and release
-  (Quidel-specific) test volumes and positivity rates.
-\item[Search Trends] Based on Google's COVID-19 Search Trends symptoms data set
-  \cite{GoogleSymptoms}, we provide indicators reflecting COVID-related search
-  activity.
-\item[Mobility Data] Cell phone mobility data is collected by SafeGraph
-  \cite{SafeGraphSD, SafeGraphPatterns}, and is available to researchers under a
-  data use agreement; we aggregate it to the county level and make indicators
-  publicly available.
-\end{description}
 
+\paragraph{Health Insurance Claims} Based on de-identified medical insurance 
+claims from Change Healthcare and other health system partners, we release
+indicators on the estimated percentage of covered outpatient visits and
+hospitalizations that involved COVID diagnoses or symptoms.
+
+\paragraph{Internet-Based Surveys} Conducted in partnership with Facebook,
+Delphi's COVID Tracking and Impact Survey receives about 50,000 responses daily,  
+and has received over 20 million responses since April 2020 \cite{DelphiSurvey,
+  Kreuter:2020}. From the surveys, we construct indicators on symptoms, social 
+distancing, vaccination, and other attitudes and behaviors related to COVID.
+
+\paragraph{COVID Antigen Tests} Based on data from Quidel, a manufacturer of
+COVID antigen tests in the United States, we calculate and release
+(Quidel-specific) test volumes and positivity rates.  
+
+\paragraph{Search Trends} Based on Google's COVID-19 Search Trends data set
+\cite{GoogleSymptoms}, we provide indicators reflecting COVID-related search  
+activity.
+
+\paragraph{Mobility Data} SafeGraph, a company that collects geospatial data
+from smartphone apps, calculates COVID-related mobility signals
+\cite{SafeGraphSD, SafeGraphPatterns} and makes it available to researchers
+under a data use agreement; we aggregate (some of) these signals to the county
+level and make them publicly available.     
+
+\medskip
 We also scrape data accessible from other public sources, such as cases and
 deaths data aggregated from public reporting by JHU CSSE \cite{Dong:2020} and by
 USAFacts \cite{USAFacts}, so that we can track revisions and updates to this data
 (see Section~\ref{subsec:revision_tracking}).
 
-Together, we collect TODO signals from TODO distinct sources, aggregate them,
-and provide them in a single common format for public access. This hence
-provides a common format both for unique data streams not available elsewhere
-and for public data streams, enabling efficient comparison and modeling use.
-
-A summary of the data sources we currently receive and make available is
-presented in Table~\ref{data-sources}, and detailed documentation of the signals
-available from each source is available at
+Altogether, we collect 110 signals from 12 distinct sources, aggregate and
+process them, and provide them in a common format for public access. This
+unifies both unique (not available anywhere else) and standard COVID data
+streams into a single common format, enabling efficient comparison and modeling.
+A summary of the data sources and signals in the API is in
+Table~\ref{data-sources}, and detailed documentation is available at
 \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}.
 
 \begin{table*}
@@ -173,7 +175,8 @@ available from each source is available at
   as of date of publication. The first group of data sources are produced by
   Delphi from data not otherwise available publicly (or only available in
   limited form); the second group is mirrored from public sources.}
-\begin{tabular}{>{\raggedright}p{1.2in} p{4.0in} r >{\raggedright\arraybackslash}p{0.5in}}\toprule
+\begin{tabular}{>{\raggedright}p{1.2in} p{4.0in} l >{\raggedright\arraybackslash}p{0.5in}}
+\toprule
 \textbf{Data source} & \textbf{Signals available} & \textbf{First date} &
 \textbf{Resolution} \\\midrule
   % Exclusive data
@@ -201,8 +204,8 @@ nationally by Delphi through Facebook \cite{DelphiSurvey, Kreuter:2020}. &
   Health \& Human Services & Counts of hospital admissions due to confirmed or
 suspected COVID-19, as reported by the Department of Health \& Human Services. &
 2019-12-31 & State \\
-    COVID Act Now & COVID-19 testing results, such as positivity and number of
-tests, compiled by COVID Act Now from CDC reporting. & 2020-03-02 &
+COVID Act Now & COVID-19 testing results, such as positivity rate and number of
+ tests, compiled by COVID Act Now from CDC reporting. & 2020-03-02 & 
 County$^*$ \\
   Google Symptoms & Trends in Google search volume for terms related to anosmia
 and ageusia (loss of smell or taste), which correlate with COVID activity, based
@@ -214,12 +217,10 @@ flu, or pneumonia, compiled by the National Center for Health Statistics [TODO
 cite]. & 2020-01-26 & State \\
     \bottomrule
 \end{tabular}
-% TODO PNAS wants a short title above and caption below, but they can't possibly
-% mean for the caption to be formatted so weirdly...
-\addtabletext{Location availability often drops lower for some times and
-  signals, e.g., due to variable reporting volume. $^*$Available at $>60$\% of
-  counties; $^{**}$available at 20--60\% of counties; $^{***}$available at
-  $<20$\% of counties.}
+\addtabletext{$^*$Available at $>60$\% of counties; $^{**}$available at 20--60\%
+  of counties; $^{***}$available at $<20$\% of counties.  For some signals,
+  location availability varies over time, e.g., due to variable reporting
+  volume.}
 \label{data-sources}
 \end{table*}
 
