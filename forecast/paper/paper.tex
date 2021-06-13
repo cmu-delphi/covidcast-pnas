@@ -24,7 +24,7 @@
 \leadauthor{Lead author last name} 
 
 % Please add a significance statement to explain the relevance of your work
-% TODO write one. This is the indicator's one.
+% TODO write a real one. This is the indicator's one.
 \significancestatement{To study the COVID-19 pandemic, its effects on society,
   and measures for reducing its spread, researchers need detailed data on the
   course of the pandemic. Standard public health data streams suffer
@@ -92,7 +92,7 @@ predicting future trends in confirmed COVID-19 cases. To assess such utility in
 as simple terms as possible, we center our study in the framework of a basic
 autoregressive model (in which COVID cases in the near future are predicted from  
 a linear combination of COVID cases in the near past), and ask whether the 
-inclusion of an auxiliary indicator as an exogenous feature in such a model
+inclusion of an auxiliary indicator as an additional feature in such a model
 improves predictive power. While forecasting carries a rich literature that
 offers a wide range of techniques, see e.g., \cite{Hyndman:2018}, we purposely
 constrain ourselves to very simple models, avoiding common enhancements such as
@@ -220,30 +220,30 @@ COVID-19 test, through standard public health reporting streams.
 For more details on the five indicators (including how these are precisely
 computed from the underlying data streams) we refer to
 \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html},
-which documents all of the COVIDcast signals, as well our companion paper on 
-COVIDcast API and database. For CTIS in particular, we refer to our companion 
-paper on this survey. For the Google Search Trends data set, see
+which documents all of the signals in the COVIDcast API, and our companion paper
+on the API and database. For CTIS in particular, we refer to our companion paper
+on this survey. For the Google Search Trends data set, see
 \cite{GoogleSymptoms}, and \cite{Klopfen:2020, Vaira:2020} for articles on the
-relevance of anosmia and ageusia.  
+relevance of anosmia or ageusia (loss of smell or taste) to COVID.
 
 As for geographic resolution, we consider the prediction of COVID-19 case rates
 and hotspots aggregated at the level of an individual \textit{hospital referral
   region} (HRR). HRRs correspond to groups of counties in the United States
 within the same hospital referral system. The Dartmouth Atlas of Healthcare 
 Policy~\cite{DartmouthHRR}, defines these 306 regions based on a number of
-characteristics. They are contiguous regions containing at least one city where
-major procedures (cardiovascular or neurological) are performed.  Most hospital
-services for the population in an HRR are performed by hospitals within the
-region.  Each HRR has a minimum population of about 120,000; some HRRs are quite
-large (such as the one containing Los Angeles, which has about 10 million
-people), but generally HRRs are much more homogenous in size than the
-(approximately) 3200 counties are, and they serve as a nice middle ground in 
-between counties and states. 
+characteristics. They are contiguous regions such that most of the hospital
+services for the underlying population are performed by hospitals within the
+region. Each HRR also contains at least one city where major procedures
+(cardiovascular or neurological) are performed. The smallest HRR has a
+population of about 120,000. While some are quite large (such as the one
+containing Los Angeles, which has about 10 million people), generally HRRs 
+are much more homogenous in size than the (approximately) 3200 counties,  
+and they serve as a nice middle ground in between counties and states.  
 
 HRRs, by their definition, would be most relevant for forecasting hospital
-admissions.  We have chosen to focus on cases (forecasting and predicting
-hotspots) at this resolution since the indicators considered should be more
-useful in predicting case versus hospitalization activity, the latter being
+demand.  We have chosen to focus on cases (forecasting and predicting
+hotspots) at the HRR level since the indicators considered should be more 
+useful in predicting case activity versus hospital demand, since the latter is
 intuitively more closely connected (in time) to the events that are measured by
 the given five indicators. Predicting case rates (and hotspots) at the HRR level
 is still a reasonable goal in its own right; and moreover, it could be used to
@@ -251,140 +251,183 @@ feed predicted case information into downstream hospitalization models.
 
 \subsection{Vintage Training Data}
 
-In this paper, all models are fit using only ``vintage'' training data. This
-means that for a given prediction date, say September 1, 2020, we train models
+In this paper, all models are fit with ``vintage'' training data. This means
+that for a given prediction date, say, September 1, 2020, we train models 
 using only the data that would have been available to us \textit{as of}
-September 1.  Essentially, we ``rewind'' the clock to September 1, and query the
-COVIDcast API to get the latest data that it would have had available at
-that point in time.  This is made possible by the COVIDcast API's comprehensive
-data versioning system (described in more detail in our companion paper).  We
-also use the \texttt{evalcast} R package \cite{EvalcastR}, which streamlines the
+September 1 (imagine that we ``rewind'' the clock to September 1, and query the
+COVIDcast API to get the latest data it would have had available at that point
+in time.)  This is made possible by the COVIDcast API's comprehensive data  
+versioning system (described in more detail in our companion paper).  We also
+use the \texttt{evalcast} R package \cite{EvalcastR}, which streamlines the
 process of training arbitrary prediction models over a sequence of prediction
-dates, by automatically constructing the (properly-versioned) sequence of
-vintage training data sets.  
+dates, by constructing the proper sequence of vintage training data sets.   
 
 Vintage training data means different things, in practice, for different
 signals. The three signals based on medical claims, CHNG-CLI, CHNG-COVID, and
-DV-CLI, are most often 3-5 days latent, and subject to a considerable degree of
-revision or ``backfill'' after their initial publication date.  The survey-based
-signal, CTIS-CLI-in-community, is 2 days latent, and rarely undergoes any 
-revision at all.  The target itself, reported case rates (or a binary hotspot
-variable, defined based on reported case rates), is 1 day latent, and exhibits
-frequent, unpredictable revisions (sometimes clear anomalies) after initial
-publication.  Compared to the revision pattern in the medical claims signals,
-which are appears to be much more systematic, the revision pattern in the case
-rates signal can be highly erratic, resulting in big spikes as reporting
-backlogs are cleared, changes in case definitions are made, other corrections
-are applied, etc.
+DV-CLI, are most often 3-5 days latent, and subject to a considerable but
+regular degree of revision or ``backfill'' after their initial publication date.
+The survey-based signal, CTIS-CLI-in-community, is 2 days latent, and rarely
+undergoes any revision at all.  The target variable itself, reported COVID-19
+case rates, is 1 day latent, and exhibits frequent, unpredictable revisions
+(sometimes clear anomalies) after initial publication.  Compared to the revision
+pattern in the medical claims signals, which are appears to be much more
+systematic in nature, the revision pattern in the case rates signal can be
+highly erratic, resulting in big spikes as reporting backlogs are cleared,
+changes in case definitions are made, other corrections are applied, etc.  
 
-TODO What is ground truth??
-TODO Better example of backfill in DV-CLI?
+TODO Are the above problems mentioned about case rates really to do with vintage 
+data, or would they still exist in finalized data?
+
+TODO Should we discuss the use of ``bad'' case rates as ground truth?? 
+
+TODO Discuss Google-AA.  We're using all finalized data, but explain why we're
+OK with this ... (they never backfill).
+
+TODO For a figure, use Jacob's ``famous'' example of backfill in DV-CLI?   
+\url{https://cmu-delphi.github.io/covidcast/talks/ml-summit/talk.html#(20)} 
+
+\subsection{Missing Data Imputation}
+
+TODO Briefly describe that we zero-fill Google-AA.
 
 \subsection{Analysis Tasks}
 
-%\subsubsection{Forecasting Commonalities} % PNAS wants Title Caps for everything 
+The first task we consider---\textit{forecasting}---is to predict the HRR-level
+COVID-19 case incidence rates, averaged over some 7-day time period in the
+future (the average number of new daily reported cases per 100,000 people, over
+the 7-day period).  The second task---\textit{hotspot prediction}---is to
+predict a binary variable defined in terms of relative changes of the
+aforementioned target variable. Why define the target variable here via 7-day 
+averaging? The short answer is robustness: averaging stabilizes the case time
+series, and accounts for uninteresting artifacts like weekend-weekday
+differences in the series.  Note that we can of course equivalently view this
+(equivalent up to a constant factor) as predicting HRR-level COVID-19 case
+incidence rates \textit{summed} over some 7-day period in the future (the total
+number of new reported cases per 100,000 people, over the 7-day period), or
+predicting a binary variable defined in terms of its relative changes.
 
-On every day between \attn{July 1 and December 31}, we make two types of
-forecasts for each of the 306 hospital referral regions in the United States:
-(1) we forecast the seven-day trailing average of incident cases, or "smoothed
-incident cases"; and (2) we predict whether the HRR will be a hotspot, a
-location with a large increase in cases. For both tasks we try to predict the
-outcome 7, 8, 9, up to \attn{21} days into the future. For both tasks, we
-estimate a baseline global model across all HRRs using the most recent
-observation of the target, as well the observations from 1 and 2 weeks earlier.
-We train a separate model for each forecast date and for each forecast horizon,
-but we do not assume any HRR-specific effects; that is, a single global model is
-used to 
-describe all HRRs for each forecast date-horizon pair. This model is
-re-estimated for every forecast date and each future target resulting in
-\attn{$180\times 15 = 2700$} estimated baseline models for each task.  
-We then add current and lagged values (analogous to the baseline) for each of
-the four signals separately. We now provide further details on each of these
-tasks. 
+To fix notation, let $Y_{\ell,t}$ denote the 7-day trailing average of COVID-19
+case incidence rates in location (HRR) $\ell$ and at time (day) $t$.  In 
+forecasting, a time $t$, we seek to predict $Y_{\ell,t+a}$ for each ``ahead''
+value $a=7,\ldots,21$. Meanwhile, in hotspot prediction, we seek to predict
+$Z_{\ell,t+a}$, a binary indicator defined in terms of the relative difference 
+$(Y_{\ell,t+a}-Y_{\ell,t+a-7}) / Y_{\ell,t+a-7}$, again for each
+$a=7,\ldots,21$.   
 
-\subsubsection{Task 1: Case Forecasting}
+For each prediction date $t$, we use a 21-day trailing window of data to train
+our forecast or hotspot prediction models (so, e.g., the trained models will
+differ from those at prediction date $t-1$).  This is done to account for
+(potential) nonstationarity.  For simplicity, the forecasting and hotspot
+prediction models are always fit to data across all HRRs (i.e., the coefficients
+in the models do not account for location-specific effects).  
 
-To fix notation, let $Y_{\ell,t}$ denote the smoothed COVID-19 case
-incidence rate per 100,000 people for location (HRR) $\ell$ and time (day) $t$. 
-Let $X_{\ell,t}$ denote
-the one of the indicators described above, for example the Facebook \%
-CLI-in-community signal, 
-for location $\ell$ and time $t$.
-We evaluate five models of the form:
-\begin{align*}
-Y_{\ell,t+d}
-&\approx \alpha + \sum_{j=0}^2 \beta_j Y_{\ell,t-7j} \\
-Y_{\ell,t+d}
-&\approx \alpha + \sum_{j=0}^2 \beta_j Y_{\ell,t-7j} +
-\sum_{j=0}^2 \gamma_j X_{\ell,t-7j}, 
-\end{align*}
-where we also exchange $X_{\ell, t}$ for the signals from \attn{CHNG and
-  Google.} 
-Here $d=7,\ldots, 21$ depending on the target value
-(number of days ahead we predict).
+In our analysis, we let the prediction date $t$ run over each day in between
+early June and December 31, 2020.  The precise start date differs for
+forecasting and hotspots prediction; for each task it was chosen to be the
+earliest date at which the data needed to train all models was available, which
+ends up being (per our setup, with 21 days of training data, and lagged values
+of signals for features as we will detail shortly) June 6, 2020 for forecasting,
+and June 13, 2020 for hotspot prediction. (The bottleneck here is the
+CTIS-CLI-in-community signal, which does not exist before early April 2020, when
+the survey was first launched). The end date was chosen with a consideration
+again to align both tasks as best as possible, and because few hotspots exist
+post December 31, 2020, due to the general and gradual decline of the pandemic
+in 2021.
 
-Informally, the first model, which we will call the ``Cases'' model, 
-bases its predictions of future case rates on the following three features:
-current COVID-19 case rates and those 1 and 2 weeks back.
-The second model, ``Cases + Facebook'', additionally incorporates the 
-current Facebook signal and the Facebook signal from 1 and 2 weeks in the past.
-The third model, ``Cases + Google'', is exactly the same but substitutes the 
-Google signal instead of the Facebook one and similarly for ``Cases + Change''.
+\subsubsection{Task 1: Forecasting}
 
+Recall $Y_{t,\ell}$ denotes the 7-day trailing average of COVID-19 case
+incidence rates in location $\ell$ and at time $t$.  Separately for each
+$a=7,\ldots,28$, to predict $Y_{\ell,t+a}$ for ahead value $a$, we consider a
+simple probabilistic forecasting model of the form:     
+\begin{equation}
+\label{eq:forecast_ar}
+\Quantile_\tau(Y_{\ell,t+a} \,|\, Y_{\ell,s}, s \leq t)  
+= \alpha^{a,\tau} + \sum_{j=0}^2 \beta^{a,\tau}_j Y_{\ell,t-7j}.  
+\end{equation}
+This model uses current case rates, and the case rates 7 and 14 days ago, in
+order to predict (the quantiles of) case rates in the future.  We consider a
+total of 7 quantile levels (chosen in accordance with the county-level quantile
+levels suggested by the COVID-19 Forecast Hub),      
+\begin{equation}
+\label{eq:quantile_levels}
+\tau \in \{0.025, 0.1, 0.25, 0.5, 0.75, 0.9, 0.975 \}.
+\end{equation}
+To estimate the coefficients, we use \textit{quantile regression}
+\cite{Koenker:1978, Koenker:2005, Koenker:2006} fit separately for each $\tau$,
+using data from all 306 HRRs, and within each HRR, using the most recent 21 days
+of training data.  To be clear, this gives 6,426 training samples for each
+quantile regression problem. 
 
-For each model, in order to make a forecast at time $t_0$
-(to predict case rates at time $t_0+d$),
-we estimate the unknown parameters using quantile
-regression~\cite{KoenkerXiao2006}, 
-training over all locations $\ell$,
-and all times $t$ that are within the most recent 21 days of data
-available up to and including time $t_0$.
-Rather than predicting only the median (or mean) value for each forecast date
-and each horizon, we estimate seven quantiles, coinciding 
-with the county-level forecast submission guidelines for the
-COVID-19 Forecast Hub~\cite{Cramer:2021}.  These are \{0.025, 0.1,
-0.25, 0.5, 
-0.75, 0.9, 0.975\}. This provides a notion of uncertainty in the forecasts. An
-example of this type of forecast is shown in \autoref{fig:trajectory}. 
+In addition to the above ``pure'' autoregression model, we consider five
+probabilistic forecasting models of the form: 
+\begin{multline}
+\label{eq:forecast_ar_x}
+\Quantile_\tau(Y_{\ell,t+a} \,|\, Y_{\ell,s}, X_{\ell,s}, s \leq t)  
+= \\ \alpha^{a,\tau} + \sum_{j=0}^2 \beta^{a,\tau}_j Y_{\ell,t-7j} + 
+\sum_{j=0}^2 \gamma^{a,\tau}_j X_{\ell,t-7j},
+\end{multline}
+where $X_{\ell,t}$ denotes any one of the five auxiliary indicators---CHNG-CLI, 
+CHNG-COVID, CTIS-CLI-in-community, DV-CLI, or Google-AA---at location $\ell$ and
+time $t$. Note that we apply the same lags (current value, along with the values
+7 and 14 days ago) for the auxiliary signals as we do for case rates. Estimation
+proceeds just as before: we use the same 7 quantile levels as in
+\eqref{eq:quantile_levels}, and again use quantile regression separately for
+each $\tau$, fit using data from all 306 HRRs and a trailing window of 21 days
+of training data.
+
+At prediction time, in order to deal with possible crossing violations (a
+predicted quantile at level $\tau$ exceeds a predicted quantile at level $\tau'
+> \tau$), we apply a simple post-hoc sorting.  See Figure \ref{fig:trajectory}
+for example forecast. 
 
 \begin{figure}[tb!]
-    \centering
-    \includegraphics[width=.9\linewidth]{fig/trajectory.pdf}
-    \caption{Forecasts and observed cases for HRR x. \attn{Create a figure here
-        for 1 HRR. Show the fan for the quantiles.}} 
-    \label{fig:trajectory}
+\centering
+\includegraphics[width=\columnwidth]{fig/trajectory.pdf}
+\caption{Forecasts and observed cases for HRR x. TODO 
+  \attn{Create a figure here for 1 HRR. Show the fan for the quantiles.}}  
+\label{fig:trajectory}
 \end{figure}
-
-
-
-
-% Noncrossing is enforced via post hoc ordering.
 
 \subsubsection{Task 2: Hotspot Prediction}
 
-We also examine whether alternative indicators help in predicting hotspots. On a
-given date, we say an HRR is a hotspot if the average number of observed cases
-over the past 7 days has increased by at least $25$\% compared to the preceding
-week. We remove all data where, on average, fewer than $30$ cases were observed
-over the preceding $7$ days. Thus, hotspot status can be represented by a
-$\{0,1\}$-valued variable, and hotspot prediction is a binary classification
-problem.  
-
-As in the case forecasting task, in hotspot prediction we train models that use
-previously observed values of cases and alternative indicators as features to
-predict a response (in our case, hotspot status). In addition to the differently
-defined response, there are two other differences between the hotspot prediction
-and case forecasting tasks. First, in hotspot prediction we always use relative
-changes in previous observed cases/indicators as features. That is, rather than
-$Y_{t,\ell}$ we use 
+Define the binary indicator:
 $$
-Y^\Delta_{\ell,t} = \frac{Y_{\ell,t} - Y_{\ell,
-    t-7}}{Y_{\ell,t-7}}\quad\text{and}\quad X^\Delta_{\ell,t} =
-\frac{X_{\ell,t} - X_{\ell, t-7}}{X_{\ell,t-7}} 
-$$ 
-Second, because hotspot prediction is a binary classification problem, we
-estimate the parameters $\alpha$, $\beta$ and $\gamma$ by logistic regression
-rather than quantile regression. 
+Z_{t,\ell} = \indicator{Y^\Delta_{\ell,t} \geq 0.25},
+$$
+where we use the notation \smash{$Y^\Delta_{\ell,t} = (Y_{\ell,t} - Y_{\ell,
+    t-7})/(Y_{\ell,t-7})$}. In other words, $Z_{t,\ell}=1$ if the number of
+newly reported cases over the past 7 days has increased by at least 25\%
+compared to the preceding week.  When this occurs, we call location $\ell$ a
+\textit{hotspot} at time $t$. 
+
+We treat hotspot prediction as a binary classification problem and use a setup 
+altogether quite similar to the forecasting setup described previously.
+Separately for each $a=7,\ldots,28$, to predict $Z_{\ell,t+a}$, we consider a
+simple logistic model:
+\begin{equation}
+\label{eq:hotspot_ar}
+\logit(Z_{\ell,t+a} \,|\, Y_{\ell,s}, s \leq t)  
+= \alpha^{a,\tau} + \sum_{j=0}^2 \^{a,\tau}_j Y^\Delta_{\ell,t-7j}.  
+\end{equation}
+In addition to this ``pure'' autoregression model, we also consider five
+logistic models of the form: 
+\begin{multline}
+\label{eq:hotspot_ar_x}
+\logit(Z_{\ell,t+a} \,|\, Y_{\ell,s}, X_{\ell,s}, s \leq t)  
+= \\ \alpha^{a,\tau} + \sum_{j=0}^2 \beta^{a,\tau}_j Y_{\ell,t-7j} + 
+\sum_{j=0}^2 \gamma^{a,\tau}_j X_{\ell,t-7j},
+\end{multline}
+where we use \smash{$X^\Delta_{\ell,t} = (X_{\ell,t} - X_{\ell,
+    t-7})/(X_{\ell,t-7})$}, and again $X_{\ell,t}$ stands for any of the five  
+auxiliary indicators at location $\ell$ and time $t$.  We fit all models
+\eqref{eq:hotspot_ar}, \eqref{eq:hotspot_ar_x} using logistic regression, 
+pooling all 306 HRRs and using a 21-day trailing window for the training data.   
+
+An important detail is that in hotspot prediction we remove all data from
+training and evaluation where, on average, fewer than 30 cases (this refers to a
+count, not a rate) are observed over the preceding 7 days. This avoids having to
+make arbitrary calls for a hotspot (or lack thereof) based on small counts.   
 
 \subsection{Evaluation Metrics}
 
@@ -497,9 +540,9 @@ forecasting and hotspots
 
 \section{Results}
 
-Code to reproduce all examples (which uses the
-\texttt{evalcast} R package and fetches data directly from the API) can be
-found at \url{TODO}.
+Code to reproduce all results (which uses the \texttt{evalcast} R package) can 
+be found at
+\url{https://www.github.com/cmu-delphi/covidcast-pnas/forecast/code/}. 
 
 \subsection{Primary Results}
 

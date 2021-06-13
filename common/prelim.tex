@@ -1,5 +1,7 @@
 % Math
-\DeclareMathOperator{\cor}{cor}
+\def\cor{\mathrm{cor}}
+\def\Quantile{\mathrm{Quantile}}
+\def\logit{\mathrm{logit}}
 
 % Figures and tables
 \usepackage{booktabs}
@@ -12,6 +14,8 @@
 \makeatletter 
 \renewcommand\@biblabel[1]{#1} 
 \makeatother
+
+
 
 \newcommand{\indicator}[1]{\mathbf{1}\left(#1\right)}
 
