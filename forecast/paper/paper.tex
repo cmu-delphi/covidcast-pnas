@@ -129,7 +129,7 @@ latency and/or revision. For example, a signal based on aggregated medical
 insurance claims may be available after just a few days, but it can then be
 substantially revised over the next several weeks as additional claims are
 submitted and/or processed late. Correlations between such a signal and case
-rates calculated ``after the fact'' (computed retrospectively, using the
+rates calculated ``after the fact'' (i.e., computed retrospectively, using the
 finalized values of this signal) will not deliver an honest answer to the    
 question of whether this signal would have been useful in real time. Instead,
 we build predictive models using only the data that would have been available
@@ -138,51 +138,17 @@ of accuracy. To do so, we leverage Delphi's \texttt{evalcast} R package
 \cite{EvalcastR}, which plugs into the COVIDcast API's data versioning system,  
 and facilitates honest backtesting. 
 
-% Furthermore, adopting this practically-oriented forecasting
-% perspective to indicator evaluation requires one to confront
-% fundamental limitations inherent to public health surveillance
-% systems.  In particular, many reporting systems are plagued by
-% latency, with delays in reporting that can sometimes span
-% multiple weeks.  Latency manifests itself in different ways in different data sources.  Some data sources may only make a signal available one week after the date it describes; other
-% data sources may provide immediate imperfect initial estimates, which are
-% gradually ``backfilled'' over a period of days, weeks, or months (in which previous estimates are updated as new
-% data trickle in).  And few of
-% these latency patterns are stable or predictable, with holidays,
-% extreme weather events, and changes in the reporting process all
-% affecting the dynamics of the delay process.  To fully and accurately
-% understand an indicator's usefulness for forecasting requires
-% accounting for the unfortunate reality of data latency.
-
-% Examining the importance of additional features for prediction is a core question
-% in inferential statistics, and there are many ways to examine this question
-% under a variety of assumptions. For time series, work in
-% this area can be traced at least to Granger causality~\cite{GrangerCausality} and
-% related multivariate extensions~\cite{GewekeTimeSeries} under the condition 
-% that the series are linearly related autoregressions among other assumptions.
-% These techniques are especially popular in econometrics and neuroscience~\cite{mccracken2007asymptotics,NeuroscienceGranger}.
-
-% We choose to take a
-% predictive angle, which is simple but also fairly robust, compared to various
-% other classical inferential approaches. In fact, drawing rigorous inference based on
-% predictions, without (or with lean) assumptions, is an active field of
-% research~\cite{dai2021significance,fryer2021shapley,zhang2020floodgate,williamson2020unified}.
-% Nonetheless, the predictive approach directly examines the target of interest: do
-% these signals help to produce forecasts? Furthermore, directly comparing
-% forecast errors without strong assumptions through tests of predictive accuracy
-% are common in epidemiology, econometrics, and other
-% fields~\cite{DieboldMarianoTest,DieboldRetrospective}. 
-
-% - then make the broad point that "feature importance" is a core question in
-% statistics, and there are many ways to look at it and lots of literature (cite
-% a bunch fo stuff).  We choose to take a predictive angle, which is simple but
-% also fairly robust, compared to various other classical inferential approaches
-% that make lots of assumptions.  In fact, drawing rigorous inference based on
-% predictions, without (or with lean) assumptions, is an active field of
-% research.  Cite several papers (Jing's conformal paper that describes LOCO,  
-% commentary by Ale, Ryan, Larry in Stat Sci, a bunch of model X stuff including
-% Lukas Janson's recent paper, Eugene + Aaditya's recent paper?).  Larry has put
-% some references in the bib.  Put more if we can find them, especially on time
-% series. 
+Finally, it is worth noting that examining the importance of additional features
+for prediction is a core question in inferential statistics and econometrics,
+with work dating back to at least \cite{Granger:1969}. Still today, drawing
+rigorous inference based on predictions, without (or with lean) assumptions, is
+an active field of research from both the applied and theoretical angles;
+see, e.g., \cite{Diebold:2002, McCraken:2007, Diebold:2015, Stokes:2017,
+  Lei:2018, Rinaldo:2019, Williamsom:2020, Zhang:2020, Dai:2021, Fryer:2021}.
+Our take on this problem is in line with much of this literature; however, in
+order to avoid making any explicit assumptions, we do attempt to make explicit
+significance statements, and instead, broadly examine the stability of our
+conclusions with respect to numerous modes of analysis.   
 
 \section{Methods}
 
@@ -264,6 +230,13 @@ use the \texttt{evalcast} R package \cite{EvalcastR}, which streamlines the
 process of training arbitrary prediction models over a sequence of prediction
 dates, by constructing the proper sequence of vintage training data sets.   
 
+\begin{figure}[tb!]
+\centering
+\includegraphics[width=\columnwidth]{fig/vintage.pdf}
+\caption{TODO}
+\label{fig:vintage}
+\end{figure}
+
 Vintage training data means different things, in practice, for different
 signals. The three signals based on medical claims, CHNG-CLI, CHNG-COVID, and
 DV-CLI, are most often 3-5 days latent, and subject to a considerable but
@@ -279,10 +252,8 @@ definitions are made, etc. Groups like JHU CSSE then work tirelessly to correct
 such anomalies after first publication (e.g., they will attempt to
 back-distribute a spike when a reporting backlog is cleared, by working with a
 local authority to figure out how this should best be done), which can result
-in very nontrivial and often unpredictable revisions.      
-
-TODO For a figure, use Jacob's ``famous'' example of backfill in DV-CLI?   
-\url{https://cmu-delphi.github.io/covidcast/talks/ml-summit/talk.html#(20)} 
+in very nontrivial and often unpredictable revisions.  See Figure
+\ref{fig:vintage} for an example.
 
 Lastly, our treatment of the Google-AA signal is different from the rest.
 Because Google's team did not start publishing this signal until early
@@ -385,7 +356,7 @@ using data from all 306 HRRs, and within each HRR, using the most recent 21 days
 of training data.  This gives us 6,426 training samples for each quantile 
 regression problem.    
 
-In addition to the above ``pure'' autoregression model, we consider five
+In addition to the above ``pure'' autoregressive model, we consider five
 probabilistic forecasting models of the form: 
 \begin{multline}
 \label{eq:forecast_ar_x}
@@ -437,7 +408,7 @@ simple logistic model:
 \logit(Z_{\ell,t+a} \,|\, Y_{\ell,s}, s \leq t)  
 = \alpha^{a,\tau} + \sum_{j=0}^2 \^{a,\tau}_j Y^\Delta_{\ell,t-7j}.  
 \end{equation}
-In addition to this ``pure'' autoregression model, we also consider five
+In addition to this ``pure'' autoregressive model, we also consider five
 logistic models of the form: 
 \begin{multline}
 \label{eq:hotspot_ar_x}
@@ -536,9 +507,9 @@ to attempt to estimate their finalized values based on vintage data---a problem
 we refer to as \textit{nowcasting}---as a pre-processing step before using them
 as features in the models in \eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar_x}. 
 Nowcasting is itself a highly nontrivial modeling problem, and we do not attempt
-it in this paper (though it is a topic of ongoing work in our research group).
-We do note, however, that this would likely improve the performance of the
-models involving claims-based indicators in particular.   
+it in this paper (it is a topic of ongoing work in our research group), but we
+note that nowcasting would likely improve the performance of the models
+involving claims-based signals in particular.        
 
 \paragraph{Spatial Heterogeneity} 
 
@@ -549,13 +520,75 @@ underlying search trends time series is self-normalized, see
 \cite{GoogleSymptoms}) and of the claims-based signals (see the discussion in
 our companion paper on the API and database).  Such spatial heterogeneity likely
 hurts the performance of the predictive models that rely on these signals,
-since the models are trained by pooling data from all locations.  In this paper,
-we do not attempt to address this issue (it is again a topic of ongoing work in
-our research group), and we simply note that location-specific effects (or 
-pre-processing to remove spatial bias) would likely improve the performance of
-the models involving Google-AA and the claims-based indicators.
+as we train the models on data pooled over all locations.  In the current 
+paper, we do not attempt to address this issue (it is again a topic of ongoing
+work in our group), and we simply note that location-specific effects
+(or pre-processing to remove spatial bias) would likely improve the performance 
+of the models involving Google-AA and the claims-based indicators.
 
 \section{Results}
+
+We begin with a summary of the high-level conclusions.  Here, and in the
+following subsections, we will use ``AR'' to refer to the pure autoregressive
+model both in forecasting \eqref{eq:forecast_ar} and in hotspot prediction
+\eqref{eq:hotspot_ar} (where the reference to the task should be clear from the
+context). We will also use the name of an auxiliary indicator---``CHNG-CLI'', 
+``CHNG-CLI'', ``CHNG-COVID'', ``CTIS-CLI-in-community'', ``DV-CLI'', or
+``Google-AA''---interchangeably with the model in forecasting
+\eqref{eq:forecast_ar_x} or hotspot prediction \eqref{eq:hotspot_ar_x} that uses
+this particular indicator as a feature (the meaning should be clear from the
+context).  So, e.g., the CHNG-CLI model in forecasting is the one in
+\eqref{eq:forecast_ar_x} that sets $X_{\ell,t}$ to be the value of the CHNG-CLI
+indicator at location $\ell$ and time $t$, fits the coefficients based on the
+training data, and makes its predictions by setting $X_{\ell,t}$ to the
+appropriate CHNG-CLI values.  Finally, we use the term ``indicator model'' to 
+broadly refer to any one of the ten models of the form \eqref{eq:forecast_ar_x},
+\eqref{eq:hotspot_ar_x} (five in each of the forecasting and hotspot prediction
+tasks).
+
+\begin{itemize}
+\item Stratifying predictions by the ahead value ($a=7,\ldots,21$), and
+  aggregating results over the prediction period (early June through end of
+  December 2020), each of the indicator models generally gives a boost in
+  predictive accuracy over the AR model, in both the forecasting and hotspot 
+  prediction tasks.  The gains in accuracy generally attenuate as the ahead 
+  value grows. 
+
+\item In the same aggregate view, CHNG-COVID and DV-CLI offer the biggest 
+  gains in each of forecasting and hotspot prediction.  CHNG-CLI is
+  inconsistent: it provides a big gain in hotspot prediction, but little gain 
+  in forecasting (it seems to be hurt by a notable lack of robustness, due
+  to backfill).  CTIS-CLI-in-community and Google-AA each provide decent 
+  gains in forecasting and hotspot prediction.  The former's performance in 
+  forecasting is notable in that it clearly improves on AR even at the largest
+  ahead values.   
+
+\item In a more detailed analysis of forecasting performance, the indicator
+  models tend to be worse than AR when case rates are increasing (this is most
+  notable in CHNG-CLI and DV-CLI), and better than AR when case rates are flat
+  or decreasing (most notable in CHNG-COV and CTIS-CLI-in-community).
+  More rarely does an indicator model tend to beat AR when case rates are
+  increasing, but there appears to be some evidence of this for Google-AA. 
+  % In an increasing period, when an indicator model is worse than AR, it tends
+  % to underpredict relative to AR (its median forecast is lower).  In a flat
+  % or decreasing  period, when an indicator model is better than AR, AR tends
+  % to overpredict relative to it (the median AR forecast is higher).   
+
+\item In this same analysis, when an indicator model performs better than AR  
+  in a decreasing period, this tends to co-occur with instances in which the
+  indicator ``leads'' case rates (meaning, roughly, on a short-time scale in a
+  given location, its behavior mimics that of case rates some number of days
+   ahead).  On the other hand, neither leading nor lagging behavior tend to
+  co-occur as consistently with an indicator model doing better in periods of
+  increase, or worse in periods of increase or decrease.  
+\end{itemize}
+
+Finally, to quantify the importance of training and making predictions using
+proper vintage data, we ran a parallel set of forecasting and hotspot prediction 
+experiments using finalized data. The results, given in the supplement, show
+that training and making predictions on finalized data can result in grossly
+optimistic estimates of true test-time performance (up to 10\% better in terms
+of average WIS or AUC).
 
 Code to reproduce all results (which uses the \texttt{evalcast} R package) can 
 be found at
