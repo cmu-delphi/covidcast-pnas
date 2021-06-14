@@ -310,16 +310,24 @@ have additional restrictions imposed by the data source; see
 
 \subsection{Interactive Visualization}
 
-% RJT: @AR I'm now thinking we should add a very short paragraph or two on
-% this. We can say that we provide various interactive maps highlighting both
-% temporal (time series) and spatial aspects (choropleth or beehive maps), but
-% also exploratory tools for correlations and anomalies.  (Very much like the
-% correlations computed in the next section.)
+Since April 2020, Delphi has been maintaining and continually improving various
+online visualization tools for the COVIDcast indicators \cite{CovidcastViz}.
+These tools fetch data directly from the API, and allow for exploration of both 
+temporal (e.g., time series graphs) and spatial (e.g., choropleth maps) trends
+in the signals, as well as many other aspects, such as correlations, anomalies,
+and backfill.  There is also a dedicated dashboard for exploring results from
+the COVID Tracking and Impact Survey.   
 
-% Another reason why I'm in favor of this is that we can now add everybody as a
-% middle author who now contributed anything at all to COVIDcast, from database
-% to API to indicator to visualization.  I'm sure the HCII students & faculty
-% who worked with us would very much appreciate being on this paper.
+\subsection{COVID-19 Forecasting Systems} 
+
+Since July 2020, Delphi has been regularly submitting short-term forecasts of
+COVID-19 case and death incidence, at the state and county levels, to the
+COVID-19 Forecast Hub \cite{ForecastHub}, under the name ``CMU-TimeSeries''.
+Building, training, and deploying our forecasting models leverages much of the
+infrastructure described in this paper (such as the COVIDcast API's \textit{as
+  of} feature), and some of our forecasting models rely on auxiliary indicators
+(such as survey-based and claims-based COVID-like illness indicators, described
+below, which we have used in case forecasting). 
 
 \section{Results}
 
@@ -334,17 +342,16 @@ numerous analyses studying the impacts of COVID-19 on the public, the
 effectiveness of policy interventions, and factors that influenced the spread of
 the pandemic \cite{Adjodah:2021, Pierri:2021, Jewell:2021, Chakrabarti:2020,
   Doerr:2021}. The API currently serves hundreds of thousands of requests to
-thousands of users, each day.
+thousands of users every day.
 
-In what follows, we present illustrative examples of the usefulness of some of
-the novel signals available in the API. These examples demonstrate that such
-indicators are meaningfully related to COVID activity, that they provide
-alternate views on pandemic activity that are not subject to the same reporting
-glitches and delays as traditional public health surveillance streams, and that
-they provide information about public behavior and attitudes that are not
-available from any other source. Code to reproduce all examples (which uses the
-\texttt{covidcast} R package and fetches data directly from the API) can be
-found at
+In what follows, we present examples of the usefulness of some of the novel
+signals available in the API. These examples demonstrate that such indicators
+are meaningfully related to COVID activity, that they provide alternate views on
+pandemic activity that are not subject to the same reporting glitches and delays
+as traditional public health surveillance streams, and that they provide
+information about public behavior and attitudes that are not available from any
+other source. Code to reproduce all examples (which uses the \texttt{covidcast}
+R package and fetches data directly from the API) can be found at
 \url{https://www.github.com/cmu-delphi/covidcast-pnas/indicators/code/}. 
 
 \subsection{Tracking Trends}
@@ -362,7 +369,7 @@ found at
 
 Many of the indicators in the COVIDcast API are intended to track COVID
 activity. Five indicators in particular have the closest connections to
-confirmed COVID cases:
+confirmed cases:
 \begin{itemize}
 \item Change Healthcare COVID-like illness (CHNG-CLI): The percentage of
   outpatient visits that are primarily about COVID-related symptoms, based on
@@ -409,6 +416,14 @@ companion paper.
 
 \subsection{Correlation Analyses}
 
+\begin{figure}[t]
+  \includegraphics[width=\columnwidth]{fig/geo_wise_corr.pdf}
+  \caption{Geo-wise correlations with case rates, from April 15, 2020 to April
+    15, 2021, calculated over all counties for which all signals were available
+    and which had at least 500 cumulative cases by the end of this period.}
+ \label{fig:geo_wise_correlation}
+\end{figure}
+
 To quantify the ability of the signals described above to track trends in COVID
 cases, we use the Spearman (rank) correlation and analyze two key correlation
 patterns, between each signal and confirmed COVID case rates (cases per 100,000
@@ -429,36 +444,18 @@ people):
   over time correspond to changes in reported cases at the same location.
 \end{enumerate}
 
-\begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/geo_wise_corr.pdf}
-  \caption{Geo-wise correlations with case rates, from April 15, 2020 to April
-    15, 2021, calculated over all counties for which all signals were available
-    and which had at least 500 cumulative cases by the end of this period.}
- \label{fig:geo_wise_correlation}
-\end{figure}
-
 Figure~\ref{fig:geo_wise_correlation} shows the geo-wise correlations achieved
 by the five signals and COVID case rates (from USAFacts, and again smoothed
 using a 7-day trailing average), from April 15, 2020 to April 15, 2021. The
 locations we consider here are counties with at least 500 cumulative cases by
 the end of this period, and at which all signals are available (956 counties in
-total). The  significantly positive correlations suggest that these signals
+total). The  significantly positive correlations suggest that these signals 
 could be useful in hotspot detection  (identifying counties with relatively high
 COVID activity, at a given time). Somewhat surprisingly, the CLI-in-community
 signal derived from the survey shows the strongest correlations for much of the
 time period. This clearly demonstrates the value of a large-scale survey such as
 CTIS for tracking symptoms and case trends, especially when other data is
 unavailable.
-
-Figure~\ref{fig:time_wise_correlation} summarizes time-wise correlations of
-these five signals over the same time period, and for the same set of
-counties. For each signal, we display the set correlations that it achieves in
-histogram form (more precisely, using a kernel density estimate). All signals
-produce positive correlations in the majority of counties considered (with very
-little mass in each estimated density being to the left of zero). The largest
-correlations, in bulk, are achieved by the CHNG-COVID signal; the
-CTIS-CLI-in-community is a close second, and the CHNG-CLI signal is third.
-There are two remarks deserving attention:
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/time_wise_correlation.pdf}
@@ -467,6 +464,16 @@ There are two remarks deserving attention:
     and which had at least 500 cumulative cases by the end of this period.}
   \label{fig:time_wise_correlation}
  \end{figure}
+
+Figure~\ref{fig:time_wise_correlation} summarizes time-wise correlations from 
+these five signals over the same time period, and for the same set of
+counties. For each signal, we display the set correlations that it achieves in
+histogram form (more precisely, using a kernel density estimate). All signals
+produce positive correlations in the majority of counties considered (with very
+little mass in each estimated density being to the left of zero). The largest
+correlations, in bulk, are achieved by the CHNG-COVID signal; the
+CTIS-CLI-in-community is a close second, and the CHNG-CLI signal is third.
+There are two remarks deserving attention:
 
 \begin{itemize}
 \item This is different from what is observed in
@@ -477,14 +484,26 @@ There are two remarks deserving attention:
   claims signals (CHNG-COVID and CHNG-CLI) seem more appropriate for
   temporal---rather than spatial---comparisons.  We revisit this point in the
   discussion.
-\item It is still quite impressive and surprising that the CTIS-CLI-in-community
-  signal, based on people reporting on the symptoms of others around them, can
-  achieve  nearly as strong time-wise correlations to confirmed cases as can a
-  signal that is based on picking up the occurrence of a confirmed case passing
-  through the outpatient system.
+\item It is still quite impressive (and surprising) that the
+  CTIS-CLI-in-community signal, based on people reporting on the symptoms of
+  others around them, can achieve  nearly as strong time-wise correlations to
+  confirmed cases as can a signal that is based on picking up the occurrence of
+  a confirmed case passing through the outpatient system.
 \end{itemize}
 
 \subsection{Helping Robustness}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{fig/bexar_compare.pdf}
+  \caption{Reported cases per day in Bexar County, Texas during the summer of
+    2020. Only July 16, 4,810 backlogged cases were reported, though they
+    actually occurred over the preceding two weeks (this shows up as a prolonged
+    spike in the left panel due to the 7-day trailing averaging applied to the
+    case counts). Daily CTIS estimates of CLI-in-community showed more stable
+    underlying trends.}
+  \label{fig:bexar-compare}
+\end{figure}
 
 Public health reporting of COVID tests, cases, deaths, and hospitalizations is
 subject to a number of possible delays and problems. For example, COVID testing
@@ -528,28 +547,7 @@ reporting problems have occurred in many jurisdictions across the United States,
 making it valuable to cross-check against external sources not part of the same
 reporting systems.
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\columnwidth]{fig/bexar_compare.pdf}
-  \caption{Reported cases per day in Bexar County, Texas during the summer of
-    2020. Only July 16, 4,810 backlogged cases were reported, though they
-    actually occurred over the preceding two weeks (this shows up as a prolonged
-    spike in the left panel due to the 7-day trailing averaging applied to the
-    case counts). Daily CTIS estimates of CLI-in-community showed more stable
-    underlying trends.}
-  \label{fig:bexar-compare}
-\end{figure}
-
 \subsection{Revisions Matter}
-
-The revision tracking feature in the API assists in model-building and
-evaluation. Figure~\ref{fig:dv_as_of} illustrates how one COVIDcast medical
-claims signal evolved as it was revised across multiple issue dates, in four
-different states, between June 1 and August 1, 2020. In each plot, the rightmost
-ends of the lines correspond to estimates for the last day that data are
-available for each issue date, which are generally the most tentative estimates,
-and appear to be significantly biased upward in Arizona in June 2020, and
-significantly biased downward in New York throughout June and July 2020.
 
 \begin{figure}[t]
 \centering
@@ -559,6 +557,15 @@ significantly biased downward in New York throughout June and July 2020.
   additional data and revising past data from prior issue dates.}
 \label{fig:dv_as_of}
 \end{figure}
+
+The revision tracking feature in the API assists in model-building and
+evaluation. Figure~\ref{fig:dv_as_of} illustrates how one COVIDcast medical
+claims signal evolved as it was revised across multiple issue dates, in four
+different states, between June 1 and August 1, 2020. In each plot, the rightmost
+ends of the lines correspond to estimates for the last day that data are
+available for each issue date, which are generally the most tentative estimates,
+and appear to be significantly biased upward in Arizona in June 2020, and
+significantly biased downward in New York throughout June and July 2020.
 
 Claims-based signals typically undergo heavy backfill as additional claims are
 processed and errors are corrected; the median relative error between initial
