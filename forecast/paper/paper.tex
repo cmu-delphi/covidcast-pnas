@@ -405,14 +405,16 @@ Separately for each $a=7,\ldots,28$, to predict $Z_{\ell,t+a}$, we consider a
 simple logistic model:
 \begin{equation}
 \label{eq:hotspot_ar}
-\logit(Z_{\ell,t+a} \,|\, Y_{\ell,s}, s \leq t)  
-= \alpha^{a,\tau} + \sum_{j=0}^2 \^{a,\tau}_j Y^\Delta_{\ell,t-7j}.  
+\logit \big( \P(Z_{\ell,t+a} = 1 \,|\, Y_{\ell,s}, s \leq t) \big) 
+= \alpha^{a,\tau} + \sum_{j=0}^2 \^{a,\tau}_j Y^\Delta_{\ell,t-7j},
 \end{equation}
+where $\logit(p) = \log(p/(1-p))$, the log-odds of $p$.
+
 In addition to this ``pure'' autoregressive model, we also consider five
-logistic models of the form: 
+logistic models of the form:  
 \begin{multline}
 \label{eq:hotspot_ar_x}
-\logit(Z_{\ell,t+a} \,|\, Y_{\ell,s}, X_{\ell,s}, s \leq t)  
+\logit \big( \P(Z_{\ell,t+a} = 1 \,|\, Y_{\ell,s}, X_{\ell,s}, s \leq t) \big)
 = \\ \alpha^{a,\tau} + \sum_{j=0}^2 \beta^{a,\tau}_j Y^\Delta_{\ell,t-7j} +  
 \sum_{j=0}^2 \gamma^{a,\tau}_j X^\Delta_{\ell,t-7j},
 \end{multline}
@@ -542,17 +544,17 @@ context).  So, e.g., the CHNG-CLI model in forecasting is the one in
 indicator at location $\ell$ and time $t$, fits the coefficients based on the
 training data, and makes its predictions by setting $X_{\ell,t}$ to the
 appropriate CHNG-CLI values.  Finally, we use the term ``indicator model'' to 
-broadly refer to any one of the ten models of the form \eqref{eq:forecast_ar_x},
-\eqref{eq:hotspot_ar_x} (five in each of the forecasting and hotspot prediction
-tasks).
+refer to any one of the ten models of the form \eqref{eq:forecast_ar_x},
+\eqref{eq:hotspot_ar_x} (five from each of the forecasting and hotspot
+prediction tasks).
 
 \begin{itemize}
 \item Stratifying predictions by the ahead value ($a=7,\ldots,21$), and
   aggregating results over the prediction period (early June through end of
-  December 2020), each of the indicator models generally gives a boost in
-  predictive accuracy over the AR model, in both the forecasting and hotspot 
-  prediction tasks.  The gains in accuracy generally attenuate as the ahead 
-  value grows. 
+  December 2020), we find that each of the indicator models generally gives a
+  boost in predictive accuracy over the AR model, in both the forecasting and
+  hotspot prediction tasks.  The gains in accuracy generally attenuate as the
+  ahead value grows. 
 
 \item In the same aggregate view, CHNG-COVID and DV-CLI offer the biggest 
   gains in each of forecasting and hotspot prediction.  CHNG-CLI is
@@ -563,24 +565,25 @@ tasks).
   forecasting is notable in that it clearly improves on AR even at the largest
   ahead values.   
 
-\item In a more detailed analysis of forecasting performance, the indicator
-  models tend to be worse than AR when case rates are increasing (this is most
-  notable in CHNG-CLI and DV-CLI), and better than AR when case rates are flat
-  or decreasing (most notable in CHNG-COV and CTIS-CLI-in-community).
-  More rarely does an indicator model tend to beat AR when case rates are
-  increasing, but there appears to be some evidence of this for Google-AA. 
+\item In a more detailed analysis of forecasting performance, we find that the
+  indicator models tend to be worse than AR when case rates are increasing (this
+  is most notable in CHNG-CLI and DV-CLI), and better than AR when case rates
+  are flat or decreasing (most notable in CHNG-COVID and CTIS-CLI-in-community).
+  More rarely does an indicator model tend to beat AR when case rates are 
+  increasing, but there appears to be some evidence of this for the Google-AA
+  model. 
   % In an increasing period, when an indicator model is worse than AR, it tends
   % to underpredict relative to AR (its median forecast is lower).  In a flat
-  % or decreasing  period, when an indicator model is better than AR, AR tends
+  % or decreasing period, when an indicator model is better than AR, AR tends
   % to overpredict relative to it (the median AR forecast is higher).   
 
-\item In this same analysis, when an indicator model performs better than AR  
-  in a decreasing period, this tends to co-occur with instances in which the
+\item In this same analysis, when an indicator model performs better than AR in
+  a decreasing period, this tends to co-occur with instances in which the
   indicator ``leads'' case rates (meaning, roughly, on a short-time scale in a
   given location, its behavior mimics that of case rates some number of days
-   ahead).  On the other hand, neither leading nor lagging behavior tend to
+  ahead).  On the other hand, neither leading nor lagging behavior tend to
   co-occur as consistently with an indicator model doing better in periods of
-  increase, or worse in periods of increase or decrease.  
+  increase, or worse in periods of increase or decrease.   
 \end{itemize}
 
 Finally, to quantify the importance of training and making predictions using
@@ -593,6 +596,43 @@ of average WIS or AUC).
 Code to reproduce all results (which uses the \texttt{evalcast} R package) can 
 be found at
 \url{https://www.github.com/cmu-delphi/covidcast-pnas/forecast/code/}. 
+
+\subsection{Aggregate Results by Ahead Value}
+
+
+
+\subsection{Implicit Regularization Hypothesis}
+
+
+---which is that 
+  defining features from lagged indicator values in the  models in
+  \eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar_x} simply provides a kind of
+  implicit regularization on top of the basic AR model (so the benefits have
+  nothing to do with the actual indicator values)---
+
+
+To test the ``implicit regularization'' hypothesis (which we explain
+  precisely later), we reran all of the prediction experiments but with
+  $X_{\ell,t}$ in each indicator model replaced by suitable random noise.  This 
+  resulted in vastly different (worse) performance compared to the indicator
+  models fit with actual indicator values, and gave no improvement over the 
+  pure AR model, in both forecasting and hotspot prediction, providing a strong
+  rejection (informally speaking) of the implicit regularization hypothesis.  
+
+\subsection{Performance in Up, Down, Flat Periods}
+
+\subsection{Leading-ness or Lagging-ness}
+
+TODO
+
+
+% TODO: make th 
+
+A Primary 
+B Bootstrap
+C up/down/flat (Dan's first histogram) --> table in appendix
+D leading/lagging 
+
 
 \subsection{Primary Results}
 
