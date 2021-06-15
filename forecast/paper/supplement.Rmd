@@ -1,0 +1,546 @@
+---
+bibliography: [../../common/covidcast.bib]
+output: 
+  pdf_document:
+    keep_tex: true
+    template: pnas-suppl-template.tex
+params:
+  fd_casefloor: 30
+  flag_jumps: 15
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.width = 5, fig.height = 3,
+                      fig.align = "center",
+                      fig.path = "fig/",
+                      cache = TRUE, 
+                      autodep = TRUE,
+                      message = FALSE, 
+                      warning = FALSE)
+source("eval_funs.R")
+source("hotspot_funs.R")
+source("trajectory_plots.R")
+library(scales)
+path_to_data <- "~/Documents/COVID-Delphi/fcast-indicators-paper/temp_data/"
+```
+
+```{r data-loading}
+actuals <- readRDS(file.path(path_to_data, "actuals.RDS"))
+fcasts_honest <- readRDS(file.path(path_to_data, "results_honest.RDS")) %>%
+  process_res_cases(actuals) %>%
+  filter(forecaster != "gs_inherit") 
+fcasts_finalized <- readRDS(file.path(path_to_data, "results_dishonest.RDS")) %>%
+  process_res_cases(actuals) %>%
+  filter(forecaster != "gs_inherit")
+hotspots_honest <- readRDS(file.path(path_to_data, "hotspots_honest.RDS")) %>%
+  process_res_hotspots() %>%
+  filter(forecaster != "gs_inherit")
+hotspots_finalized <- readRDS(
+  file.path(path_to_data, "hotspots_dishonest.RDS")) %>%
+  process_res_hotspots() %>%
+  filter(forecaster != "gs_inherit")
+cases7dav <- readRDS(file.path(path_to_data, "cases7dav.RDS")) %>%
+  rename(case_num = value)
+if (params$fd_casefloor >= 0) {
+  fcasts_honest <- filter_case_floor(fcasts_honest, cases7dav, params)
+  fcasts_finalized <- filter_case_floor(fcasts_finalized, cases7dav, params)
+}
+if (params$flag_jumps > 0) {
+  fcasts_honest <- filter_jumps(fcasts_honest, actuals, params)
+  fcasts_finalized <- filter_jumps(fcasts_finalized, actuals, params)
+  hotspots_honest <- filter_jumps(hotspots_honest, actuals, params)
+  hotspots_finalized <- filter_jumps(hotspots_finalized, actuals, params)
+}
+```
+
+```{r gs-processing}
+# only honest
+fcasts_gs <- intersect_averagers(
+  fcasts_honest, "forecaster", 
+  c("geo_value", "ahead", "forecast_date", "target_end_date")) %>%
+  filter(forecaster != "gs_subset") %>%
+  mutate(forecaster = recode(forecaster, gs = "Google-AA"))
+fcasts_honest <- filter(fcasts_honest, forecaster != "gs_subset") %>%
+  mutate(forecaster = recode(forecaster, gs = "Google-AA"))
+fcasts_finalized <- filter(fcasts_finalized, forecaster != "gs_subset")%>%
+  mutate(forecaster = recode(forecaster, gs = "Google-AA"))
+hotspots_gs <- intersect_averagers(
+  hotspots_honest %>% filter(!is.na(value), !is.na(actual)), 
+  "forecaster", 
+  c("geo_value", "ahead", "forecast_date", "target_end_date")) %>%
+  filter(forecaster != "gs_subset") %>%
+  mutate(forecaster = recode(forecaster, gs = "Google-AA"))
+hotspots_honest <- intersect_averagers( # Deal with DV NaN's
+  hotspots_honest %>% 
+    filter(! is.na(value), !is.na(actual), forecaster != "gs_subset"), 
+  "forecaster", 
+  c("geo_value", "ahead", "forecast_date", "target_end_date")) %>%
+  mutate(forecaster = recode(forecaster, gs = "Google-AA"))
+hotspots_finalized <- intersect_averagers( 
+  hotspots_finalized %>% 
+    filter(! is.na(value), !is.na(actual), forecaster != "gs_subset"), 
+  "forecaster", 
+  c("geo_value", "ahead", "forecast_date", "target_end_date")) %>%
+  mutate(forecaster = recode(forecaster, gs = "Google-AA"))
+```
+
+
+## Forecasts
+
+
+```{r fcast}
+fig5a <- plotter(fcasts_honest %>% filter(period != "jm"), 
+        "wis", Mean, scaler = "strawman_wis", 
+        order_of_operations = c("aggr","scale")) +
+  ylab("Mean WIS (relative to baseline)")
+fig5a
+```
+
+```{r fcast-finalized}
+plotter(fcasts_finalized %>% filter(period != "jm"), 
+        "wis", Mean, scaler = "strawman_wis", 
+        order_of_operations = c("aggr","scale")) +
+  ylab("Mean WIS (relative to baseline)")
+```
+
+```{r fcast-honest-v-finalized}
+fig6a <- plotter(
+  left_join(
+    fcasts_honest %>% filter(period != "jm") %>% select(forecaster:wis),
+    fcasts_finalized %>% filter(period != "jm") %>% select(forecaster:wis) %>%
+      rename(finalized_wis = wis)
+    ), 
+  "wis", Mean, scaler = "finalized_wis", 
+  order_of_operations = c("aggr","scale")) +
+  geom_hline(yintercept = 1) +
+  ylab("Mean WIS (vintage / finalized)")
+fig6a
+```
+
+```{r fcast-adjusted}
+plotter(fcasts_honest %>% filter(period != "jm"), 
+        "wis", GeoMean, scaler = "strawman_wis", 
+        order_of_operations = c("scale","aggr")) +
+  ylab("Geometric mean of WIS (relative to baseline)")
+```
+
+```{r wis-densities}
+ggplot(fcasts_honest %>% filter(period != "jm"), 
+       aes(wis, fill = forecaster)) +
+  geom_density() +
+  scale_x_log10() +
+  theme_bw(base_size = 12) +
+  xlab("WIS") +
+  scale_fill_brewer(palette = "Set1") +
+  facet_wrap(~forecaster) +
+  theme(legend.position = "none")
+```
+
+### All periods
+
+```{r fcast-alldates}
+plotter(fcasts_honest,
+        "wis", Mean, scaler = "strawman_wis", 
+        order_of_operations = c("aggr","scale")) +
+  ylab("Mean WIS (relative to baseline)")
+```
+
+```{r fcast-alldates-adjusted}
+plotter(fcasts_honest, 
+        "wis", GeoMean, scaler = "strawman_wis", 
+        order_of_operations = c("scale","aggr")) +
+  ylab("Geometric mean of WIS (relative to baseline)")
+```
+
+### Only GS locations
+
+```{r fcast-gs-locations}
+plotter(fcasts_gs %>% filter(period != "jm"),
+        "wis", Mean, scaler = "strawman_wis", 
+        order_of_operations = c("aggr","scale")) +
+  ylab("Mean WIS (relative to baseline)")
+```
+
+```{r fcast-gs-locations-adjusted}
+plotter(fcasts_gs %>% filter(period != "jm"), 
+        "wis", GeoMean, scaler = "strawman_wis", 
+        order_of_operations = c("scale","aggr")) +
+  ylab("Geometric mean of WIS (relative to baseline)")
+```
+
+## Trajectories
+
+```{r hrr-names}
+hrr_names <- read_csv(file.path(path_to_data, "Hospital_Referral_Regions.csv"), 
+                      col_types = "_ccc__") %>%
+  mutate(state = substr(hrrcity, 1, 2),
+         hrrname = paste(HRR_lbl, state)) %>%
+  select(hrrnum, hrrname)
+hrr_tab <- pull(hrr_names, hrrname)
+names(hrr_tab) <- pull(hrr_names, hrrnum)
+```
+
+```{r traj-data, eval = FALSE}
+preds <- readRDS(file.path(path_to_data, "predictions_honest.RDS"))
+traj_best <- get_trajectory_plots(fcasts_honest, preds, actuals, hrr_tab, 
+                                  "only2020", "best")
+traj_worst <- get_trajectory_plots(fcasts_honest, preds, actuals, hrr_tab,
+                                   "only2020", "worst")
+rm(preds)
+```
+
+```{r trajectory-plots, eval = FALSE}
+for (nm in names(traj_best)) print(trajectory_panel(nm, traj_best, traj_worst))
+```
+
+
+
+
+## Hotspots
+
+```{r hot}
+fig5b <- plotter_hotspots(hotspots_honest %>% filter(period != "jm")) + 
+  geom_hline(yintercept = 0.5)
+fig5b
+```
+
+```{r hot-finalized}
+plotter_hotspots(hotspots_finalized %>% filter(period != "jm")) +
+  geom_hline(yintercept = 0.5)
+```
+
+```{r hot-honest-v-finalized}
+fig6b <- left_join(
+  hotspots_honest %>%
+    group_by(forecaster, ahead) %>%
+    summarise(auc_honest = auc(value, actual)),
+  hotspots_finalized %>%
+    group_by(forecaster, ahead) %>%
+    summarise(auc_finalized = auc(value, actual))) %>%
+  ggplot(aes(ahead, auc_honest / auc_finalized, color = forecaster)) + 
+  geom_line() + geom_point() +
+  theme_bw(base_size = 12) + 
+  scale_color_brewer(palette = "Set1", guide = guide_legend(nrow=1)) +
+  theme(legend.position = "bottom", legend.title = element_blank()) +
+  geom_hline(yintercept = 1) +
+  ylab("AUC (vintage / finalized)")
+fig6b
+```
+
+### All periods
+
+```{r hot-alldates}
+plotter_hotspots(hotspots_honest)
+```
+
+### Only GS locations
+
+```{r hot-gs-locations}
+plotter_hotspots(hotspots_gs %>% filter(period != "jm")) +
+  geom_hline(yintercept = 0.5)
+```
+
+### Figure 5
+
+* Currently, this is the "main" figure. WIS and hotspots, 2 panels, only 2020, honest training.
+
+```{r figure5, eval = FALSE, fig.width=9, fig.height=4}
+library(cowplot)
+leg <- get_legend(fig5a)
+fig5a <- fig5a + theme(legend.position = "none")
+fig5b <- fig5b + theme(legend.position = "none")
+fig5 <- plot_grid(fig5a, fig5b, align = "hv", nrow = 1)
+fig5 <- plot_grid(fig5, leg, rel_heights = c(1,.1), nrow = 2)
+fig5
+```
+
+### Figure 6 (misleading retrospective analysis)
+
+* WIS and hotspots, 2 panels, only 2020, honest training.
+
+```{r figure6, fig.width=9, fig.height=4}
+fig6a <- fig6a + theme(legend.position = "none")
+fig6b <- fig6b + theme(legend.position = "none")
+fig6 <- plot_grid(fig6a, fig6b, align = "hv", nrow = 1)
+fig6 <- plot_grid(fig6, leg, rel_heights = c(1,.1), nrow = 2)
+fig6
+```
+
+### Correlations with lagged actuals
+
+```{r cor-with-actuals}
+pct_change <- function(x, n = 14, col_name = "pct_change"){
+  # courtesy of Alden
+  dt <- c(0,-n)
+  y = covidcast:::apply_shifts(x,dt) %>%
+    rename(value = tidyselect::matches("value\\+"),
+           lag_value = tidyselect::matches("value\\-")) %>%
+    mutate(`:=`(!!col_name,(value - lag_value)/lag_value))
+  return(y)
+}
+comparison_df <- left_join(
+  fcasts_honest %>% filter(forecaster != "QAR3", period != "jm"),
+  fcasts_honest %>% filter(forecaster == "QAR3", period != "jm") %>%
+    select(-c(forecaster,target_end_date)) %>%
+    rename(ar3_wis = wis),
+  by = c("geo_value", "ahead", "forecast_date")) %>%
+  group_by(forecaster, forecast_date, geo_value) %>%
+  summarize(wis_ratio = mean(wis) / mean(ar3_wis), .groups = "drop") 
+
+pct_chng_df <- readRDS(file.path(
+  path_to_data, 
+  "jhu-csse_confirmed_7dav_incidence_num_2021-05-18.RDS")) %>%
+  pct_change(n = 7) %>%
+  select(geo_value, time_value, pct_change) %>%
+  filter(time_value %in% unique(comparison_df$forecast_date))
+
+comparison_df <- comparison_df %>% 
+  left_join(pct_chng_df, 
+            by = c("forecast_date" = "time_value", "geo_value"))
+
+pct_chng_df <- comparison_df %>% 
+  group_by(forecaster, geo_value) %>%
+  summarize(
+    cor_wisratio_pctchange = cor(wis_ratio, pct_change, method = "spearman"),
+    cor_abs_wisratio_minus_1_pctchange = cor(
+      abs(wis_ratio - 1), pct_change,method = "spearman"), .groups = "drop")
+```
+
+```{r cor-wis-ratio}
+ggplot(pct_chng_df %>% 
+         group_by(forecaster) %>% 
+         mutate(median = median(cor_wisratio_pctchange)), 
+       aes(x = cor_wisratio_pctchange)) +
+  geom_histogram(aes(y = ..count.. / sum(..count..), fill = forecaster)) +
+  scale_fill_brewer(palette = "Set1") +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom", legend.title = element_blank()) +
+  geom_vline(aes(xintercept = median)) + 
+  geom_vline(xintercept = 0, linetype = "dotted") +
+  facet_wrap(~forecaster) + 
+  xlab("Spearman correlation") + ylab("relative frequency") +
+  scale_y_continuous(labels = scales::label_percent(accuracy = 1))
+```
+
+```{r cor-wis-ratio-m1}
+ggplot(pct_chng_df %>% 
+         group_by(forecaster) %>% 
+         mutate(median = median(cor_abs_wisratio_minus_1_pctchange)), 
+       aes(x = cor_abs_wisratio_minus_1_pctchange)) +
+  geom_histogram(aes(y = ..count.. / sum(..count..), fill = forecaster)) +
+  scale_fill_brewer(palette = "Set1") +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom", legend.title = element_blank()) +
+  geom_vline(aes(xintercept = median)) + 
+  geom_vline(xintercept = 0, linetype = "dotted") +
+  facet_wrap(~forecaster) + 
+  xlab("Spearman correlation") + ylab("Relative frequency") +
+  scale_y_continuous(labels = scales::label_percent(accuracy = 1))
+```
+
+## Upswings vs downswings
+
+```{r up-down-processing}
+preds <- readRDS(file.path(path_to_data, "predictions_honest.RDS"))
+preds <- preds %>% 
+  filter(abs(quantile - 0.5) < 1e-6) %>% 
+  select(-quantile) %>%
+  mutate(forecaster = recode(forecaster,
+                             AR3 = "AR",
+                             AR3CHCLI3 = "CHNG-CLI",
+                             AR3CHCOV3 = "CHNG-COV",
+                             AR3DVCLI3 = "DV-CLI",
+                             AR3FBCLI3 = "CTIS-CLI-in-community",
+                             AR3GSSAA3_Subset = "gs_subset",
+                             AR3GSSAA3_Zero = "Google-AA",
+                             Baseline = "strawman"
+  )) %>%
+  filter(! forecaster %in% c("gs_subset", "strawman"))
+
+up_down <- actuals %>%
+  arrange(geo_value, target_end_date) %>%
+  group_by(geo_value) %>%
+  left_join(cases7dav, c("target_end_date" = "time_value", "geo_value")) %>%
+  mutate(pct_change = (actual - lag(actual,7)) / lag(actual,7),
+         udf = case_when(
+           pct_change >= .25 ~ "up",
+           pct_change <= -.25 ~ "down",
+           TRUE ~ "flat")) %>%
+  filter(case_num > 30, !is.na(pct_change)) #%>%
+  #rename(forecast_date = target_end_date)
+
+corr_df <- left_join(fcasts_honest, preds, 
+                     by = c("geo_value", "ahead", "forecaster", 
+                            "forecast_date")) %>%
+  select(-actual_fd, -starts_with("strawman"), -ae) %>%
+  rename(med = value)
+rm(preds)
+
+df <- left_join(corr_df %>% 
+                  ungroup() %>%
+                  filter(forecaster != "AR"),
+                corr_df %>% 
+                  ungroup() %>%
+                  filter(forecaster == "AR") %>%
+                  select(-forecaster, -actual_td) %>%
+                  rename(AR_wis = wis, AR_med = med)) %>%
+  inner_join(up_down, by = c("geo_value","target_end_date"))
+```
+
+```{r upswing-histogram}
+df %>% 
+  filter(period != "jm") %>%
+  group_by(forecaster, geo_value, udf) %>%
+  ggplot(aes(AR_wis - wis, fill = forecaster)) +
+  geom_histogram(bins = 100) +
+  facet_grid(udf ~ forecaster) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "none") +
+  scale_fill_brewer(palette = "Set1") +
+  scale_y_log10(breaks = c(10,1000,100000), 
+                labels = trans_format("log10", math_format(10^.x))) +
+  xlab("AR WIS - forecaster WIS") +
+  geom_vline(xintercept = 0)
+```
+
+```{r upswing-histogram-logged}
+df_summary <- df %>%
+  filter(period != "jm") %>%
+  group_by(forecaster, udf) %>%
+  summarise(m = GeoMean((AR_wis + 1) / (wis + 1)))
+df %>% 
+  filter(period != "jm") %>%
+  group_by(forecaster, udf) %>%
+  ggplot(aes((AR_wis + 1) / (wis + 1), fill = forecaster)) +
+  geom_histogram(bins = 100) +
+  facet_grid(udf ~ forecaster) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "none") +
+  scale_fill_brewer(palette = "Set1") +
+  scale_x_log10() +
+  scale_y_log10(breaks = c(10,1000,100000), 
+                labels = trans_format("log10", math_format(10^.x))) +
+  xlab("AR WIS - forecaster WIS") +
+  geom_vline(xintercept = 1) +
+  geom_vline(data = df_summary, aes(xintercept = m), linetype = "dotted")
+```
+
+
+```{r upswing-corr-table}
+df %>% 
+  filter(period != "jm") %>% 
+  group_by(forecaster, udf) %>%
+  summarise(cor = cor(AR_wis - wis, AR_med - med)) %>%
+  pivot_wider(names_from = forecaster, values_from = cor) %>%
+  kableExtra::kbl(booktabs = TRUE, digits = 2)
+```
+
+
+## Leadingness and laggingness
+
+```{r lead-lag-processing}
+# see lead-lag-analysis.R for signal downloading and processing
+lead_lag <- function(x, y, lag.max = NULL, na.len = 14) {
+  if (sum(is.na(x)) >= na.len || sum(is.na(y)) >= na.len) {
+    return(c(leading = NA, lagging = NA))
+  }
+  out <- ccf(x, y, lag.max = lag.max, plot = FALSE, na.action = na.omit)
+  clim <- qnorm((1 + .95) / 2) / sqrt(out$n.used)
+  lag_vec <- drop(out$lag)
+  cc <- drop(out$acf)
+  cc <- cc * (cc > clim)
+  return(c(leading = mean(cc[lag_vec < 0]),
+           lagging = mean(cc[lag_vec > 0])))
+}
+
+slide_lead_lag <- function(x, y, min_len = 56, lag.max = NULL, na.len = 14) {
+  n <- length(x)
+  outlist <- list()
+  idx <- 1:min_len
+  for (i in min_len:n) {
+    outlist[[i]] <- lead_lag(x[idx], y[idx], lag.max, na.len)
+    idx <- idx + 1
+  }
+  outlist <- bind_rows(outlist)
+  bind_rows(
+    tibble(leading = rep(NA, min_len-1), lagging = rep(NA, min_len -1)),
+    outlist)
+}
+
+all_sigs <- readRDS(file.path(
+  path_to_data, "all_signals_wide_as_of_2020-05-15.RDS"))
+
+all_sigs_imputed <- all_sigs %>% 
+  group_by(geo_value) %>% 
+  arrange(time_value) %>%
+  mutate(across(contains("value+0"), 
+                ~zoo::na.locf(.x, na.rm = FALSE, maxgap = 13))) %>%
+  pivot_longer(contains("value+0"))
+
+sigs_cor <- left_join(
+  all_sigs_imputed %>% filter(! str_detect(name, "jhu-csse")),
+  all_sigs_imputed %>% filter(str_detect(name, "jhu-csse")) %>%
+    select(-name) %>%
+    rename(cases = value))
+
+lead_lag_metric <- sigs_cor %>% 
+  group_by(geo_value, name) %>%
+  arrange(time_value) %>%
+  group_modify(~ {
+    bind_cols(time_value = .x$time_value, slide_lead_lag(.x$value, .x$cases))
+  })
+
+lead_lag_metric <- lead_lag_metric %>%
+  mutate(
+    forecaster = recode(
+      name,
+      `value+0:chng_smoothed_adj_outpatient_cli` = "CHNG-CLI",
+      `value+0:chng_smoothed_adj_outpatient_covid` = "CHNG-COV",
+      `value+0:doctor-visits_smoothed_adj_cli` = "DV-CLI",
+      `value+0:fb-survey_smoothed_hh_cmnty_cli` = "CTIS-CLI-in-community",
+      `value+0:google-symptoms_sum_anosmia_ageusia_smoothed_search` = "Google-AA")) %>%
+  ungroup() %>%
+  select(-name)
+
+df2 <- left_join(
+  df, 
+  lead_lag_metric,
+  by = c("geo_value","forecaster","target_end_date" = "time_value"))
+```
+
+```{r leading-and-lagging, fig.width=8, fig.height=4}
+df2 %>%
+  filter(period != "jm") %>%
+  group_by(forecaster, udf) %>%
+  summarise(
+    leadingness = cor(AR_wis - wis, leading, use = "pairwise.complete.obs"),
+    laggingness = cor(AR_wis - wis, lagging, use = "pairwise.complete.obs")) %>%
+  pivot_longer(leadingness:laggingness) %>%
+  ggplot(aes(udf, value, fill = forecaster)) +
+  geom_bar(width = 0.6, position = position_dodge(width=0.6),
+           stat = "identity") +
+  geom_hline(yintercept = 0) +
+  scale_fill_brewer(palette = "Set1") +
+  facet_wrap(~name) +
+  theme_bw(base_size = 14) +
+  ylab("correlation") +
+  xlab("") +
+  theme(legend.position = "bottom", legend.title = element_blank())
+```
+
+```{r diff-in-lead-lag, fig.width=8, fig.height=4}
+df2 %>%
+  filter(period != "jm") %>%
+  group_by(forecaster, udf) %>%
+  summarise(cor = cor(AR_wis - wis, leading - lagging, 
+                      use = "pairwise.complete.obs")) %>%
+  ggplot(aes(udf, cor, fill = forecaster)) +
+  geom_bar(width = 0.6, position = position_dodge(width=0.6),
+           stat = "identity") +
+  geom_hline(yintercept = 0) +
+  scale_fill_brewer(palette = "Set1") +
+  theme_bw(base_size = 14) +
+  ylab("correlation") +
+  xlab("") +
+  theme(legend.position = "bottom", legend.title = element_blank())
+```
