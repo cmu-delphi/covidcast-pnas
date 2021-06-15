@@ -167,59 +167,59 @@ Table~\ref{tab:sources_signals}, and detailed documentation is available at
 \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}.
 
 \begin{table*}[t]
-  \centering
-  \caption{Data sources available in Delphi's COVIDcast API \cite{CovidcastAPI},
-    as of date of publication. The first group of data sources are produced by
-    Delphi from data not otherwise available publicly (or only available in
-    limited form); the second group is mirrored from public sources.}
-  \begin{tabular}{>{\raggedright}p{1.2in} p{4.0in} l >{\raggedright\arraybackslash}p{0.5in}}
-    \toprule
-    \textbf{Data source} & \textbf{Signals available} & \textbf{First date} &
+\centering
+\caption{Data sources available in Delphi's COVIDcast API \cite{CovidcastAPI},
+  as of date of publication. The first group of data sources are produced by
+  Delphi from data not otherwise available publicly (or only available in
+  limited form); the second group is mirrored from public sources.}
+\begin{tabular}{>{\raggedright}p{1.2in} p{4.0in} l >{\raggedright\arraybackslash}p{0.5in}}
+  \toprule
+  \textbf{Data source} & \textbf{Signals available} & \textbf{First date} &
 \textbf{Resolution} \\\midrule
-    % Exclusive data
-    Change Healthcare & Percentage of outpatient visits with COVID diagnostic
+  % Exclusive data
+  Change Healthcare & Percentage of outpatient visits with COVID diagnostic
 codes or codes indicating COVID-like symptoms. Based on de-identified claims
 data processed by Change Healthcare. & 2020-02-01 & County$^*$ \\
-    Doctor Visits & Percentage of outpatient visits primarily about COVID-like
+  Doctor Visits & Percentage of outpatient visits primarily about COVID-like
 symptoms, based on de-identified claims data provided by health system
 partners. & 2020-02-01 & County$^*$ \\
-    Hospital Admissions & Percentage of new hospital admissions with COVID
+  Hospital Admissions & Percentage of new hospital admissions with COVID
 diagnostic codes, based on de-identified claims data provided by health system
 partners. & 2020-02-01 & County$^{**}$\\
-    Quidel & Test positivity rates for COVID-19 antigen tests produced by
+  Quidel & Test positivity rates for COVID-19 antigen tests produced by
 Quidel. & 2020-05-26 & County$^{**}$ \\
-    SafeGraph & Mobility metrics, such as time away from home or visits to bars 
+  SafeGraph & Mobility metrics, such as time away from home or visits to bars 
 and restaurants, based on cell phone mobility data collected by SafeGraph
 \cite{SafeGraphSocial, SafeGraphPatterns}. & 2019-01-01 & County \\
-    COVID Trends and Impact Survey & COVID symptoms, social distancing 
+  COVID Trends and Impact Survey & COVID symptoms, social distancing 
 behaviors, mental health, economic impact, behavior (e.g., mask-wearing,
 vaccination attitudes), and COVID testing signals based on daily surveys
 conducted nationally by Delphi through Facebook \cite{DelphiSurvey,
 Kreuter:2020}. & 2020-04-06 & County$^{**}$ \\
-    \midrule
-     % Mirrored data from other sources
-    Health \& Human Services & Counts of hospital admissions due to confirmed or 
+  \midrule
+  % Mirrored data from other sources
+  Health \& Human Services & Counts of hospital admissions due to confirmed or 
 suspected COVID-19, as reported by the Department of Health \& Human Services. &
 2019-12-31 & State \\
-    COVID Act Now & COVID-19 testing results, such as positivity rate and number
+  COVID Act Now & COVID-19 testing results, such as positivity rate and number
 of tests, compiled by COVID Act Now from CDC reporting. & 2020-03-02 &
 County$^*$ \\
-    Google Symptoms & Trends in Google search volume for terms related to
+  Google Symptoms & Trends in Google search volume for terms related to
 anosmia and ageusia (loss of smell or taste), which correlate with COVID
 activity, based on data shared by Google \cite{GoogleSymptoms}. & 2020-02-13 &
 County$^{***}$ \\
-    Cases and Deaths & Confirmed COVID-19 cases and deaths, compiled by JHU CSSE 
+  Cases and Deaths & Confirmed COVID-19 cases and deaths, compiled by JHU CSSE 
 \cite{Dong:2020} and by USAFacts \cite{USAFacts}. & 2020-01-22 & County \\
     NCHS Mortality & Weekly totals of deaths broken down by cause, such as
 COVID, flu, or pneumonia, compiled by the National Center for Health Statistics
 \cite{TODO}. & 2020-01-26 & State \\ 
-    \bottomrule
-  \end{tabular}
-  \addtabletext{$^*$Available at $>60$\% of counties; $^{**}$available at
-    20--60\% of counties; $^{***}$available at $<20$\% of counties.  For some
-    signals, location availability varies over time, e.g., due to variable
-    reporting volume.}
-  \label{tab:sources_signals}
+  \bottomrule
+\end{tabular}
+\addtabletext{$^*$Available at $>60$\% of counties; $^{**}$available at
+  20--60\% of counties; $^{***}$available at $<20$\% of counties.  For some
+  signals, location availability varies over time, e.g., due to variable
+  reporting volume.}
+\label{tab:sources_signals}
 \end{table*}
 
 \subsection{Signal Processing}
@@ -354,7 +354,6 @@ R package and fetches data directly from the API) can be found at
 \subsection{Tracking Trends}
 
 \begin{figure}[t]
-\centering
 \includegraphics[width=\columnwidth]{fig/time_trends_national.pdf}
 \caption{National trends, from April 2020 to April 2021, of four signals in
   the COVIDcast API. The auxiliary signals, based on medical claims data and
@@ -498,7 +497,6 @@ There are two noteworthy points:
 \subsection{Helping Robustness}
 
 \begin{figure}[t]
-\centering
 \includegraphics[width=\columnwidth]{fig/bexar_compare.pdf}
 \caption{Reported cases per day in Bexar County, Texas during the summer of
   2020. Only July 16, 4,810 backlogged cases were reported, though they
@@ -554,7 +552,6 @@ not part of the same reporting systems.
 \subsection{Revisions Matter}
 
 \begin{figure}[t]
-\centering
 \includegraphics[width=\columnwidth]{fig/dv_as_of.pdf}
 \caption{Estimated percentage of doctor's visits due to COVID-like illness
   displayed across multiple issue dates, with later issue dates adding
