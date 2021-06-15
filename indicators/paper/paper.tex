@@ -63,11 +63,11 @@
 \thispagestyle{firststyle}
 \ifthenelse{\boolean{shortarticle}}{\ifthenelse{\boolean{singlecolumn}}{\abscontentformatted}{\abscontent}}{}
 
-\dropcap{P}ublic health decision-makers, healthcare providers, epidemiological
+\dropcap{P}ublic health decision makers, healthcare providers, epidemiological 
 researchers, employers, institutions, and the general public benefit from
 promptly and readily accessible data regarding COVID-19 activity levels,
-countermeasures, and pandemic impact.  Real-time indicators of COVID-19 activity
-levels, such as statistics on cases, deaths, test positivity, and
+countermeasures, and pandemic impact.  Real-time indicators of COVID-19 
+activity levels, such as statistics on cases, deaths, test positivity, and
 hospitalizations, enable reports and interactive dashboard applications for
 situational awareness \cite{Dong:2020, NYTimes, USAFacts}, and are essential for
 most analyses of the pandemic.  These data are available for locations across
@@ -97,23 +97,19 @@ behavior, the economy, and disease spread \cite{Bonaccorsi:2020, Nouvellet:2021,
 
 The Delphi Group works with partner organizations and public data sets to build
 a massive database of indicators tracking COVID-19 activity and other relevant
-phenomena, which has been publicly available and continuously updated since
-April 2020. Alongside public data on reported cases and deaths, this database
-includes several unique data streams, including indicators extracted from
-de-identified medical claims data, antigen test results from a major testing
-manufacturer, large-scale public surveys that measure symptoms and public
-behavior, and symptom indicators based on Google search query volume. (We use
-the terms ``indicator'' and ``signal'' interchangeably.) We make aggregate
-signals publicly available, generally at the county level, via the COVIDcast API  
-\cite{CovidcastAPI}. We store and provide access to all previous (historical)
-versions of the signals, a key feature that exposes the effects of data
-revisions.  Lastly, we provide R \cite{CovidcastR} and Python \cite{CovidcastPy}  
-packages to facilitate interaction with the API, and an online dashboard to
-visualize the data \cite{CovidcastViz}. 
-
-% RJT: We should fiddle with the bib so that the URLs actually appear in the
-% references at the end.  Otherwise it's kind of pointless to cite manuals or
-% websites like the COVIDcast API site or R/Python manuals.
+phenomena in the United States, which has been publicly available and
+continuously updated since April 2020. Alongside public data on reported cases
+and deaths, this database includes several unique data streams, including
+indicators extracted from de-identified medical claims data, antigen test
+results from a major testing manufacturer, large-scale public surveys that
+measure symptoms and public behavior, and indicators based on particular Google
+search queries. (We use the terms ``indicator'' and ``signal'' interchangeably.)
+We make aggregate signals publicly available, generally at the county level, via
+the COVIDcast API \cite{CovidcastAPI}. We store and provide access to all
+previous (historical) versions of the signals, a key feature that exposes the
+effects of data revisions.  Lastly, we provide R \cite{CovidcastR} and Python
+\cite{CovidcastPy} packages to facilitate interaction with the API, and an
+online dashboard to visualize the data \cite{CovidcastViz}. 
 
 In a companion paper, we analyze the utility provided by a core set of the
 indicators in COVID-19 forecasting and hotspot prediction models.  In another
@@ -136,10 +132,11 @@ indicators on the estimated percentage of covered outpatient visits and
 hospitalizations that involved COVID diagnoses or symptoms.
 
 \paragraph{Internet-Based Surveys} Conducted in partnership with Facebook,
-Delphi's COVID Tracking and Impact Survey receives about 50,000 responses daily,  
-and has received over 20 million responses since April 2020 \cite{DelphiSurvey,
-  Kreuter:2020}. From the surveys, we construct indicators on symptoms, social 
-distancing, vaccination, and other attitudes and behaviors related to COVID.
+Delphi's COVID Trends and Impact Survey receives an average of 50,000 responses
+daily, and has received over 20 million responses since April 2020
+\cite{DelphiSurvey, Kreuter:2020}. From the surveys, we construct indicators on
+symptoms, social distancing, vaccination, and other attitudes and behaviors
+related to COVID.  
 
 \paragraph{COVID Antigen Tests} Based on data from Quidel, a manufacturer of
 COVID antigen tests in the United States, we calculate and release
@@ -170,59 +167,59 @@ Table~\ref{tab:sources_signals}, and detailed documentation is available at
 \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}.
 
 \begin{table*}[t]
-  \centering
-  \caption{Data sources available in Delphi's COVIDcast API \cite{CovidcastAPI},
-    as of date of publication. The first group of data sources are produced by
-    Delphi from data not otherwise available publicly (or only available in
-    limited form); the second group is mirrored from public sources.}
-  \begin{tabular}{>{\raggedright}p{1.2in} p{4.0in} l >{\raggedright\arraybackslash}p{0.5in}}
-    \toprule
-    \textbf{Data source} & \textbf{Signals available} & \textbf{First date} &
+\centering
+\caption{Data sources available in Delphi's COVIDcast API \cite{CovidcastAPI},
+  as of date of publication. The first group of data sources are produced by
+  Delphi from data not otherwise available publicly (or only available in
+  limited form); the second group is mirrored from public sources.}
+\begin{tabular}{>{\raggedright}p{1.2in} p{4.0in} l >{\raggedright\arraybackslash}p{0.5in}}
+  \toprule
+  \textbf{Data source} & \textbf{Signals available} & \textbf{First date} &
 \textbf{Resolution} \\\midrule
-    % Exclusive data
-    Change Healthcare & Percentage of outpatient visits with COVID diagnostic
+  % Exclusive data
+  Change Healthcare & Percentage of outpatient visits with COVID diagnostic
 codes or codes indicating COVID-like symptoms. Based on de-identified claims
 data processed by Change Healthcare. & 2020-02-01 & County$^*$ \\
-    Doctor Visits & Percentage of outpatient visits primarily about COVID-like
+  Doctor Visits & Percentage of outpatient visits primarily about COVID-like
 symptoms, based on de-identified claims data provided by health system
 partners. & 2020-02-01 & County$^*$ \\
-    Hospital Admissions & Percentage of new hospital admissions with COVID
+  Hospital Admissions & Percentage of new hospital admissions with COVID
 diagnostic codes, based on de-identified claims data provided by health system
 partners. & 2020-02-01 & County$^{**}$\\
-    Quidel & Test positivity rates for COVID-19 antigen tests produced by
+  Quidel & Test positivity rates for COVID-19 antigen tests produced by
 Quidel. & 2020-05-26 & County$^{**}$ \\
-    SafeGraph & Mobility metrics, such as time away from home or visits to bars 
+  SafeGraph & Mobility metrics, such as time away from home or visits to bars 
 and restaurants, based on cell phone mobility data collected by SafeGraph
 \cite{SafeGraphSocial, SafeGraphPatterns}. & 2019-01-01 & County \\
-    COVID Tracking and Impact Survey & COVID symptoms, social distancing
+  COVID Trends and Impact Survey & COVID symptoms, social distancing 
 behaviors, mental health, economic impact, behavior (e.g., mask-wearing,
 vaccination attitudes), and COVID testing signals based on daily surveys
 conducted nationally by Delphi through Facebook \cite{DelphiSurvey,
 Kreuter:2020}. & 2020-04-06 & County$^{**}$ \\
-    \midrule
-     % Mirrored data from other sources
-    Health \& Human Services & Counts of hospital admissions due to confirmed or 
+  \midrule
+  % Mirrored data from other sources
+  Health \& Human Services & Counts of hospital admissions due to confirmed or 
 suspected COVID-19, as reported by the Department of Health \& Human Services. &
 2019-12-31 & State \\
-    COVID Act Now & COVID-19 testing results, such as positivity rate and number
+  COVID Act Now & COVID-19 testing results, such as positivity rate and number
 of tests, compiled by COVID Act Now from CDC reporting. & 2020-03-02 &
 County$^*$ \\
-    Google Symptoms & Trends in Google search volume for terms related to
+  Google Symptoms & Trends in Google search volume for terms related to
 anosmia and ageusia (loss of smell or taste), which correlate with COVID
 activity, based on data shared by Google \cite{GoogleSymptoms}. & 2020-02-13 &
 County$^{***}$ \\
-    Cases and Deaths & Confirmed COVID-19 cases and deaths, compiled by JHU CSSE 
+  Cases and Deaths & Confirmed COVID-19 cases and deaths, compiled by JHU CSSE 
 \cite{Dong:2020} and by USAFacts \cite{USAFacts}. & 2020-01-22 & County \\
     NCHS Mortality & Weekly totals of deaths broken down by cause, such as
 COVID, flu, or pneumonia, compiled by the National Center for Health Statistics
-[TODO cite]. & 2020-01-26 & State \\
-    \bottomrule
-  \end{tabular}
-  \addtabletext{$^*$Available at $>60$\% of counties; $^{**}$available at
-    20--60\% of counties; $^{***}$available at $<20$\% of counties.  For some
-    signals, location availability varies over time, e.g., due to variable
-    reporting volume.}
-  \label{tab:sources_signals}
+\cite{TODO}. & 2020-01-26 & State \\ 
+  \bottomrule
+\end{tabular}
+\addtabletext{$^*$Available at $>60$\% of counties; $^{**}$available at
+  20--60\% of counties; $^{***}$available at $<20$\% of counties.  For some
+  signals, location availability varies over time, e.g., due to variable
+  reporting volume.}
+\label{tab:sources_signals}
 \end{table*}
 
 \subsection{Signal Processing}
@@ -234,17 +231,17 @@ consistently using standard identifiers such as FIPS codes; the sample size and
 standard error for each observation is also reported when applicable. Each
 signal is reported at the finest geographic resolution its source supports (such
 as county or state) and also aggregated to metropolitan statistical areas,
-Health and Human Services regions, and Hospital Referral Regions. National
-averages are also provided. Crucially, each record includes an \textit{issue
-  date} recording when the value was first issued, as described below. This
-allows tracking of multiple revisions to individual observations, each revision
-with a separate issue date.
+Health and Human Services regions, and hospital referral regions. National
+averages are also provided. Crucially, each record is tagged with an
+\textit{issue date} referring to when the value was first issued, as described 
+below. This allows tracking of revisions made to individual observations, as
+each revision is tagged with its own issue date.  
 
 When appropriate, additional post-processing (often nontrivial) is applied to
 the data. For example, data on visits to doctor's offices is subject to strong
 day-of-week effects, and so regression is used to adjust for these
-effects. Other indicators are available in raw versions and versions smoothed
-with a seven-day moving average. All processing is done using open-source code
+effects. Other indicators are available in raw versions and versions smoothed 
+with a 7-day trailing average. All processing is done using open-source code 
 written primarily in Python and R, and available publicly at
 \url{https://github.com/cmu-delphi/covidcast-indicators/}.
 
@@ -316,7 +313,7 @@ These tools fetch data directly from the API, and allow for exploration of both
 temporal (e.g., time series graphs) and spatial (e.g., choropleth maps) trends
 in the signals, as well as many other aspects, such as correlations, anomalies,
 and backfill.  There is also a dedicated dashboard for exploring results from
-the COVID Tracking and Impact Survey.   
+the COVID Trends and Impact Survey.   
 
 \subsection{COVID Forecasting} 
 
@@ -357,43 +354,45 @@ R package and fetches data directly from the API) can be found at
 \subsection{Tracking Trends}
 
 \begin{figure}[t]
-  \centering
-  \includegraphics[width=\columnwidth]{fig/time_trends_national.pdf}
-  \caption{National trends, from April 2020 to April 2021, of four signals in
-    the COVIDcast API. The auxiliary signals, based on medical claims data and
-    massive surveys, track changes in officially reported cases quite
-    well. (They have all been placed on the same scale as reported cases per
-    100,000 people.)}
-  \label{fig:time_trends_national}
+\includegraphics[width=\columnwidth]{fig/time_trends_national.pdf}
+\caption{National trends, from April 2020 to April 2021, of four signals in
+  the COVIDcast API. The auxiliary signals, based on medical claims data and
+  massive surveys, track changes in officially reported cases quite
+  well. (They have all been placed on the same scale as reported cases per
+  100,000 people.)}
+\label{fig:time_trends_national}
 \end{figure}
 
 Many of the indicators in the COVIDcast API are intended to track COVID
 activity. Five indicators in particular have the closest connections to
 confirmed cases:
+
 \begin{itemize}
 \item Change Healthcare COVID-like illness (CHNG-CLI): The percentage of
   outpatient visits that are primarily about COVID-related symptoms, based on
   de-identified Change Healthcare claims data.
 \item Change Healthcare COVID (CHNG-COVID): The percentage of outpatient visits
   with confirmed COVID-19, based on the same claims data.
-\item COVID Tracking and Impact Survey CLI (CTIS-CLI): The estimated percentage
+\item COVID Trends and Impact Survey CLI (CTIS-CLI): The estimated percentage
   of the population with COVID-like illness based on Delphi's surveys of
   Facebook users.
-\item COVID Tracking and Impact Survey CLI-in-community (CTIS-CLI-in-community):
-  The estimated percentage of the population who knows someone who is sick,
-  based on Delphi's surveys of Facebook users.
-\item Quidel COVID test positivity rate (Quidel-TPR): The percentage of positive
-  test results among Quidel COVID antigen tests.
+\item COVID Trends and Impact Survey CLI in the community
+  (CTIS-CLI-in-community): The estimated percentage of the population who know 
+  someone in their local community that is sick, based the same surveys.
+\item Quidel test positivity rate (Quidel-TPR): The percentage of positive
+  results among Quidel COVID antigen tests.  
 \end{itemize}
-Figure~\ref{fig:time_trends_national} compares the first three of these signals
-to reported COVID cases in the United States (from JHU CSSE, and smoothed with a
-7-day trailing average) over the first year of the pandemic (April 15, 2020 to
-April 15, 2021), illustrating how they  appear to track national trends in cases
-quite well. Importantly, this same relationship persists broadly across multiple
-resolutions, down to smaller geographic regions such as states and counties, as
-shown in the supplement. This will also be illustrated in a more detailed
-correlation analysis in the next subsection.
 
+Figure~\ref{fig:time_trends_national} compares the first three of these signals
+to COVID cases in the United States (from JHU CSSE, smoothed with a 7-day
+trailing average) over a year of the pandemic (April 15, 2020 to April 15,
+2021), illustrating how they track national trends quite well.  Importantly, 
+this same relationship persists across multiple resolutions of the data, down to
+smaller geographic regions such as states and counties, as shown in the
+supplement.  This will also be illustrated in a more detailed correlation 
+analysis in the next subsection.   
+
+% TODO
 % RJT: @AR Note what I claimed we would do above!  I'm thinking we can just
 % produce a big batch of case trends over the same time period and for the same
 % signals, but for each US state (and territory?), and for the 50 most populous
@@ -404,7 +403,10 @@ Besides tracking contemporaneous COVID activity, these and other indicators can
 be used to improve forecasts of future COVID case trends, as investigated in a
 companion paper.
 
-% RJT: @AR Consider for the supplement.
+% TODO 
+% RJT: @AR Consider for the supplement.  [Or skip it?  Not all that important 
+% but I think it would be nice to do.  Maybe you can delegate this to Logan,
+% Aaron, Jingjing, etc.] 
 % - Hospitalization trends?
 % - Hospitalization correlations?
 %  (I see you already have a plot for the first ... but I'm a bit bothered by
@@ -417,17 +419,18 @@ companion paper.
 \subsection{Correlation Analyses}
 
 \begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/geo_wise_corr.pdf}
-  \caption{Geo-wise correlations with case rates, from April 15, 2020 to April
-    15, 2021, calculated over all counties for which all signals were available
-    and which had at least 500 cumulative cases by the end of this period.}
- \label{fig:geo_wise_correlation}
+\includegraphics[width=\columnwidth]{fig/geo_wise_corr.pdf}
+\caption{Geo-wise correlations with case rates, from April 15, 2020 to April
+  15, 2021, calculated over all counties for which all signals were available
+  and which had at least 500 cumulative cases by the end of this period.}
+\label{fig:geo_wise_correlation}
 \end{figure}
 
 To quantify the ability of the signals described above to track trends in COVID
 cases, we use the Spearman (rank) correlation and analyze two key correlation
 patterns, between each signal and confirmed COVID case rates (cases per 100,000
 people):
+
 \begin{enumerate}
 \item \textit{Geo-wise correlations} (i.e., on a specific date, do values of the
   signal correlate with case rates across locations?): Formally, let $X_t$ and
@@ -445,25 +448,24 @@ people):
 \end{enumerate}
 
 Figure~\ref{fig:geo_wise_correlation} shows the geo-wise correlations achieved
-by the five signals and COVID case rates (from USAFacts, and again smoothed
-using a 7-day trailing average), from April 15, 2020 to April 15, 2021. The
-locations we consider here are counties with at least 500 cumulative cases by
-the end of this period, and at which all signals are available (956 counties in
-total). The  significantly positive correlations suggest that these signals 
-could be useful in hotspot detection  (identifying counties with relatively high
-COVID activity, at a given time). Somewhat surprisingly, the CLI-in-community
-signal derived from the survey shows the strongest correlations for much of the
-time period. This clearly demonstrates the value of a large-scale survey such as
-CTIS for tracking symptoms and case trends, especially when other data is
-unavailable.
+by the five signals and COVID case rates (from USAFacts, smoothed using a 7-day
+trailing average), from April 15, 2020 to April 15, 2021. This calculation is
+performed over counties with at least 500 cumulative cases by the end of this 
+period, and at which all indicators are available (956 counties in total). The
+significantly positive correlations suggest that these signals could be useful
+in hotspot detection (identifying counties with relatively high COVID activity,
+at a given time). Somewhat surprisingly, the survey-based CLI-in-community
+signal shows the strongest correlations for much of the time period. This
+clearly demonstrates the value of a large-scale survey such as CTIS for tracking
+symptoms and case trends, especially when other data is unavailable.
 
 \begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/time_wise_correlation.pdf}
-  \caption{Time-wise correlations with case rates, from April 15, 2020 to April
-    15, 2021, calculated over all counties for which all signals were available
-    and which had at least 500 cumulative cases by the end of this period.}
-  \label{fig:time_wise_correlation}
- \end{figure}
+\includegraphics[width=\columnwidth]{fig/time_wise_correlation.pdf}
+\caption{Time-wise correlations with case rates, from April 15, 2020 to April
+  15, 2021, calculated over all counties for which all signals were available
+  and which had at least 500 cumulative cases by the end of this period.}
+\label{fig:time_wise_correlation}
+\end{figure}
 
 Figure~\ref{fig:time_wise_correlation} summarizes time-wise correlations from 
 these five signals over the same time period, and for the same set of
@@ -473,7 +475,7 @@ produce positive correlations in the majority of counties considered (with very
 little mass in each estimated density being to the left of zero). The largest
 correlations, in bulk, are achieved by the CHNG-COVID signal; the
 CTIS-CLI-in-community is a close second, and the CHNG-CLI signal is third.
-There are two remarks deserving attention:
+There are two noteworthy points:
 
 \begin{itemize}
 \item This is different from what is observed in
@@ -484,6 +486,7 @@ There are two remarks deserving attention:
   claims signals (CHNG-COVID and CHNG-CLI) seem more appropriate for
   temporal---rather than spatial---comparisons.  We revisit this point in the
   discussion.
+
 \item It is still quite impressive (and surprising) that the
   CTIS-CLI-in-community signal, based on people reporting on the symptoms of
   others around them, can achieve  nearly as strong time-wise correlations to
@@ -494,15 +497,14 @@ There are two remarks deserving attention:
 \subsection{Helping Robustness}
 
 \begin{figure}[t]
-  \centering
-  \includegraphics[width=\columnwidth]{fig/bexar_compare.pdf}
-  \caption{Reported cases per day in Bexar County, Texas during the summer of
-    2020. Only July 16, 4,810 backlogged cases were reported, though they
-    actually occurred over the preceding two weeks (this shows up as a prolonged
-    spike in the left panel due to the 7-day trailing averaging applied to the
-    case counts). Daily CTIS estimates of CLI-in-community showed more stable
-    underlying trends.}
-  \label{fig:bexar-compare}
+\includegraphics[width=\columnwidth]{fig/bexar_compare.pdf}
+\caption{Reported cases per day in Bexar County, Texas during the summer of
+  2020. Only July 16, 4,810 backlogged cases were reported, though they
+  actually occurred over the preceding two weeks (this shows up as a prolonged
+  spike in the left panel due to the 7-day trailing averaging applied to the
+  case counts). Daily CTIS estimates of CLI-in-community showed more stable
+  underlying trends.}
+\label{fig:bexar_compare}
 \end{figure}
 
 Public health reporting of COVID tests, cases, deaths, and hospitalizations is
@@ -530,27 +532,26 @@ effects in claims signals should be correctable: they are mainly due to
 \textit{overall} changes in medical seeking behavior during holiday, periods,
 and we can estimate such effects using historical claims data.
 
-As a further example, Figure~\ref{fig:bexar-compare} displays data from Bexar
+As a further example, Figure~\ref{fig:bexar_compare} displays data from Bexar
 County, Texas (which contains San Antonio) during July 2020. On July 16, 2020,
 4,810 backlogged cases were reported after reporting problems prevented them
-from being reported over the past two weeks \cite{Palacios:2021}. This results
-in a clearly visible spike in the left-hand panel of the figure (case data from
-JHU CSSE, smoothed with a 7-day trailing average).  However, Delphi's COVID
-Tracking and Impact Survey averaged around 350 responses per day in Bexar
-County over the same time period, and was able to estimate the fraction
-of the population who know someone in their community with COVID-Like Illness
-(CLI). As we can see in the right-hand panel of the figure, this signal was not
-affected by Bexar County's reporting problems and, as shown in the last
-subsection, it is (in general) highly correlated with case rates, providing an
-alternate stream of data about COVID activity unaffected by backlogs. Similar
-reporting problems have occurred in many jurisdictions across the United States,
-making it valuable to cross-check against external sources not part of the same
-reporting systems.
+from being reported over the past two weeks \cite{Palacios:2021}, resulting in a
+clearly visible spike in the left-hand panel of Figure~\ref{fig:bexar_compare}
+(case data from JHU CSSE, smoothed using a 7-day trailing average).  Meanwhile,
+Delphi's COVID Trends and Impact Survey averaged around 350 responses per day in
+Bexar County over the same time period, and was able to estimate the fraction of
+the population who know someone in their community with COVID-Like Illness
+(CLI). As we can see in the right-hand panel of Figure~\ref{fig:bexar_compare},
+this signal was not affected by Bexar County's reporting problems and, as shown
+in the last subsection, it is (in general) highly correlated with case rates,
+providing an alternate stream of data about COVID activity unaffected by
+backlogs. Similar reporting problems have occurred in many jurisdictions across
+the United States, making it valuable to cross-check against external sources
+not part of the same reporting systems.
 
 \subsection{Revisions Matter}
 
 \begin{figure}[t]
-\centering
 \includegraphics[width=\columnwidth]{fig/dv_as_of.pdf}
 \caption{Estimated percentage of doctor's visits due to COVID-like illness
   displayed across multiple issue dates, with later issue dates adding
@@ -599,6 +600,8 @@ reflects healthcare-seeking behavior and how it may be affected by local case
 rates; measures of COVID vaccine acceptance can guide outreach efforts
 \cite{TODO}.
 
+% TODO
+
 % AR: Potentially interesting things to show or comment on:
 % - Medical claims data can give info about medical-seeking behavior and how it
 % varies with caseload -- e.g. are people deterred from seeking medical care
@@ -609,7 +612,6 @@ rates; measures of COVID vaccine acceptance can guide outreach efforts
 
 % RJT: @AR Since we already stuff on claims, can we do: mobility, masks, vaccine
 % uptake or hesitancy, distancing behaviors, how worried are you?
-
 % How about this (in each case, each point in said plot is a county's signal
 % values averaged over some period)
 % - Bivariate plot of mask use versus how worried are you
@@ -620,123 +622,45 @@ rates; measures of COVID vaccine acceptance can guide outreach efforts
 
 \section{Discussion}
 
-% AR: I think our discussion should also make an argument: that providing many
-% data sources in a common format, with revision tracking, is a valuable goal.
-% Each of our individual data sources has various limitations -- SafeGraph has
-% various biases, the claims data is limited by geographically varying market
-% share, the surveys have demographic biases, etc. So if the argument is solely
-% "We have better data than everyone else," it's a tough sell; if the argument
-% is that our data being convenient to use and accessible in a single unified
-% way makes it more valuable than the individual parts, and that other
-% epidemiological data should be available the same way, then I think we have a
-% strong case.
-% RJT: I agree
+The COVIDcast API provides open access to real-time and geographically-detailed
+indicators that support and enhance standard public health reporting streams in 
+several ways.     
 
-% RJT Proposed format for this discussion.
-% 1. COVID indicators can help supplement public health reports by filling out
-% the severity pyramid, improving timeliness, helping with robustness, etc.
-% 2. They also provide info well beyond public health reports (behaviors,
-% attitudes)
-% 3. There is an argument to be made for having data all in one unified
-% convenient access format (with all revisions)
+First, several signals in the API closely track COVID activity (over both time
+and space); yet they are derived from different data streams (e.g., surveys,
+medical insurance claims, medical devices), and are therefore not subject to the
+same sources of error as public health reporting data.  This can be important
+both for downstream modeling purposes (enhancing the accuracy in nowcasting and
+forecasting models; see our companion paper on forecasting) and also for
+robustness (providing sanity checks when faced with potential anomalies in
+standard surveillance streams).  
 
-% There are a number of open questions, and challenges to be recognized.  We
-% should be clear in identifying survey bias; geo bias in claims data; and
-% backfill and holiday corrections in claims data.
+Second, the API features many other signals that are relevant to understanding
+aspects of the pandemic and its effects on the United States population that are
+not found in traditional public health streams, e.g., data on mobility patterns,
+internet search trends, mask wearing, and vaccine hesitancy, to name just a few
+(the last two are derived from the COVID Trends and Impact Survey; see our
+companion paper on this survey for a detailed view of its features and
+capabilities).  
 
-% Finish with list of iniatives our API can power (like we have now, but
-% compress it quite a lot.)
+Third, the underlying database tracks all revisions made to the data, allowing
+us to query the API to learn ``what was known when'', critical for understanding
+the behavior (and potential pitfalls) of real-time surveillance signals.     
 
-% Signals in the COVIDcast API indicating amounts of COVID-19 and
-% COVID-like illness supplement publicly available case and death data by
-% capturing and focusing on different levels of severity and parts of the
-% timelines of COVID-19 infections. For example, the survey-based COVID-like
-% illness indicators may reflect mild or recently-developed COVID-19 infections
-% before or without a visit to a healthcare provider or COVID-19
-% test. Additionally, the reporting pipeline for various digital signals can be
-% quite short. For example, many survey signals are released the morning after the
-% surveys were taken, and describe symptoms experienced just one to two days in
-% the past; initial estimates of outpatient visits and inpatient admissions are
-% released after a few days, generally within a week. The timeliness of these
-% signals may enable users to more quickly detect and predict changes in the
-% direction of COVID-19 activity.
+Finally, we emphasize that unifying many relevant signals into a single common
+format, with comprehensive revision tracking, is a valuable goal in it of
+itself.  No one data source is perfect; each is subject to error.  Bringing
+numerous signals from different data streams all together, and making access as
+convenient as possible for public health researchers, policy makers, modelers,
+etc., is a strong testament to our belief in ``the whole being greater than the
+sum of its parts''.  
 
-% TODO move backfill and correlation discussion here?
-%
-% Discuss other applications of the data:
-% - Early warning (informal: just call a human to look at things when the
-%   indicators blow up)
-% - Hotspot prediction (formal: build a model to predict a surge)
-% - Forecasting (refer out to the paper we're writing in parallel)
-% - Nowcasting (i.e., estimating latent infection curve)
-% - Reopening criteria (refer to COVID Exit Strategy?)
-%
-% COVIDcast facilitates several types of real-time applications and retrospective
-% analyses.
-% \begin{itemize}
-% \item
-% \emph{Situational awareness dashboards and reports}
-% summarize activity levels and outcomes, public behavior, vaccination rates, and
-% other relevant statistics.
-% %
-% Features of the COVIDcast API and \texttt{covidcast} packages that are
-% particularly relevant here are the common data format across all signals and the
-% ability to easily request data for individual locations and for less-commonly
-% used geographical resolutions such as Hospital Referral Regions and metropolitan
-% statistical areas, and for newer types of data such as vaccination status.
-% %
-% \item
-% \emph{Early warning} systems flag fast rises in COVID-19 activity indicators;
-% formal variants first define what counts as elevated activity or surges and
-% perform statistical \emph{hotspot predictions}.
-% %
-% For individuals and local-level response, signals with sufficient availability
-% and high time-wise correlations with an outcome of interest (e.g., official case
-% or hospitalization data) are natural choices to monitor.
-% %
-% For resource allocation across locations or drug trial site selection, natural
-% choices would be indicators directly describing the stage of the disease being
-% targeted or signals with high geo-wise correlations to these indicators.
-% %
-% \item
-% \emph{Forecasts} directly predict COVID-19 activity levels using point estimates
-% or probability distributions.
-% %
-% These models may operate at fine geographical and temporal resolutions and/or
-% draw on a wide variety of data, making a common data format and signals offered
-% by county and by date particularly useful.
-% %
-% Revision tracking is especially useful here, helping to explain anomalies in
-% past forecasts and improve future ones.
-% %
-% \item
-% \emph{Nowcasts} estimate current or near-future COVID-19 activity levels or the
-% true number of infections.
-% %
-% For these applications, it is important to have signals with time
-% values that relate to when symptoms started or were present, or when a healthcare
-% visit occurred, rather than to the time that these values were eventually
-% reported, unless there is a fixed reporting delay or auxiliary data regarding the
-% distribution of reporting delays.
-% %
-% For example, time values for survey data in COVIDcast relates to when symptoms
-% were occurring, doctor visit data indicates the date of the visit, and inpatient
-% data indicates the date of admission.
-% %
-% This contrasts with nationwide aggregated case and death data, which is
-% usually aligned by the date that a case or death was reported and subject to
-% variable delays based on testing availability and location-specific reporting pipelines.
-% %
-% % TODO antibodies, revisions, positivity
-% \item
-% \emph{Reopening criteria} are informed by COVID-19 activity levels, public
-% behavior, and vaccination levels.  Methodologies to develop and evaluate these
-% criteria may require such information, as well as additional data on timing of
-% public health interventions and on confounding variables, in order to draw valid
-% conclusions or to improve estimated effects of potential policies.
-% \end{itemize}
-
-% TODO refer out to the paper we're writing in parallel
+There are a number of open questions, and challenges that remain.  
+% TODO:
+% RJT: we should write quick bullet points on 1. survey bias, 2. geo bias in
+% claims data, 3. backfill and holiday corrections in claims data. 
+% @AR: can you give this a stab?  You can also delegate (Aaron e.g. should be
+% able to write something on the claims stuff.)  Let's keep it succint!
 
 \matmethods{Please describe your materials and methods here. This can be more than one paragraph, and may contain subsections and equations as required.
 
