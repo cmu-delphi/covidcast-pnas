@@ -234,8 +234,14 @@ process of training arbitrary prediction models over a sequence of prediction
 dates, by constructing the proper sequence of vintage training data sets.   
 
 \begin{figure}[tb!]
-\includegraphics[width=\columnwidth]{fig/vintage.pdf}
-\caption{TODO}
+\includegraphics[width=\columnwidth]{fig/revisions-dv-jhu-1.pdf}
+\caption{Revision behavior for signals in the New York City HRR from two
+  sources. Each colored line 
+  corresponds to the data as reported on that date. DV-CLI is revised upward
+  throughout the month of December, though the amount fades as we look further
+  back in time. In contrast, JHU-CSSE data remains ``as reported'' on
+  December 3 until a major correction is made on December 31, affecting all data
+  over the period. }
 \label{fig:vintage}
 \end{figure}
 
@@ -381,8 +387,12 @@ predicted quantile at level $\tau$ exceeds a predicted quantile at level $\tau'
 for an example forecast. 
 
 \begin{figure}[t]
-\includegraphics[width=\columnwidth]{fig/trajectory.pdf}
-\caption{TODO}
+\includegraphics[width=\columnwidth]{fig/ny-trajectory-1.pdf}
+\caption{Forecast from the autoregressive model for the New York City HRR made
+  on October 15 (vertical line). 
+  The fan displays 50\%, 80\% and 95\% intervals while the orange curve shows
+  the median forecast. The connected black points represent ``finalized'' data,
+  as reported in May 2021.}
 \label{fig:trajectory}
 \end{figure}
 
@@ -627,10 +637,13 @@ supplement).
 % TODO note what we said here about the supplement
 
 \begin{figure}[t]
-\includegraphics[width=\columnwidth]{fig/fcast-1.pdf}
-\caption{TODO}
-\label{fig:forecast}
+  \includegraphics[width=\columnwidth]{fig/fcast-1.pdf}
+  \caption{Average WIS for each forecast model divided by the averaged WIS of
+    the flat-line forecaster.}
+  \label{fig:forecast}
 \end{figure}
+
+
 
 Figure~\ref{fig:hotspot} displays the results for hotspot prediction, again
 stratified by ahead value and averaged over all HRRs and prediction dates (June 
@@ -643,6 +656,8 @@ quite well in hotspot prediction, close to the best-performing indicator models
 for many of the ahead values. [TODO: should we insert one line explaining
 this---you're somewhat protected form volatiliy in a logistic model thanks to
 the sigmoid function used to define the probabilities?]  
+
+
 
 \subsection{Implicit Regularization Hypothesis}
 
@@ -664,17 +679,39 @@ rejection (informally speaking) of the implicit regularization hypothesis.
 
 \begin{figure}[t]
 \includegraphics[width=\columnwidth]{fig/hot-1.pdf}
-\caption{TODO}
+\caption{Area under the curve for each forecast model averaged over all
+  prediction dates and HRRS.}
 \label{fig:hotspot}
 \end{figure}
 
 \subsection{Performance in Up, Down, Flat Periods}
 
-TODO
+\begin{figure}[t]
+  \includegraphics[width=\columnwidth]{fig/upswing-histogram-1.pdf}
+  \caption{Histogram of the difference in WIS for the AR model relative to each
+    forecaster. Larger values are better for the indicator assisted model.}
+  \label{fig:up-down-flat}
+\end{figure}
 
 \subsection{Effects of Leading or Lagging Behavior}
 
-TODO
+\begin{figure}[t]
+  \includegraphics[width=\columnwidth]{fig/leading-and-lagging-1.pdf}
+  \caption{Correlation of the difference in WIS with the ``leadingness'' and
+    ``laggingness'' of the indicator at the target date.}
+  \label{fig:leading-lagging}
+\end{figure}
+
+
+\begin{figure}[t]
+  \includegraphics[width=\columnwidth]{fig/diff-in-lead-lag-1.pdf}
+  \caption{Correlation of the difference in WIS with difference between the
+    ``leadingness'' and ``laggingness'' of the indicator at the target date.}
+  \label{fig:diff-btw-leading-lagging}
+\end{figure}
+
+
+
 
 \section{Discussion}
 
