@@ -8,7 +8,7 @@
 
 \input{../../common/prelim.tex}
 
-\title{Can Auxiliary Indicators Improve COVID-19 Forecasts and Hotspot
+\title{Can Auxiliary Indicators Improve COVID-19 Forecasting and Hotspot  
   Prediction?} 
 
 % Use letters for affiliations, numbers to show equal authorship (if applicable) and to indicate the corresponding author
@@ -24,19 +24,21 @@
 \leadauthor{Lead author last name} 
 
 % Please add a significance statement to explain the relevance of your work
-% TODO write a real one. This is the indicator's one.
-\significancestatement{To study the COVID-19 pandemic, its effects on society,
-  and measures for reducing its spread, researchers need detailed data on the
-  course of the pandemic. Standard public health data streams suffer
-  inconsistent reporting and frequent, unexpected revisions. They also miss
-  other aspects of a population's behavior, worthy of consideration. We
-  present an open database of COVID signals in the United States, measured at
-  the county level and updated daily. These include traditionally reported COVID
-  cases and deaths, and many others: signals based on measures of mobility,
-  social distancing, internet search trends, self-reported symptoms, and
-  patterns COVID-related activity in de-identified medical insurance claims. The
-  database provides all signals in a common, easy-to-use format, empowering both
-  public health research and operational decision-making.
+\significancestatement{
+  TODO % For reference, below is the indicators paper one.
+
+  % To study the COVID-19 pandemic, its effects on society,
+  % and measures for reducing its spread, researchers need detailed data on the
+  % course of the pandemic. Standard public health data streams suffer
+  % inconsistent reporting and frequent, unexpected revisions. They also miss
+  % other aspects of a population's behavior, worthy of consideration. We
+  % present an open database of COVID signals in the United States, measured at
+  % the county level and updated daily. These include traditionally reported
+  % COVID cases and deaths, and many others: signals based on measures of
+  % mobility, social distancing, internet search trends, self-reported symptoms,
+  % and patterns COVID-related activity in de-identified medical insurance 
+  % claims. The database provides all signals in a common, easy-to-use format,
+  % empowering both  public health research and operational decision-making. 
 }
 
 % Please include corresponding author, author contribution and author
@@ -170,15 +172,16 @@ in the API, we study the following five:
   de-identified Change Healthcare claims data.
 \item Change Healthcare COVID (CHNG-COVID): The percentage of outpatient visits
   with confirmed COVID-19, based on the same claims data.
-\item COVID Tracking and Impact Survey CLI-in-community (CTIS-CLI-in-community): 
-  The estimated percentage of the population who knows someone who is sick,
-  based on Delphi's surveys of Facebook users.
+\item COVID Trends and Impact Survey CLI in the community
+  (CTIS-CLI-in-community): The estimated percentage of the population who know
+  someone in their local community that is sick, based on Delphi's surveys of
+  Facebook users, called the COVID Trends and Impact Survey. 
 \item Doctor Visits COVID-like illness (DV-CLI): The same as CHNG-CLI, but
   computed based on de-identified medical insurance claims from other health
   systems partners.  
 \item Google Search Trends for anosmia and ageusia (Google-AA): A measure of 
-  COVID-19 related Google search volume for queries related to anosmia (loss of
-  smell), ageusia (loss of taste), or both.  
+  COVID-19 related Google search volume for queries relating to anosmia or
+  ageusia (loss of smell or taste), based on Google's Search Trends data set. 
 \end{itemize}
 In short, we choose these indicators because, conceptually speaking, they
 measure aspects of an individual's disease progression that would plausibly
@@ -231,7 +234,6 @@ process of training arbitrary prediction models over a sequence of prediction
 dates, by constructing the proper sequence of vintage training data sets.   
 
 \begin{figure}[tb!]
-\centering
 \includegraphics[width=\columnwidth]{fig/vintage.pdf}
 \caption{TODO}
 \label{fig:vintage}
@@ -252,8 +254,8 @@ definitions are made, etc. Groups like JHU CSSE then work tirelessly to correct
 such anomalies after first publication (e.g., they will attempt to
 back-distribute a spike when a reporting backlog is cleared, by working with a
 local authority to figure out how this should best be done), which can result
-in very nontrivial and often unpredictable revisions.  See Figure
-\ref{fig:vintage} for an example.
+in very nontrivial and often unpredictable revisions.  See
+Figure~\ref{fig:vintage} for an example. 
 
 Lastly, our treatment of the Google-AA signal is different from the rest.
 Because Google's team did not start publishing this signal until early
@@ -265,24 +267,24 @@ finalized values for it in our analysis.
 \subsection{Analysis Tasks}
 
 \begin{table*}[t]
-  \centering
-  \caption{Summary of forecasting and hotspot prediction tasks considered in
-    this paper.}
-  \begin{tabular}{l p{2.75in} p{2.75in}}
-    \toprule
-    & \textbf{Forecasting} & \textbf{Hotspot prediction} \\
-    \midrule
-    Response variable & $Y_{\ell,t}$ (7-day trailing average of COVID-19 case
- incidence rates, per location $\ell$ and time $t$) & $Z_{\ell,t} =
-\indicator{Y_{\ell,t} \geq 1.25 \cdot Y_{\ell, t-7}}$ (indicator that $Y_{\ell,t}$ 
-grows by more than 25\% relative to the preceding week) \\
-    Geographic resolution & Hospital referral region (HRR) & Hospital referral
+\centering
+\caption{Summary of forecasting and hotspot prediction tasks considered in
+  this paper.}
+\begin{tabular}{l p{2.75in} p{2.75in}}
+  \toprule
+  & \textbf{Forecasting} & \textbf{Hotspot prediction} \\
+  \midrule
+  Response variable & $Y_{\ell,t}$ (7-day trailing average of COVID-19 case 
+incidence rates, per location $\ell$ and time $t$) & $Z_{\ell,t} =
+\indicator{Y_{\ell,t} \geq 1.25 \cdot Y_{\ell,t-7}}$ (indicator that 
+$Y_{\ell,t}$ grows by more than 25\% relative to the preceding week) \\ 
+  Geographic resolution & Hospital referral region (HRR) & Hospital referral
 region (HRR) \\ 
-    Forecast period & June 6--December 31, 2020 & June 13--December 31, 2020 \\  
-    Model type & Quantile regression & Logistic regression \\
-    Evaluation metric & Weighted interval score (WIS) & Area under curve (AUC) \\
-    \bottomrule
-  \end{tabular}
+  Forecast period & June 9--December 31, 2020 & June 16--December 31, 2020 \\  
+  Model type & Quantile regression & Logistic regression \\
+  Evaluation metric & Weighted interval score (WIS) & Area under curve (AUC) \\
+  \bottomrule
+\end{tabular}
 \label{tab:analysis_tasks}
 \end{table*}
 
@@ -300,9 +302,9 @@ Why do we define the response variables via 7-day averaging? The short answer
 is robustness: averaging stabilizes the case time series, and accounts for 
 uninteresting artifacts like weekend-weekday differences in the series.  Note
 that we can of course equivalently view this (equivalent up to a constant
-factor) as predicting the HRR-level COVID-19 case incidence rate \textit{summed} 
-over some 7-day period in the future, and predicting a binary variable derived 
-from this. 
+factor) as predicting the HRR-level COVID-19 case incidence rate \textit{summed}
+over some 7-day period in the future, and predicting a binary variable derived
+from this.  
 
 In what follows, we cover more details on our two analysis
 tasks. Table~\ref{tab:analysis_tasks} presents a summary.   
@@ -323,8 +325,8 @@ early/mid June and December 31, 2020.  The precise start date differs for
 forecasting and hotspots prediction; for each task it was chosen to be the
 earliest date at which the data needed to train all models was available, which
 ends up being (per our setup, with 21 days of training data, and lagged values
-of signals for features as we will detail shortly) June 6, 2020 for forecasting,
-and June 13, 2020 for hotspot prediction. (The bottleneck here is the
+of signals for features as we will detail shortly) June 9, 2020 for forecasting,
+and June 16, 2020 for hotspot prediction. (The bottleneck here is the
 CTIS-CLI-in-community signal, which does not exist before early April 2020, when
 the survey was first launched). The end date was chosen again with a
 consideration to align both tasks as best as possible, and because few hotspots
@@ -333,7 +335,7 @@ pandemic in 2021.
 
 \paragraph{Forecasting Models}
 
-Recall $Y_{t,\ell}$ denotes the 7-day trailing average of COVID-19 case
+Recall $Y_{\ell,t}$ denotes the 7-day trailing average of COVID-19 case
 incidence rates in location $\ell$ and at time $t$.  Separately for each
 $a=7,\ldots,28$, to predict $Y_{\ell,t+a}$ for ahead value $a$, we consider a
 simple probabilistic forecasting model of the form:     
@@ -375,11 +377,10 @@ training data.
 
 At prediction time, in order to deal with possible crossing violations (a
 predicted quantile at level $\tau$ exceeds a predicted quantile at level $\tau'
-> \tau$), we apply a simple post-hoc sorting.  See Figure \ref{fig:trajectory}
+> \tau$), we apply a simple post-hoc sorting.  See Figure~\ref{fig:trajectory}
 for an example forecast. 
 
-\begin{figure}[tb!]
-\centering
+\begin{figure}[t]
 \includegraphics[width=\columnwidth]{fig/trajectory.pdf}
 \caption{TODO}
 \label{fig:trajectory}
@@ -389,14 +390,14 @@ for an example forecast.
 
 Define the binary indicator:
 $$
-Z_{t,\ell} = \indicator{Y^\Delta_{\ell,t} \geq 0.25},
+Z_{\ell,t} = \indicator{Y^\Delta_{\ell,t} \geq 0.25},
 $$
 where we use the notation \smash{$Y^\Delta_{\ell,t} = (Y_{\ell,t} - Y_{\ell,
-    t-7})/(Y_{\ell,t-7})$}. In other words, $Z_{t,\ell}=1$ if the number of
+    t-7})/(Y_{\ell,t-7})$}. In other words, $Z_{\ell,t}=1$ if the number of
 newly reported cases over the past 7 days has increased by at least 25\%
 compared to the preceding week.  When this occurs, we say location $\ell$ is a
 \textit{hotspot} at time $t$.  Empirically, this rule labels about 27\% of
-location-time pairs as hotspots, during the prediction period (June 13--December
+location-time pairs as hotspots, during the prediction period (June 16--December
 31, 2020).  
 
 We treat hotspot prediction as a binary classification problem and use a setup 
@@ -515,18 +516,18 @@ involving claims-based signals in particular.
 
 \paragraph{Spatial Heterogeneity} 
 
-Some signals display a significant degree of spatial heterogeneity, by which we
-mean the values that they take at different geographic locations are not 
-comparable.  This is true of the Google-AA signal (due to the way in which the 
+Some signals have a significant amount of spatial heterogeneity, by which we
+mean their values across different geographic locations are not comparable.
+This is the case for the Google-AA signal (due to the way in which the
 underlying search trends time series is self-normalized, see
-\cite{GoogleSymptoms}) and of the claims-based signals (see the discussion in
-our companion paper on the API and database).  Such spatial heterogeneity likely
+\cite{GoogleSymptoms}) and the claims-based signals (see the discussion in our
+companion paper on the API and database).  Such spatial heterogeneity likely
 hurts the performance of the predictive models that rely on these signals,
-as we train the models on data pooled over all locations.  In the current 
+because we train the models on data pooled over all locations.  In the current
 paper, we do not attempt to address this issue (it is again a topic of ongoing
-work in our group), and we simply note that location-specific effects
-(or pre-processing to remove spatial bias) would likely improve the performance 
-of the models involving Google-AA and the claims-based indicators.
+work in our group), and we simply note that location-specific effects (or
+pre-processing to remove spatial bias) would likely improve the performance of
+the models involving Google-AA and the claims-based indicators.
 
 \section{Results}
 
@@ -589,9 +590,10 @@ prediction tasks).
 Finally, to quantify the importance of training and making predictions using
 proper vintage data, we ran a parallel set of forecasting and hotspot prediction 
 experiments using finalized data. The results, given in the supplement, show
-that training and making predictions on finalized data can result in grossly
+that training and making predictions on finalized data can result in overly
 optimistic estimates of true test-time performance (up to 10\% better in terms
 of average WIS or AUC).
+% TODO note what we said here about the supplement
 
 Code to reproduce all results (which uses the \texttt{evalcast} R package) can 
 be found at
@@ -599,360 +601,116 @@ be found at
 
 \subsection{Aggregate Results by Ahead Value}
 
+Figure~\ref{fig:forecast} displays the results for forecasting, stratified by
+ahead value and averaged over all HRRs and forecast dates (June 9--December 31,
+2020).  Shown is the average WIS for each forecast model divided by the averaged
+WIS from a ``baseline'' model, which is basically a flat-line forecaster (its
+median forecast for $Y_{\ell,t+a}$ is always $Y_{\ell,t}$, with predicted
+quantiles defined around this flat line based on historical variation). This is
+the same baseline model as that used in the COVID-19 Forecast Hub.  Here, we  
+divide by the average WIS of the baseline model in order to put the y-axis on an 
+interpretable scale.  We can see that all curves are well below 1, which means
+that all of the models, including AR, outperform the baseline on average over
+the forecast period (though their advantage over the baseline clearly narrows as
+the ahead value grows).    
 
+We can also see from the figure that CHNG-COVID and DV-CLI offer the biggest
+gains over AR at small ahead values, followed by CTIS-CLI-in-community and
+Google-AA, with the former providing the biggest gains at large ahead values.
+The CHNG-CLI model performs basically the same as AR.  This is likely due to the
+fact that CHNG-CLI suffers from some sort of volatility in forecasting due to
+backfill.  The evidence for this is twofold: the CHNG-CLI model benefits from a
+more robust method of aggregating WIS (geometric mean; shown in the supplement),
+and when we train and make predictions on all-finalized data, it provides a big
+gain over AR, on par with the best-performing models (also shown in the
+supplement).
+% TODO note what we said here about the supplement
+
+\begin{figure}[t]
+\includegraphics[width=\columnwidth]{fig/fcast-1.pdf}
+\caption{TODO}
+\label{fig:forecast}
+\end{figure}
+
+Figure~\ref{fig:hotspot} displays the results for hotspot prediction, again
+stratified by ahead value and averaged over all HRRs and prediction dates (June 
+16--December 31, 2020).  We can see many similarities to the forecasting
+results: CHNG-COVID and DV-CLI offer the biggest improvement over AR, all models
+including AR degrade in performance towards the baseline (this is now just a
+classifier based on random guessing, which achieves an AUC of 0.5) as the ahead
+values grow.  However, one clear difference is that the CHNG-CLI model performs
+quite well in hotspot prediction, close to the best-performing indicator models
+for many of the ahead values. [TODO: should we insert one line explaining
+this---you're somewhat protected form volatiliy in a logistic model thanks to
+the sigmoid function used to define the probabilities?]  
 
 \subsection{Implicit Regularization Hypothesis}
 
+One might ask if the benefits we observe in forecasting and hotspot have
+anything to do with the actual indicator themselves; could it instead be that
+the indicators are simply providing ``implicit regularization'' on top of the
+basic AR model, when we include them as lagged features in
+\eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar_x}?  
 
----which is that 
-  defining features from lagged indicator values in the  models in
-  \eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar_x} simply provides a kind of
-  implicit regularization on top of the basic AR model (so the benefits have
-  nothing to do with the actual indicator values)---
+To test this implicit regularization hypothesis, we reran all of the prediction
+experiments but with $X_{\ell,t}$ in each indicator model \eqref{eq:forecast_ar_x},
+\eqref{eq:hotspot_ar_x} replaced with suitable random noise (bootstrap
+samples form an indicator's historical distribution).  The results, shown and
+explained more precisely in the supplement, are vastly different (worse) than
+the original set of results.  In both forecasting and hotspot prediction, the
+``fake'' indicator models (with random noise as auxiliary features) offered
+essentially no improvement over the pure AR model, which provides a strong
+rejection (informally speaking) of the implicit regularization hypothesis.     
 
-
-To test the ``implicit regularization'' hypothesis (which we explain
-  precisely later), we reran all of the prediction experiments but with
-  $X_{\ell,t}$ in each indicator model replaced by suitable random noise.  This 
-  resulted in vastly different (worse) performance compared to the indicator
-  models fit with actual indicator values, and gave no improvement over the 
-  pure AR model, in both forecasting and hotspot prediction, providing a strong
-  rejection (informally speaking) of the implicit regularization hypothesis.  
+\begin{figure}[t]
+\includegraphics[width=\columnwidth]{fig/hot-1.pdf}
+\caption{TODO}
+\label{fig:hotspot}
+\end{figure}
 
 \subsection{Performance in Up, Down, Flat Periods}
 
-\subsection{Leading-ness or Lagging-ness}
+TODO
+
+\subsection{Effects of Leading or Lagging Behavior}
 
 TODO
 
-
-% TODO: make th 
-
-A Primary 
-B Bootstrap
-C up/down/flat (Dan's first histogram) --> table in appendix
-D leading/lagging 
-
-
-\subsection{Primary Results}
-
-Figure \ref{fig:topline-overall-results} displays the primary results
-of this paper, showing the effect of using indicators on the two
-forecasting tasks as a function of the horizon of the forecast (i.e.,
-the number of days ahead one is forecasting). For the case rate forecasting
-task, the left panel shows the ratio of the mean
-WIS 
-of each forecaster relative to the mean WIS of the
-baseline. \attn{Further description and justification of this metric
-  should be added to the ``Evaluation Metrics'' section rather than
-  here it seems?}  Both means are taken over all HRRs and forecast
-dates ranging from June 9, 2020 to December 31, 2020 \attn{verify}.
-All curves are well below 1, which means that all methods, including \ar, outperform the baseline across all
-considered forecast horizons. The claims-based
-indicators \dv~and \chngcov~show the most substantial gains, whereas
-the \chngcli~does not show any improvement over \ar.  The \fb~and
-\gs~indicators also show a non-negligible improvement.  Notably,
-\fb~is the only indicator to offer a clear improvement at far aheads.
-%\begin{itemize}
-%\item \dv~and \chngcov~perform very well
-%\item \fb~and \gs~perform well
-%\item \chngcli~performs poorly
-%\item Interestingly, fb is the only one offering clear improvement at
- % far aheads
-%\item Note the y-axis: consistent, clear improvement over baseline
-%\end{itemize}
-
-For the hotspot prediction task, the right panel of Figure
-\ref{fig:topline-overall-results} shows the AUC of each method.
-The monotonic decrease of all curves reflects the fact that hotspot
-prediction gets harder as the forecasting horizon increases. At the
-highest considered ahead (nearly one month ahead), the AUCs are close
-  to 0.5, which is no better than random guessing.
-In the 7-14 day ahead range, the indicators show a noticeable
-  improvement over \ar.  For larger horizons there does not
-  appear to be much difference in methods.
-The approximate ordering of methods is similar to what is seen
-  in the forecasting task: \chngcov~and \dv~are the strongest
-  performing and \ar~the weakest.
-Even for 7-day ahead predictions, the AUC is below 0.7,
-  suggesting that all methods struggle with this classification
-  task. \attn{Do people agree that an AUC of 0.7 is not all that great?}
-  That said, \dv~and \chngcov~attain roughly a 10\% increase in AUC
-  over the \ar~classifier.
-  
-%\begin{itemize}
-%\item Monotonic decrease reflects the fact that hotspot
-%  prediction gets harder as ahead increases.
-%\item At the highest ahead (almost one month ahead) the AUCs are close
-%  to 0.5, which is no better than random guessing.
-%\item In the 7-14 day ahead range, the indicators show a noticeable
-%  improvement over the \ar.  For larger horizons there does not
-%  appear to be much difference in methods
-%\item The approximate ordering of methods is similar to what is seen
-%  in the forecasting task: chng\_cov and dv are the strongest
-%  performing and \ar the weakest.
-%\item Even for 7-day ahead predictions, the AUC is below 0.7,
-%  suggesting that all methods struggle with this classification task.
-%  That said, dv and chng\_cov attain roughly a 10\% increase in AUC
-%  over the \ar classifier.
-%\end{itemize}
-
-
-% We see that all three \attn{will need to
-% include imputed-zero google here, hopefully four} indicator-assisted
-% forecasters improve upon the baseline QAR3 forecaster.  The QAR3 model
-% assisted by the Change Healthcare confirmed COVID-19 signal
-% (QAR3+CHCOV3) sees the strongest improvement.
-% C`
-
-\begin{figure}[tb!]
-  \centering
-  \includegraphics[width=\linewidth]{fig/figure5.pdf}
-  \caption{\label{fig:topline-overall-results}  Forecasting performance as a
-    function of number of days 
-    ahead, aggregated across all HRRs and forecast dates. \attn{How's this?}}
-\end{figure}
-
-\subsection{Avoiding misleading retrospective evaluations}
-
-Figure \ref{fig:finalized-vs-honest} quantifies the effect of
-not properly accounting for the question of ``what was known when'' in
-performing retrospective evaluations of forecasters.  When methods are
-given the finalized version of the data rather than the version available at the time that the forecast would have been made, all methods
-appear (falsely) to have better performance.  For example, for forecasting case rates
-7-days ahead, the WIS of all methods is at least 8\% larger than what would have been
-recorded using the finalized values of the data.  This effect
-diminishes as the forecasting horizon increases, reflecting the fact
-that these forecasters rely less heavily on recent data than very
-short-term forecasters.  Crucially, some methods are
-``helped'' more than others by the less scrupulous retrospective
-evaluation, underscoring the difficulty of avoiding misleading
-conclusions when performing retrospective evaluations of forecasters.
-
-The \chngcli~indicator (along with the other claims-based signals) is the most
-affected by this distinction, reflecting the latency in claims-based
-reporting. \attn{Actually, \dv~is the least affected for forecasting
-  whereas it is one of the most affected for hotspots.}  This supports
-the importance of efforts to provide ``nowcasts'' for claims signals
-(which corresponds to a 0-ahead ``forecast'' of what the claims
-signal's value will be once all data has been collected).
-
-Even the \ar~model is affected by this distinction, reflecting the
-fact that the case rates themselves (i.e., the response values) are also
-subject to revision.  The forecasters based on indicators are thus
-affected both by revisions to the indicators and by revisions to the
-case rates.
-
-\begin{itemize}
-%\item Motivates the importance of nowcasting for claims signals.
-  \item For forecasting task: Also, \chngcli~and \dv~perform very similarly here, which is
-    reassuring because they're measuring the same thing (in
-    principle).  Yet they must have very different backfill profiles…
-  \item For hotspots task: dv seems to get a bigger boost than
-    \chngcov - interesting dichotomy to forecasting
-\item But in both forecasting/hotspots \chngcli~is affected a lot by backfill
-\item \attn{We should be careful about which indicators we were not
-      able to track latency for.  In fact, we should probably remove
-      these from the plot since they would be more strongly affected
-      than is shown in the plot.}
-
-\item \attn{We can also discuss the distinction
-      between indicators that could in principle have low latency
-      (e.g. GS) versus those where latency is inherent
-      (e.g. claims-based indicators). If the goal is assessing the
-      performance of GS ``for the next pandemic'' then it would make
-      sense to give GS a pass since in theory they could have had it
-      with very low latency (as opposed to claims based signals where
-      backfill may be unavoidable).  Of course, in
-    ``the next pandemic'' there might not be such highly specific
-    symptoms such as A+A as there was in the COVID-19 case.} 
-\end{itemize}
-
-\begin{figure}[tb!]
-     \centering
-     \includegraphics[width=\linewidth]{fig/figure6.pdf}
-     \caption{How misleading is a retrospective analysis that uses the
-       finalized version of the data rather than the version that was
-       in fact available at the time the forecast was made?  Plots
-       show the ratio in performance (using mean WIS fore the
-       forecasting task and AUC for the hotspot prediction
-       task). \label{fig:finalized-vs-honest} Cheating vs. honest plots.} 
-\end{figure}
-
-\subsection{Additional sensitivity analyses}
-
-In addition to whether one properly accounts for signal latency, there
-are several other choices in evaluating forecasters that can also have
-a non-trivial impact on results.
-
-For example, in Figure
-\ref{fig:topline-overall-results}, we show the ratio
-of means.  Other choices of aggregation and scaling are also
-possible.  For example, taking the mean of ratios of errors is
-possible and would give more importance to locations where
-errors are small (either because the location-time pairs had low case
-rates or because the forecasting task was itself easier).  By
-contrast, the ratio of the mean of errors may be dominated by
-location-time pairs where the error is large.
-Figure \ref{fig:
-  scale-aggregate-order} of the Supplementary Information shows...
-\begin{itemize}
-\item Note the y-axis: barely an improvement over baseline, and this goes away for AR after 11 days ahead, and for all other models around 13-14 days ahead.
-\item Using trimmed means here because otherwise the results are extremely unstable (as the denominators can be small, when WIS of baseline is small).
-\item Similar message to before (non-adjusted), but \dv~and \chngcov~the best, \fb~and \gs~still good, but now \chngcli~seems to do much better!  
-\item What's our interpretation here?  That somehow \chngcli~just
-  does particularly bad in tasks where the baseline is also bad?
-  \item We might include a histogram of WIS with a log-transformed
-    x-axis to suggest that the geometric mean may be reasonable here.
-\end{itemize}
-Using instead the geometric mean makes the order of aggregation and
-scaling immaterial since the ratio of geometric means is the same as
-the geometric mean of ratios.  Figure \ref{fig:geometric-mean} of the
-Supplementary Information shows how Figure
-\ref{fig:topline-overall-results} panel A would change if
-one replaces the arithmetic mean by the geometric mean.
-
-In Supplementary Information \ref{sec:2021}, we investigate the effect of lengthening
-the time window to include 2021.
-\begin{itemize}
-\item For forecasting: results get better, whether we look at
-  non-adjusted (first plot) or adjusted scores (second plot).  Other
-  than that, interpretation is qualitatively similar, except fb now
-  seems to be worse than gs.  And \chngcli~is strong, even in the
-  non-adjusted view.
-  \item For hotspots: Alden will write something explaining why we
-    don't do hotspot detection in 2021.
-\end{itemize}
-
-In Supplementary Information Section \ref{sec:gs-locations}, we look at various approaches to
-accounting for the fact that the \gs~indicator is only available
-for XX HRRs.
-
-\begin{itemize}
-  \item For forecasting task: clearly gs is not missing at random, and when it's present, it tends to be predictive.  Hence high values have a low false positivity rate.  Most visible in the adjusted view below, where gs triumphs.  Also \chngcli~gets a lot worse.
-
-\item For hotspots: All methods look better, suggesting that the “GS locations” are easier for hotspot prediction. E.g. at 7-days ahead, the AUCs computed based on all locations range from 0.61-0.66; restricted to GS locations, the AUCs range from about 0.65-0.69. (These are all eyeballed, should get actual numbers if we want to say something like this in paper.)
-\item gs\_subset appears to be particularly helped by this subsetting
-  (which makes sense since on those other locations it was 0-imputed)
-  \item Daniel will also try gs\_impute as in forecasting
-\end{itemize}
-
-% Figure \ref{fig:forecast-median-relative-wis-faceted} splits the topline
-% median relative WIS results over four time periods:  June and July, which
-% corresponds to the small, initial surge experienced in the US;
-% August and September, when incident cases nationally were somewhat stable;
-% October, when a second surge was witnessed; and November and December,
-% which saw the largest surges to date.  In essentially all the time periods,
-% the indicator-assisted models perform in aggregate as well or better than
-% the baseline QAR3 model.  The results in October do not show much
-% differentiation between the baseline QAR3 and the indicator-assisted models.
-% However, we note that during that time period, even the baseline QAR3
-% model is doing very well in terms of relative WIS (especially compared to
-% other time periods), so perhaps there is not much ``room for improvement'',
-% so to speak.
-
-% \begin{figure*}[tb!]
-%      \centering
-%      \begin{subfigure}[b]{0.49\textwidth}
-%          \centering
-%          \includegraphics[width=\textwidth]{fig/reduction_mean_scaled_wis_facet_honest.pdf}
-%          \caption{Forecasting task: mean WIS relative to mean WIS of baseline}
-%          \label{fig:forecast-reduction-mean-scaled-wis-facet}
-%      \end{subfigure}
-%      \hfill
-%      \begin{subfigure}[b]{0.49\textwidth}
-%          \centering
-%          \includegraphics[width=\textwidth]{fig/auc_by_forecast_period.pdf}
-%          \caption{Hotspot prediction task: AUC}
-%          \label{fig:hotspot-auc-faceted}
-%      \end{subfigure}
-%      \label{fig:topline-faceted-results}
-%      \caption{Topline results from June - December 2020, split into
-%      four representative time periods.}
-% \end{figure*}
-
-
-\paragraph{\attn{Additional results section material, some for Discussion}}
-
-
-\begin{figure}
-    \centering
-    \includegraphics[width=.95\linewidth]{fig/fake-map.pdf}
-    \caption{Weighted interval score for forecasts made on April 1, 2021. Scores
-      are averaged over horizons from 1 to 14 days ahead and are relative to
-      population size.} 
-    \label{fig:fake-map}
-\end{figure}
-
-\begin{enumerate}
-%\item How does this vary over time? Table showing 7-day ahead and 14-day ahead
-%  (just picking out two of the d=5,...,20). Include a national curve.
-\item Spatial map of errors across HRRs for both tasks. See
-  \autoref{fig:fake-map} for an example. 
-\item Unlikely we can find it, but we should try anyway. Possibly put in the
-  intro or discussion instead. Find an example of a forecast altered by the
-  presence of an indicator.  Plot the two trajectories.
-\item Examine a specific HRR over time. What does it mean to predict certain
-  hotspots? How can we understand what is happening?
- \item What can we say about statistical significance? NRI, paired t-test?
- \item Figures showing hotspots make sense
- \item Horizontal line at 0.5 on AUC curve, discribe that this is random
-   guessing. 
-\end{enumerate}
-
-
 \section{Discussion}
 
-We have assessed the performance of [NUMBER] indicators in terms of their
-usefulness for performing two forecasting tasks: probabilistic
-forecasting of case
-rates and hotspot prediction at the HRR-level, 1--[NUMBER] days in advance.
-In measuring the practical usefulness of an indicator to forecasting,
-we distinguish between honest versus aspirational assessments.  Data
-latency is an important factor when considering the usefulness of an
-indicator.  Retrospective evaluations that ignore these messy data
-issues fail to provide the full picture.  While one can hope that reporting
-systems will operate faster and more consistently in ``the next
-pandemic,'' some reasons for this latency appear unavoidable.  The
-chaos and strain inherent to pandemic times make indicators that can
-be reported and collected with quickly with minimal effort or manual
-involvement desirable.
+Can axuiliary indicators improve COVID-19 forecasting and hotspot prediction
+models?  Our answer, based on analyzing five auxiliary indicators from the  
+COVIDcast API (defined using from medical insurance claims, internet-based
+surveys, and Google search trends) is undoubtedbly ``yes''. However, there are 
+levels of nuance to such an answer that must be explained.  None of the
+indicators that we have investigated appear to be the ``silver bullet'' that 
+one  might have hoped for, revolutionizing the tractability of the prediction 
+problem, rendering it ``easy'' when it was once ``hard'', in the absence of
+auxiliary information.  Rather, the gains in accuracy offered by the indicator
+models appear to be nontrivial, and consistent across modes of analysis, but
+modest---and more about tipping the bias-variance tradeoff in our favor than
+providing a consistent leading indication of future events.   
 
-We conclude by observing that the
-approach we have taken in this paper is somewhat opposite to that of much of the COVID-19
-forecasting literature.  We have chosen to consider only very simple forecasting models while devoting most of our effort to accounting for as much of the complexity of
-the data and evaluation as possible.  By contrast, many papers focus
-on very complicated forecasting approaches but then evaluate them
-under unrealistic, retrospective conditions.
+[TODO:  Explain how insights from up/down/flat, lagging/leading, etc., are
+relevant to this overall arc.  Reiterate the importance of vintage data.  Finish
+with something about what's left for future work?  ] 
 
 
-\begin{enumerate}
+% RJT: some text commented out below.  May be useful for finishing off the
+% discussion   
 
-\item Discussion should contain more detailed lit review ("context"), rather
-  than in the intro, per the instructions. 
+% This paper is as much about demonstrating how one might go about answering
+% such questions about feature importance in forecasting and hotspot prediction 
+% general, as providing an empirically rigorous answer to this precise question
+% in the context of the COVID-19 pandemic. 
 
-\item Use of syndromic surveillance for other diseases?
-
-\item Cite any papers that use our signals in forecasting.
-\end{enumerate}
-
-\paragraph{\attn{Other potential discussion topics}}
-
-
-
-\begin{itemize}
-
-\item When was this data actually available? (As of issue. The argument is: sure
-  we didn't have it, but it would have helped. We should have this next time.)
-\item Side issues, are there places / times where one signal is especially good?
-  Especially bad?
-\item What do we do about holidays? How do we understand the performance when
-  the data is trash? If the data is trash, all the more reason to have other
-  data that is perhaps less susceptible to these criticisms.
-\item Other signals we might want? Mobility? Discuss how SEIR models need
-  contact matrices, relationship with ``in community'' signals.
-  
-\end{itemize}
+% We conclude by observing that the approach we have taken in this paper is
+% somewhat opposite to that of much of the COVID-19 forecasting literature.  We
+% have chosen to consider only very simple forecasting models while devoting
+% most of our effort to accounting for as much of the complexity of the data and 
+% evaluation as possible.  By contrast, many papers focus on very complicated
+% forecasting approaches but then evaluate them under unrealistic, retrospective 
+% conditions.
 
 \showmatmethods{} % Display the Materials and Methods section
 
