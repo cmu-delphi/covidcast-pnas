@@ -285,7 +285,9 @@ that backfill can significantly alter forecast performance \cite{Brooks:2018,
   Reich:2019}, and that careful training on preliminary data can reduce this
 influence \cite{Brooks:2020}. We also investigate this in our companion paper on
 forecasting, where we observe that training and validating models on finalized 
-data yields overly optimistic estimates of true test-time performance.    
+data yields overly optimistic estimates of true test-time performance.
+
+% TODO: Cite this? https://arxiv.org/abs/2106.04420
 
 \subsection{Public API}
 
@@ -448,9 +450,9 @@ people):
 \end{enumerate}
 
 Figure~\ref{fig:geo_wise_correlation} shows the geo-wise correlations achieved
-by the five signals and COVID case rates (from USAFacts, smoothed using a 7-day
+by the five signals and COVID case rates (from JHU CSSE, smoothed using a 7-day
 trailing average), from April 15, 2020 to April 15, 2021. This calculation is
-performed over counties with at least 500 cumulative cases by the end of this 
+performed over counties with at least 500 cumulative cases by the end of this
 period, and at which all indicators are available (956 counties in total). The
 significantly positive correlations suggest that these signals could be useful
 in hotspot detection (identifying counties with relatively high COVID activity,
@@ -460,14 +462,14 @@ clearly demonstrates the value of a large-scale survey such as CTIS for tracking
 symptoms and case trends, especially when other data is unavailable.
 
 \begin{figure}[t]
-\includegraphics[width=\columnwidth]{fig/time_wise_correlation.pdf}
-\caption{Time-wise correlations with case rates, from April 15, 2020 to April
-  15, 2021, calculated over all counties for which all signals were available
-  and which had at least 500 cumulative cases by the end of this period.}
-\label{fig:time_wise_correlation}
+  \includegraphics[width=\columnwidth]{fig/time_wise_correlation.pdf}
+  \caption{Time-wise correlations with case rates, from April 15, 2020 to April
+    15, 2021, calculated over all counties for which all signals were available
+    and which had at least 500 cumulative cases by the end of this period.}
+  \label{fig:time_wise_correlation}
 \end{figure}
 
-Figure~\ref{fig:time_wise_correlation} summarizes time-wise correlations from 
+Figure~\ref{fig:time_wise_correlation} summarizes time-wise correlations from
 these five signals over the same time period, and for the same set of
 counties. For each signal, we display the set correlations that it achieves in
 histogram form (more precisely, using a kernel density estimate). All signals
