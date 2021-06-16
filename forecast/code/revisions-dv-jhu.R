@@ -1,19 +1,22 @@
-# Known major case revision on Dec 29
-# HRR 303 is NYC
+# Large spike in cases on 9/25 due to inclusion of positive antigen tests as 
+# probable cases. Backfilled by JHU on 10/2 or there abouts.
+# See https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data#retrospective-reporting-of-probable-cases-and-deaths
+# 
+# HRR 311 is Charlotte NC
 
-as_ofs <- seq(as.Date("2020-12-3"), as.Date("2020-12-31"), by = "week")
+as_ofs <- seq(as.Date("2020-09-28"), as.Date("2020-10-19"), by = "week")
 cases_as_of <- map_dfr(as_ofs, function(as_of) {
   covidcast_signal(data_source = "jhu-csse", 
                    signal = "confirmed_incidence_prop",
-                   start_day = "2020-10-01", end_day = "2020-12-01", 
-                   geo_type = "hrr", geo_values = "303", as_of = as_of) %>%
+                   start_day = "2020-08-15", end_day = "2020-09-26", 
+                   geo_type = "hrr", geo_values = "311", as_of = as_of) %>%
     mutate(as_of = as_of)
 })
 dv_as_of <-  map_dfr(as_ofs, function(as_of) {
   covidcast_signal(data_source = "doctor-visits", 
                    signal = "smoothed_adj_cli",
-                   start_day = "2020-10-01", end_day = "2020-12-01", 
-                   geo_type = "hrr", geo_values = "303", as_of = as_of) %>%
+                   start_day = "2020-08-15", end_day = "2020-09-26", 
+                   geo_type = "hrr", geo_values = "311", as_of = as_of) %>%
     mutate(as_of = as_of)
 })
 
