@@ -625,52 +625,58 @@ rates; measures of COVID vaccine acceptance can guide outreach efforts
 \section{Discussion}
 
 The COVIDcast API provides open access to real-time and geographically-detailed
-indicators that support and enhance standard public health reporting streams in 
-several ways.     
+indicators of COVID activity in the United States that support and enhance
+standard public health reporting streams in several ways.
 
 First, several signals in the API closely track COVID activity (over both time
-and space); yet they are derived from different data streams (e.g., surveys,
-medical insurance claims, medical devices), and are therefore not subject to the
-same sources of error as public health reporting data.  This can be important
-both for downstream modeling purposes (enhancing the accuracy in nowcasting and
-forecasting models; see our companion paper on forecasting) and also for
-robustness (providing sanity checks when faced with potential anomalies in
-standard surveillance streams).  
+and space); yet they are derived from different data streams (such as surveys,
+medical insurance claims, and medical devices), and are therefore not subject to
+the same sources of error as public health reporting data. This can be important
+both for robustness and situational awareness, allowing decision-makers to
+diagnose potential anomalies in standard surveillance streams, and for modeling
+tasks such as forecasting and nowcasting. Our companion paper on forecasting
+discusses this in more detail.
 
 Second, the API features many other signals that are relevant to understanding
 aspects of the pandemic and its effects on the United States population that are
-not found in traditional public health streams, e.g., data on mobility patterns,
-internet search trends, mask wearing, and vaccine hesitancy, to name just a few
-(the last two are derived from the COVID Trends and Impact Survey; see our
-companion paper on this survey for a detailed view of its features and
-capabilities).  
+not found in traditional public health streams, such as data on mobility
+patterns, Internet search trends, mask wearing, and vaccine hesitancy, to name
+just a few. (The latter two are derived from the COVID Trends and Impact Survey;
+see our companion paper on this survey for a detailed view of its features and
+capabilities.) These signals have already supported pandemic research and
+policy-making.
 
 Third, the underlying database tracks all revisions made to the data, allowing
 us to query the API to learn ``what was known when'', critical for understanding
-the behavior (and potential pitfalls) of real-time surveillance signals.     
+the behavior (and potential pitfalls) of real-time surveillance signals. Such
+revision data is rarely available in standardized form from other sources.
 
 Finally, we emphasize that unifying many relevant signals into a single common
-format, with comprehensive revision tracking, is a valuable goal in it of
-itself.  No one data source is perfect; each is subject to error.  Bringing
+format, with comprehensive revision tracking, is a valuable goal in and of
+itself. No one data source is perfect; each is subject to error. Bringing
 numerous signals from different data streams all together, and making access as
 convenient as possible for public health researchers, policy makers, modelers,
-etc., is a strong testament to our belief in ``the whole being greater than the
-sum of its parts''.  
+etc., is a strong testament to our belief that ``the whole is greater than the
+sum of its parts''.
 
-There are a number of open questions, and challenges that remain.  
-% TODO:
-% RJT: we should write quick bullet points on 1. survey bias, 2. geo bias in
-% claims data, 3. backfill and holiday corrections in claims data. 
-% @AR: can you give this a stab?  You can also delegate (Aaron e.g. should be
-% able to write something on the claims stuff.)  Let's keep it succint!
+There are a number of open questions, and challenges that remain. Each signal is
+subject to different biases, such as survey sampling and nonresponse biases or
+geographic differences in market share for medical claims data. Claims data can
+also be subject to biases during major national holidays and other events that
+change health-seeking behavior. Characterizing these biases will be important
+for future research using these signals. Several data sources are also subject
+to extensive revision and backfill, which must be studied and modeled to enable
+real-time use of these sources in forecasting and nowcasting systems. The
+breadth and unique features of the COVIDcast API will help facilitate this work,
+which will be vital to advancing pandemic modeling and preparedness.
 
-\matmethods{Please describe your materials and methods here. This can be more than one paragraph, and may contain subsections and equations as required.
+% \matmethods{Please describe your materials and methods here. This can be more than one paragraph, and may contain subsections and equations as required.
 
-\subsection*{Subsection for Method}
-Example text for subsection.
-}
+% \subsection*{Subsection for Method}
+% Example text for subsection.
+% }
 
-\showmatmethods{} % Display the Materials and Methods section
+% \showmatmethods{} % Display the Materials and Methods section
 
 \acknow{Please include your acknowledgments here, set in a single paragraph. Please do not include any acknowledgments in the Supporting Information, or anywhere else in the manuscript.}
 
