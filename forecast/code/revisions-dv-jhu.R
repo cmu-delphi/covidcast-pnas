@@ -1,6 +1,3 @@
-library(covidcast)
-library(tidyverse)
-
 # Known major case revision on Dec 29
 # HRR 303 is NYC
 
@@ -20,13 +17,15 @@ dv_as_of <-  map_dfr(as_ofs, function(as_of) {
     mutate(as_of = as_of)
 })
 
-bind_rows(cases_as_of, dv_as_of) %>% 
+
+pp <- bind_rows(cases_as_of, dv_as_of) %>% 
   mutate(as_of = fct_relabel(factor(as_of), function(x) strftime(x, "%b %d"))) %>%
   ggplot(aes(x = time_value, y = value)) + 
   geom_line(aes(color = factor(as_of))) + 
   facet_wrap(~data_source, scales = "free_y") +
-  theme_bw(base_size = 14) +
+  theme_bw() +
   labs(x = "", y = "", color = "") +
   theme(legend.position = "bottom") +
   scale_color_viridis_d(end = .9, begin = .1)
-ggsave("../gfx/revisions-dv-jhu.pdf", width = 8, height = 4)
+
+

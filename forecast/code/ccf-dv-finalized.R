@@ -1,6 +1,3 @@
-library(covidcast)
-library(tidyverse)
-
 sigs <- covidcast_signals(
   data_source = c("jhu-csse", "doctor-visits"),
   signal = c("confirmed_7dav_incidence_prop", "smoothed_adj_cli"),
@@ -38,5 +35,7 @@ g2 <- ggplot(tibble(lag = drop(cc$lag), ccf = drop(cc$acf)), aes(lag)) +
   geom_vline(xintercept = 0) +
   ylab("cross correlation") +
   theme_bw(base_size = 14) 
-cowplot::plot_grid(g2, g1, rel_widths = c(4,6))
-ggsave("../gfx/ccf-dv-finalized.pdf", width = 8, height = 4)
+
+
+gg <- cowplot::plot_grid(g2, g1, rel_widths = c(4,6))
+

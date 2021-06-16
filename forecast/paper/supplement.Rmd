@@ -1,5 +1,5 @@
 ---
-bibliography: [../../common/covidcast.bib]
+bibliography: [../../common/covidcast.bib, pnas-materials/pnas-sample.bib]
 output: 
   pdf_document:
     keep_tex: true
@@ -10,17 +10,22 @@ params:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, fig.width = 5, fig.height = 3,
+knitr::opts_chunk$set(echo = FALSE, fig.width = 6.5, fig.height = 4.5,
                       fig.align = "center",
                       fig.path = "fig/",
                       cache = TRUE, 
+                      out.width = "\\linewidth",
                       autodep = TRUE,
                       message = FALSE, 
                       warning = FALSE)
-source("eval_funs.R")
-source("hotspot_funs.R")
-source("trajectory_plots.R")
+```
+
+```{r source-funs, cache=FALSE}
+source("../code/eval_funs.R")
+source("../code/hotspot_funs.R")
+source("../code/trajectory_plot_funs.R")
 library(scales)
+library(cowplot)
 path_to_data <- "~/Documents/COVID-Delphi/fcast-indicators-paper/temp_data/"
 ```
 
@@ -85,6 +90,8 @@ hotspots_finalized <- intersect_averagers(
 ```
 
 
+# Figures from results
+
 ## Forecasts
 
 
@@ -129,9 +136,9 @@ ggplot(fcasts_honest %>% filter(period != "jm"),
        aes(wis, fill = forecaster)) +
   geom_density() +
   scale_x_log10() +
-  theme_bw(base_size = 12) +
+  theme_bw() +
   xlab("WIS") +
-  scale_fill_brewer(palette = "Set1") +
+  scale_fill_manual(values = fcast_colors) +
   facet_wrap(~forecaster) +
   theme(legend.position = "none")
 ```
@@ -168,7 +175,7 @@ plotter(fcasts_gs %>% filter(period != "jm"),
   ylab("Geometric mean of WIS (relative to baseline)")
 ```
 
-## Trajectories
+## Trajectories (deprecated)
 
 ```{r hrr-names}
 hrr_names <- read_csv(file.path(path_to_data, "Hospital_Referral_Regions.csv"), 
@@ -218,9 +225,10 @@ fig6b <- left_join(
     group_by(forecaster, ahead) %>%
     summarise(auc_finalized = auc(value, actual))) %>%
   ggplot(aes(ahead, auc_honest / auc_finalized, color = forecaster)) + 
-  geom_line() + geom_point() +
-  theme_bw(base_size = 12) + 
-  scale_color_brewer(palette = "Set1", guide = guide_legend(nrow=1)) +
+  geom_line() + 
+  geom_point() +
+  theme_bw() + 
+  scale_color_manual(values = fcast_colors, guide = guide_legend(nrow=1)) +
   theme(legend.position = "bottom", legend.title = element_blank()) +
   geom_hline(yintercept = 1) +
   ylab("AUC (vintage / finalized)")
@@ -244,8 +252,7 @@ plotter_hotspots(hotspots_gs %>% filter(period != "jm")) +
 
 * Currently, this is the "main" figure. WIS and hotspots, 2 panels, only 2020, honest training.
 
-```{r figure5, eval = FALSE, fig.width=9, fig.height=4}
-library(cowplot)
+```{r figure5}
 leg <- get_legend(fig5a)
 fig5a <- fig5a + theme(legend.position = "none")
 fig5b <- fig5b + theme(legend.position = "none")
@@ -258,7 +265,7 @@ fig5
 
 * WIS and hotspots, 2 panels, only 2020, honest training.
 
-```{r figure6, fig.width=9, fig.height=4}
+```{r figure6}
 fig6a <- fig6a + theme(legend.position = "none")
 fig6b <- fig6b + theme(legend.position = "none")
 fig6 <- plot_grid(fig6a, fig6b, align = "hv", nrow = 1)
@@ -266,7 +273,7 @@ fig6 <- plot_grid(fig6, leg, rel_heights = c(1,.1), nrow = 2)
 fig6
 ```
 
-### Correlations with lagged actuals
+## Correlations with lagged actuals
 
 ```{r cor-with-actuals}
 pct_change <- function(x, n = 14, col_name = "pct_change"){
@@ -279,8 +286,8 @@ pct_change <- function(x, n = 14, col_name = "pct_change"){
   return(y)
 }
 comparison_df <- left_join(
-  fcasts_honest %>% filter(forecaster != "QAR3", period != "jm"),
-  fcasts_honest %>% filter(forecaster == "QAR3", period != "jm") %>%
+  fcasts_honest %>% filter(forecaster != "AR", period != "jm"),
+  fcasts_honest %>% filter(forecaster == "AR", period != "jm") %>%
     select(-c(forecaster,target_end_date)) %>%
     rename(ar3_wis = wis),
   by = c("geo_value", "ahead", "forecast_date")) %>%
@@ -312,13 +319,13 @@ ggplot(pct_chng_df %>%
          mutate(median = median(cor_wisratio_pctchange)), 
        aes(x = cor_wisratio_pctchange)) +
   geom_histogram(aes(y = ..count.. / sum(..count..), fill = forecaster)) +
-  scale_fill_brewer(palette = "Set1") +
-  theme_bw(base_size = 14) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
+  scale_fill_manual(values = fcast_colors) +
+  theme_bw() +
+  theme(legend.position = "none") +
   geom_vline(aes(xintercept = median)) + 
   geom_vline(xintercept = 0, linetype = "dotted") +
   facet_wrap(~forecaster) + 
-  xlab("Spearman correlation") + ylab("relative frequency") +
+  xlab("Spearman correlation") + ylab("Relative frequency") +
   scale_y_continuous(labels = scales::label_percent(accuracy = 1))
 ```
 
@@ -328,9 +335,9 @@ ggplot(pct_chng_df %>%
          mutate(median = median(cor_abs_wisratio_minus_1_pctchange)), 
        aes(x = cor_abs_wisratio_minus_1_pctchange)) +
   geom_histogram(aes(y = ..count.. / sum(..count..), fill = forecaster)) +
-  scale_fill_brewer(palette = "Set1") +
-  theme_bw(base_size = 14) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
+  scale_fill_manual(values = fcast_colors) +
+  theme_bw() +
+  theme(legend.position = "none") +
   geom_vline(aes(xintercept = median)) + 
   geom_vline(xintercept = 0, linetype = "dotted") +
   facet_wrap(~forecaster) + 
@@ -350,7 +357,7 @@ preds <- preds %>%
                              AR3CHCLI3 = "CHNG-CLI",
                              AR3CHCOV3 = "CHNG-COV",
                              AR3DVCLI3 = "DV-CLI",
-                             AR3FBCLI3 = "CTIS-CLI-in-community",
+                             AR3FBCLI3 = "CTIS-CLIIC",
                              AR3GSSAA3_Subset = "gs_subset",
                              AR3GSSAA3_Zero = "Google-AA",
                              Baseline = "strawman"
@@ -394,9 +401,10 @@ df %>%
   ggplot(aes(AR_wis - wis, fill = forecaster)) +
   geom_histogram(bins = 100) +
   facet_grid(udf ~ forecaster) +
-  theme_bw(base_size = 14) +
+  theme_bw() +
+  ylab("Count") +
   theme(legend.position = "none") +
-  scale_fill_brewer(palette = "Set1") +
+  scale_fill_manual(values = fcast_colors) +
   scale_y_log10(breaks = c(10,1000,100000), 
                 labels = trans_format("log10", math_format(10^.x))) +
   xlab("AR WIS - forecaster WIS") +
@@ -414,9 +422,10 @@ df %>%
   ggplot(aes((AR_wis + 1) / (wis + 1), fill = forecaster)) +
   geom_histogram(bins = 100) +
   facet_grid(udf ~ forecaster) +
-  theme_bw(base_size = 14) +
+  theme_bw() +
+  ylab("Count") +
   theme(legend.position = "none") +
-  scale_fill_brewer(palette = "Set1") +
+  scale_fill_manual(values = fcast_colors) +
   scale_x_log10() +
   scale_y_log10(breaks = c(10,1000,100000), 
                 labels = trans_format("log10", math_format(10^.x))) +
@@ -497,7 +506,7 @@ lead_lag_metric <- lead_lag_metric %>%
       `value+0:chng_smoothed_adj_outpatient_cli` = "CHNG-CLI",
       `value+0:chng_smoothed_adj_outpatient_covid` = "CHNG-COV",
       `value+0:doctor-visits_smoothed_adj_cli` = "DV-CLI",
-      `value+0:fb-survey_smoothed_hh_cmnty_cli` = "CTIS-CLI-in-community",
+      `value+0:fb-survey_smoothed_hh_cmnty_cli` = "CTIS-CLIIC",
       `value+0:google-symptoms_sum_anosmia_ageusia_smoothed_search` = "Google-AA")) %>%
   ungroup() %>%
   select(-name)
@@ -508,7 +517,7 @@ df2 <- left_join(
   by = c("geo_value","forecaster","target_end_date" = "time_value"))
 ```
 
-```{r leading-and-lagging, fig.width=8, fig.height=4}
+```{r leading-and-lagging}
 df2 %>%
   filter(period != "jm") %>%
   group_by(forecaster, udf) %>%
@@ -520,15 +529,15 @@ df2 %>%
   geom_bar(width = 0.6, position = position_dodge(width=0.6),
            stat = "identity") +
   geom_hline(yintercept = 0) +
-  scale_fill_brewer(palette = "Set1") +
+  scale_fill_manual(values = fcast_colors) +
   facet_wrap(~name) +
-  theme_bw(base_size = 14) +
-  ylab("correlation") +
+  theme_bw() +
+  ylab("Correlation") +
   xlab("") +
   theme(legend.position = "bottom", legend.title = element_blank())
 ```
 
-```{r diff-in-lead-lag, fig.width=8, fig.height=4}
+```{r diff-in-lead-lag}
 df2 %>%
   filter(period != "jm") %>%
   group_by(forecaster, udf) %>%
@@ -538,9 +547,28 @@ df2 %>%
   geom_bar(width = 0.6, position = position_dodge(width=0.6),
            stat = "identity") +
   geom_hline(yintercept = 0) +
-  scale_fill_brewer(palette = "Set1") +
-  theme_bw(base_size = 14) +
-  ylab("correlation") +
+  scale_fill_manual(values = fcast_colors) +
+  theme_bw() +
+  ylab("Correlation") +
   xlab("") +
   theme(legend.position = "bottom", legend.title = element_blank())
+```
+
+
+# Side figures (in their own scripts)
+
+```{r ccf-dv-finalized}
+library(covidcast)
+source("../code/ccf-dv-finalized.R")
+gg
+```
+
+```{r ny-trajectory}
+source("../code/ny-trajectory.R")
+gg
+```
+
+```{r revisions-dv-jhu}
+source("../code/revisions-dv-jhu.R")
+pp
 ```

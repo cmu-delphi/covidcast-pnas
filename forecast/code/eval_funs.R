@@ -10,6 +10,10 @@ TrimMean05 <- function(x) mean(x, trim = .05, na.rm = TRUE)
 TrimMean1 <- function(x) mean(x, trim = .1, na.rm = TRUE)
 GeoMean <- function(x) exp(mean(log(x), na.rm = TRUE))
 
+fcast_colors <- c(RColorBrewer::brewer.pal(5, "Set1"), "#000000")
+names(fcast_colors) <- c("CHNG-CLI", "CHNG-COV", "CTIS-CLIIC", "DV-CLI",
+                         "Google-AA", "AR")
+
 summarizer <- function(df, y, centerer, scaler, aggr, order_of_operations) {
   for (i in seq_along(order_of_operations)) {
     df <- switch(
@@ -46,8 +50,9 @@ plotter <- function(df, y, aggr,
   ggplot(df, aes(ahead, wis, color = forecaster)) + 
     geom_line() + geom_point() +
     facet_layer +
-    theme_bw(base_size = 14) + 
-    scale_color_brewer(palette = "Set1", guide = guide_legend(nrow = 1)) +
+    theme_bw() + 
+    xlab("Days ahead") +
+    scale_color_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
     theme(legend.position = "bottom", legend.title = element_blank())
 }
 
@@ -65,10 +70,13 @@ plotter_hotspots <- function(df, facet_by_period = FALSE) {
   df <- summarize(df, auc = auc(value, actual))
   
   ggplot(df, aes(ahead, auc, color = forecaster)) + 
-    geom_line() + geom_point() +
+    geom_line() + 
+    geom_point() +
     facet_layer +
-    theme_bw(base_size = 14) + 
-    scale_color_brewer(palette = "Set1", guide = guide_legend(nrow=1)) +
+    theme_bw() + 
+    ylab("AUC") +
+    xlab("Days ahead") +
+    scale_color_manual(values = fcast_colors, guide = guide_legend(nrow=1)) +
     theme(legend.position = "bottom", legend.title = element_blank())
 }
 
@@ -90,9 +98,9 @@ process_res_hotspots <- function(res) {
     mutate(forecaster = recode(forecaster,
                                AR3 = "AR",
                                AR3CHCLI3 = "CHNG-CLI",
-                               AR3CHCOV3 = "CHNG-COVID",
+                               AR3CHCOV3 = "CHNG-COV",
                                AR3DV3 = "DV-CLI",
-                               AR3FB3 = "CTIS-CLI-in-community",
+                               AR3FB3 = "CTIS-CLIIC",
                                AR3GG3 = "gs_subset",
                                AR3GG3_imputed = "gs"
     ))
@@ -121,7 +129,7 @@ process_res_cases <- function(res, actuals) {
                                AR3CHCLI3 = "CHNG-CLI",
                                AR3CHCOV3 = "CHNG-COV",
                                AR3DVCLI3 = "DV-CLI",
-                               AR3FBCLI3 = "CTIS-CLI-in-community",
+                               AR3FBCLI3 = "CTIS-CLIIC",
                                AR3GSSAA3_Subset = "gs_subset",
                                AR3GSSAA3_Zero = "gs",
                                Baseline = "strawman"

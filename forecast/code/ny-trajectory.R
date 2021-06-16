@@ -1,14 +1,12 @@
-library(tidyverse)
-library(lubridate)
 
-ny_preds <- readRDS("../temp_data/predictions_honest.RDS") %>%
+ny_preds <- readRDS(file.path(path_to_data, "predictions_honest.RDS")) %>%
   filter(geo_value == "303", 
          forecast_date == "2020-10-15",
          forecaster == "AR3") %>%
   mutate(target_end_date = forecast_date + days(ahead),
          incidence_period = "day")
 
-actuals <- readRDS("../temp_data/actuals.RDS") %>%
+actuals <- readRDS(file.path(path_to_data, "actuals.RDS")) %>%
   filter(geo_value == "303", 
          target_end_date > "2020-09-01", 
          target_end_date < "2020-11-15") %>%
@@ -17,7 +15,7 @@ actuals <- readRDS("../temp_data/actuals.RDS") %>%
 pd <- evalcast:::setup_plot_trajectory(ny_preds, side_truth = actuals)
 pd$truth_df <- pd$truth_df %>% rename(target_end_date = time_value)
 
-ggplot(pd$truth_df, mapping = aes(x = target_end_date)) +
+gg <- ggplot(pd$truth_df, mapping = aes(x = target_end_date)) +
   geom_ribbon(
     data = pd$quantiles_df,
     mapping = aes(ymin = lower, ymax = upper, fill = interval)) +
@@ -33,6 +31,5 @@ ggplot(pd$truth_df, mapping = aes(x = target_end_date)) +
   geom_vline(xintercept = as.Date("2020-10-15")) +
   theme_bw(base_size = 14) + 
   theme(legend.position = "none") + 
-  ylab("QAR3 forecast for case rate in NYC") + 
+  ylab("AR forecast for case rate in NYC") + 
   xlab("date")
-ggsave("../gfx/ny-trajectory-plot.pdf", width = 8, height = 5)

@@ -6,4 +6,7 @@ auto/
 *.out
 paper.pdf
 *.synctex.gz
+supplement_cache/
+*.Rhistory
+*.DS_Store
 
