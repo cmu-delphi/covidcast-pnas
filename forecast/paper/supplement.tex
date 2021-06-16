@@ -15,193 +15,292 @@
 
 \begin{document}
 
-%% Comment out or remove this line before generating final copy for submission; this will also remove the warning re: "Consecutive odd pages found".
-\instructionspage  
+
+
+\instructionspage
 
 \maketitle
 
-%% Adds the main heading for the SI text. Comment out this line if you do not have any supporting information text.
 \SItext
 
+All our text goes here. Reference figures with the R chuck label as
+Figure\textasciitilde{}\ref{fig:fcast-finalized}.
 
-\section*{PNAS Template material, to be removed}
+All figures go on their own page after all of the text\ldots{}
 
-\subsection*{Subhead}
-Type or paste text here. This should be additional explanatory text such as an extended technical description of results, full details of mathematical models, etc.   
+Edit \texttt{pnas-suppl-template.tex} for the correct Author list and
+Title.
 
-\section*{Heading}
-\subsection*{Subhead}
-Type or paste text here. You may break this section up into subheads as needed (e.g., one section on ``Materials'' and one on ``Methods'').
+\hypertarget{examining-the-relative-advantage-of-using-finalized-rather-than-vintage-data}{%
+\section{Examining the relative advantage of using finalized rather than
+vintage
+data}\label{examining-the-relative-advantage-of-using-finalized-rather-than-vintage-data}}
 
-\subsection*{Materials}
-Add a materials subsection if you need to.
+This section referes to
+Figures\textasciitilde{}\ref{fig:fcast-finalized}--\ref{fig:hot-honest-v-finalized}.
 
-\subsection*{Methods}
-Add a methods subsection if you need to.
+\hypertarget{aggregating-with-geometric-mean}{%
+\section{Aggregating with geometric
+mean}\label{aggregating-with-geometric-mean}}
 
+\begin{itemize}
+\tightlist
+\item
+  The weighted interval score is bounded below by zero and can be very
+  large. This behavior is typical of right-skewed distributions.
+\item
+  Figure\textasciitilde{}\ref{fig:wis-densities} illustrates that the
+  densities appear log-Gaussian.
+\item
+  This suggests aggregating by the geometric mean rather than the mean
+  for comparisons. See Figure\textasciitilde{}\ref{fig:fcast-adjusted}.
+\end{itemize}
 
-%%% Each figure should be on its own page
+\hypertarget{bootstrap-results}{%
+\section{Bootstrap results}\label{bootstrap-results}}
+
+Here we discuss how implicit regularization is not the reason for
+improved performance
+
+\hypertarget{correlations-with-lagged-actuals}{%
+\section{Correlations with lagged
+actuals}\label{correlations-with-lagged-actuals}}
+
+Alden's histograms are in Figure\textasciitilde{}\ref{fig:cor-wis-ratio}
+and Figure\textasciitilde{}\ref{fig:cor-wis-ratio-m1}.
+
+\hypertarget{upswings-and-downswings}{%
+\section{Upswings and Downswings}\label{upswings-and-downswings}}
+
+Logged version of Figure 5 in the manuscript is in
+Figure\textasciitilde{}\ref{fig:upswing-histogram-logged}.
+
+See also Table\textasciitilde{}\ref{tab:upswing-corr-table}.
+
+\hypertarget{leadingness-and-laggingness}{%
+\section{Leadingness and
+laggingness}\label{leadingness-and-laggingness}}
+
+Currently, both figures are in the manuscript. Probably just need text
+here.
+
+\hypertarget{examining-data-in-2021}{%
+\section{Examining data in 2021}\label{examining-data-in-2021}}
+
+See Figures \ref{fig:fcast-alldates} -- \ref{fig:hot-alldates}.
+
+\hypertarget{deprecated}{%
+\section{Deprecated}\label{deprecated}}
+
+There are a few blocks at the bottom (figures with Google symptoms only
+and the old trajectory plots) that we can remove once we decide.
+
 \begin{figure}
-\centering
-\includegraphics[width=\textwidth]{example-image}
-\caption{First figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/fcast-finalized-1} 
+
+}
+
+\caption{Forecasting performance using finalized data. Compare to Figure 3 in the manuscript.}\label{fig:fcast-finalized}
 \end{figure}
-
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{pnas-materials/frog}
-\caption{Second figure}
-\end{figure}
-
-\begin{table}\centering
-\caption{This is a table}
-
-\begin{tabular}{lrrr}
-Species & CBS & CV & G3 \\
-\midrule
-1. Acetaldehyde & 0.0 & 0.0 & 0.0 \\
-2. Vinyl alcohol & 9.1 & 9.6 & 13.5 \\
-3. Hydroxyethylidene & 50.8 & 51.2 & 54.0\\
-\bottomrule
-\end{tabular}
-\end{table}
-
 
 \clearpage
 
-\hypertarget{figures-from-results}{%
-\section{Figures from results}\label{figures-from-results}}
+\begin{figure}
 
-\hypertarget{forecasts}{%
-\subsection{Forecasts}\label{forecasts}}
+{\centering \includegraphics[width=\textwidth]{fig/hot-finalized-1} 
 
-\begin{center}\includegraphics[width=\linewidth]{fig/fcast-1} \end{center}
+}
 
-\begin{center}\includegraphics[width=\linewidth]{fig/fcast-finalized-1} \end{center}
+\caption{Hotspot prediction performance using finalized data. Compare to Figure 4 in the manuscript.}\label{fig:hot-finalized}
+\end{figure}
 
-\begin{center}\includegraphics[width=\linewidth]{fig/fcast-honest-v-finalized-1} \end{center}
+\clearpage
 
-\begin{center}\includegraphics[width=\linewidth]{fig/fcast-adjusted-1} \end{center}
+\begin{figure}
 
-\begin{center}\includegraphics[width=\linewidth]{fig/wis-densities-1} \end{center}
+{\centering \includegraphics[width=\textwidth]{fig/fcast-honest-v-finalized-1} 
 
-\hypertarget{all-periods}{%
-\subsubsection{All periods}\label{all-periods}}
+}
 
-\begin{center}\includegraphics[width=\linewidth]{fig/fcast-alldates-1} \end{center}
+\caption{Relative forecast WIS with vintage compared to finalized data. Using finalized data leads to overly optimistic performance.}\label{fig:fcast-honest-v-finalized}
+\end{figure}
 
-\begin{center}\includegraphics[width=\linewidth]{fig/fcast-alldates-adjusted-1} \end{center}
+\clearpage
 
-\hypertarget{only-gs-locations}{%
-\subsubsection{Only GS locations}\label{only-gs-locations}}
+\begin{figure}
 
-\begin{center}\includegraphics[width=\linewidth]{fig/fcast-gs-locations-1} \end{center}
+{\centering \includegraphics[width=\textwidth]{fig/hot-honest-v-finalized-1} 
 
-\begin{center}\includegraphics[width=\linewidth]{fig/fcast-gs-locations-adjusted-1} \end{center}
+}
 
-\hypertarget{trajectories-deprecated}{%
-\subsection{Trajectories (deprecated)}\label{trajectories-deprecated}}
+\caption{Relative AUC with vintage compared to finalized data. Using finalized data leads to overly optimistic hotspot performance.}\label{fig:hot-honest-v-finalized}
+\end{figure}
 
-\hypertarget{hotspots}{%
-\subsection{Hotspots}\label{hotspots}}
+\clearpage
 
-\begin{center}\includegraphics[width=\linewidth]{fig/hot-1} \end{center}
+\begin{figure}
 
-\begin{center}\includegraphics[width=\linewidth]{fig/hot-finalized-1} \end{center}
+{\centering \includegraphics[width=\textwidth]{fig/wis-densities-1} 
 
-\begin{center}\includegraphics[width=\linewidth]{fig/hot-honest-v-finalized-1} \end{center}
+}
 
-\hypertarget{all-periods-1}{%
-\subsubsection{All periods}\label{all-periods-1}}
+\caption{Weighted interval score appears to more closely resemble a log-Gaussian distribution.}\label{fig:wis-densities}
+\end{figure}
 
-\begin{center}\includegraphics[width=\linewidth]{fig/hot-alldates-1} \end{center}
+\clearpage
 
-\hypertarget{only-gs-locations-1}{%
-\subsubsection{Only GS locations}\label{only-gs-locations-1}}
+\begin{figure}
 
-\begin{center}\includegraphics[width=\linewidth]{fig/hot-gs-locations-1} \end{center}
+{\centering \includegraphics[width=\textwidth]{fig/fcast-adjusted-1} 
 
-\hypertarget{figure-5}{%
-\subsubsection{Figure 5}\label{figure-5}}
+}
 
-\begin{itemize}
-\tightlist
-\item
-  Currently, this is the ``main'' figure. WIS and hotspots, 2 panels,
-  only 2020, honest training.
-\end{itemize}
+\caption{Relative forecast performance using vintage data and summarizing with the more robust geometric mean.}\label{fig:fcast-adjusted}
+\end{figure}
 
-\begin{center}\includegraphics[width=\linewidth]{fig/figure5-1} \end{center}
+\clearpage
 
-\hypertarget{figure-6-misleading-retrospective-analysis}{%
-\subsubsection{Figure 6 (misleading retrospective
-analysis)}\label{figure-6-misleading-retrospective-analysis}}
+\begin{figure}
 
-\begin{itemize}
-\tightlist
-\item
-  WIS and hotspots, 2 panels, only 2020, honest training.
-\end{itemize}
+{\centering \includegraphics[width=\textwidth]{fig/fcast-booted-1} 
 
-\begin{center}\includegraphics[width=\linewidth]{fig/figure6-1} \end{center}
+}
 
-\hypertarget{correlations-with-lagged-actuals}{%
-\subsection{Correlations with lagged
-actuals}\label{correlations-with-lagged-actuals}}
+\caption{Forecast performance when indicators are replaced with samples from their empirical distribution. Performance is largely similar to the AR model.}\label{fig:fcast-booted}
+\end{figure}
 
-\begin{center}\includegraphics[width=\linewidth]{fig/cor-wis-ratio-1} \end{center}
+\clearpage
 
-\begin{center}\includegraphics[width=\linewidth]{fig/cor-wis-ratio-m1-1} \end{center}
+\begin{figure}
 
-\hypertarget{upswings-vs-downswings}{%
-\subsection{Upswings vs downswings}\label{upswings-vs-downswings}}
+{\centering \includegraphics[width=\textwidth]{fig/fcast-booted-adjusted-1} 
 
-\begin{center}\includegraphics[width=\linewidth]{fig/upswing-histogram-1} \end{center}
+}
 
-\begin{center}\includegraphics[width=\linewidth]{fig/upswing-histogram-logged-1} \end{center}
+\caption{Forecast performance as measured with the geometric mean when indicators are replaced with samples from their empirical distribution. Performance is largely similar to the AR model.}\label{fig:fcast-booted-adjusted}
+\end{figure}
 
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/hot-booted-1} 
+
+}
+
+\caption{Hotspot prediction performance when indicators are replaced with samples from their empirical distribution. Performance is largely similar to the AR model.}\label{fig:hot-booted}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/cor-wis-ratio-1} 
+
+}
+
+\caption{This is one of the correlation plots Alden made. It shows histograms of the Spearman correlation between the ratio of AR to AR WIS with the percent change in 7dav cases relative to 7 days earlier.}\label{fig:cor-wis-ratio}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/cor-wis-ratio-m1-1} 
+
+}
+
+\caption{This is Alden's second set of histograms. Here we have the correlation of the absolute value of WIS ratio - 1 with the percent change in 7dav cases relative to 7 days earlier}\label{fig:cor-wis-ratio-m1}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/upswing-histogram-logged-1} 
+
+}
+
+\caption{Not sure if we want this here. Similar to Figure 5 in the manuscript but taking logs. }\label{fig:upswing-histogram-logged}
+\end{figure}
+
+\clearpage
+
+\begin{table}
+
+\caption{\label{tab:upswing-corr-table}Correlation of the difference in WIS between the AR model with the difference in median predictions. In down periods, improvements in forecast risk are highly correlated with lower median predictions. The opposite is true in up periods. This suggests, as one might expect that improved performance of the indicator-assisted model is attributable to being closer to the truth then the AR model. This conclusion is stronger in down periods then in up periods.}
+\centering
 \begin{tabular}[t]{lrrrrr}
 \toprule
-udf & CHNG-CLI & CHNG-COV & CTIS-CLIIC & DV-CLI & Google-AA\\
+udf & CHNG-CLI & CHNG-COVID & CTIS-CLIIC & DV-CLI & Google-AA\\
 \midrule
 down & 0.79 & 0.80 & 0.83 & 0.81 & 0.81\\
 flat & 0.12 & 0.17 & 0.28 & 0.18 & 0.17\\
 up & -0.57 & -0.56 & -0.53 & -0.53 & -0.47\\
 \bottomrule
 \end{tabular}
+\end{table}
 
-\hypertarget{leadingness-and-laggingness}{%
-\subsection{Leadingness and
-laggingness}\label{leadingness-and-laggingness}}
+\clearpage
 
-\begin{center}\includegraphics[width=\linewidth]{fig/leading-and-lagging-1} \end{center}
+\begin{figure}
 
-\begin{center}\includegraphics[width=\linewidth]{fig/diff-in-lead-lag-1} \end{center}
+{\centering \includegraphics[width=\textwidth]{fig/hotspots-upswing-downswing-1} 
 
-\hypertarget{side-figures-in-their-own-scripts}{%
-\section{Side figures (in their own
-scripts)}\label{side-figures-in-their-own-scripts}}
+}
 
-\begin{center}\includegraphics[width=\linewidth]{fig/ccf-dv-finalized-1} \end{center}
+\caption{Classification and loglikelihood separated into periods of upswing, downswing, and flat cases. Like the analysis of the forecasting task in the main paper (see Figure 7), performance is better during down and flat periods.}\label{fig:hotspots-upswing-downswing}
+\end{figure}
 
-\begin{center}\includegraphics[width=\linewidth]{fig/ny-trajectory-1} \end{center}
+\clearpage
 
-\begin{center}\includegraphics[width=\linewidth]{fig/revisions-dv-jhu-1} \end{center}
+\begin{figure}
 
+{\centering \includegraphics[width=\textwidth]{fig/fcast-alldates-1} 
 
+}
 
-%%% Add this line AFTER all your figures and tables
+\caption{Forecast performance over all periods. Performance largely improves for all forecasters with the inclusion of data in 2021.}\label{fig:fcast-alldates}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/fcast-alldates-adjusted-1} 
+
+}
+
+\caption{Forcast performance over all periods aggregaged with the geometric mean. Again, the inclusion of data in 2021 leads to improved performance.}\label{fig:fcast-alldates-adjusted}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/hot-alldates-1} 
+
+}
+
+\caption{Area under the curve for hotspot predictions including data in 2021. Performance degrades relative to the period in 2020. However, there are far fewer hotspots during this period as case rates declined in much of the country.}\label{fig:hot-alldates}
+\end{figure}
+
+\clearpage
+
+\clearpage
+
 \FloatBarrier
 
 \movie{Type legend for the movie here.}
 
-\movie{Type legend for the other movie here. Adding longer text to show what happens, to decide on alignment and/or indentations.}
-
-\movie{A third movie, just for kicks.}
-
 \dataset{dataset_one.txt}{Type or paste legend here.}
 
 \dataset{dataset_two.txt}{Type or paste legend here. Adding longer text to show what happens, to decide on alignment and/or indentations for multi-line or paragraph captions.}
+
+
+
+
 
 
 \bibliography{../../common/covidcast.bib,pnas-materials/pnas-sample.bib}

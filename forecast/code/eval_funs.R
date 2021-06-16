@@ -1,7 +1,3 @@
-library(tidyverse)
-library(lubridate)
-library(evalcast)
-
 Mean <- function(x) mean(x, na.rm = TRUE)
 Median <- function(x) median(x, na.rm = TRUE)
 TrimMean01 <- function(x) mean(x, trim = .01, na.rm = TRUE)
@@ -11,7 +7,7 @@ TrimMean1 <- function(x) mean(x, trim = .1, na.rm = TRUE)
 GeoMean <- function(x) exp(mean(log(x), na.rm = TRUE))
 
 fcast_colors <- c(RColorBrewer::brewer.pal(5, "Set1"), "#000000")
-names(fcast_colors) <- c("CHNG-CLI", "CHNG-COV", "CTIS-CLIIC", "DV-CLI",
+names(fcast_colors) <- c("CHNG-CLI", "CHNG-COVID", "CTIS-CLIIC", "DV-CLI",
                          "Google-AA", "AR")
 
 summarizer <- function(df, y, centerer, scaler, aggr, order_of_operations) {
@@ -98,7 +94,7 @@ process_res_hotspots <- function(res) {
     mutate(forecaster = recode(forecaster,
                                AR3 = "AR",
                                AR3CHCLI3 = "CHNG-CLI",
-                               AR3CHCOV3 = "CHNG-COV",
+                               AR3CHCOV3 = "CHNG-COVID",
                                AR3DV3 = "DV-CLI",
                                AR3FB3 = "CTIS-CLIIC",
                                AR3GG3 = "gs_subset",
@@ -127,7 +123,7 @@ process_res_cases <- function(res, actuals) {
     mutate(forecaster = recode(forecaster,
                                AR3 = "AR",
                                AR3CHCLI3 = "CHNG-CLI",
-                               AR3CHCOV3 = "CHNG-COV",
+                               AR3CHCOV3 = "CHNG-COVID",
                                AR3DVCLI3 = "DV-CLI",
                                AR3FBCLI3 = "CTIS-CLIIC",
                                AR3GSSAA3_Subset = "gs_subset",
@@ -197,4 +193,15 @@ filter_holidays <- function(res) {
   holiday_craziness = c(thanksgiving, christmas)
   res <- filter(res, !(target_end_date %in% holiday_craziness))
   res
+}
+
+
+pct_change <- function(x, n = 14, col_name = "pct_change"){
+  # courtesy of Alden
+  dt <- c(0,-n)
+  y = covidcast:::apply_shifts(x,dt) %>%
+    rename(value = tidyselect::matches("value\\+"),
+           lag_value = tidyselect::matches("value\\-")) %>%
+    mutate(`:=`(!!col_name,(value - lag_value)/lag_value))
+  return(y)
 }
