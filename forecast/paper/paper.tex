@@ -685,16 +685,34 @@ surveys, and Google search trends) is undoubtedbly ``yes''. However, there are
 levels of nuance to such an answer that must be explained.  None of the
 indicators that we have investigated appear to be the ``silver bullet'' that 
 one  might have hoped for, revolutionizing the tractability of the prediction 
-problem, rendering it ``easy'' when it was once ``hard'', in the absence of
-auxiliary information.  Rather, the gains in accuracy offered by the indicator
-models appear to be nontrivial, and consistent across modes of analysis, but
-modest---and more about tipping the bias-variance tradeoff in our favor than
-providing a consistent leading indication of future events.   
+problem, rendering it easy when it was once hard (in the absence of auxiliary 
+information).  Rather, the gains in accuracy offered by the indicator models 
+(over an autoregressive model based on past case rates along) appear to be
+nontrivial, and consistent across modes of analysis, but modest.  In
+forecasting, the indicator models appear to be most useful in periods in which 
+case rates are flat or trending down, rather than periods in which case rates
+are trending up (as one might hope to see, as the hypothetical benefit provided
+by an idealized ``leading indicator'').  
 
-[TODO:  Explain how insights from up/down/flat, lagging/leading, etc., are
-relevant to this overall arc.  Reiterate the importance of vintage data.  Finish
-with something about what's left for future work?  ] 
+As mentioned previously, the indicator models could certainly benefit from a 
+careful handling of location-specific effects (to account for spatial
+heterogeneity in the search trends and claims-based indicators in particular),
+as well as nowcasting techniques to estimate finalized indicator values before
+using them as features (to account for backfill in the claims-based indicators
+in particular).  Beyond this, it is certainly possible that more sophisticated 
+models for forecasting or hotspot prediction would lead to different results,
+and potentially even different insights.  Natural directions to explore include  
+using interactions, using multiple indicators in tandem in a single model, and 
+leveraging HRR demographics or mobility patterns.  That said, we are doubtful
+that the ``topline'' conclusion would change--that auxiliary indicators can
+provide a nontrivial, consistent, but modest improvement in forecasting and
+hotspot prediction.  
 
+Furthermore, from our experience working on forecasting  TODO
+
+[  Finish by reiterating the importance of vintage data.  Emphasizing the rigor
+or our approach, how we have provided a template for others to be able to do the
+same thing with new models ]
 
 % RJT: some text commented out below.  May be useful for finishing off the
 % discussion   
