@@ -148,7 +148,7 @@ an active field of research from both the applied and theoretical angles;
 see, e.g., \cite{Diebold:2002, McCraken:2007, Diebold:2015, Stokes:2017,
   Lei:2018, Rinaldo:2019, Williamsom:2020, Zhang:2020, Dai:2021, Fryer:2021}.
 Our take on this problem is in line with much of this literature; however, in
-order to avoid making any explicit assumptions, we do attempt to make explicit
+order to avoid making any explicit assumptions, we do not attempt to make formal 
 significance statements, and instead, broadly examine the stability of our
 conclusions with respect to numerous modes of analysis.   
 
@@ -225,22 +225,25 @@ feed predicted case information into downstream hospitalization models.
 In this paper, all models are fit with ``vintage'' training data. This means
 that for a given prediction date, say, September 1, 2020, we train models 
 using only the data that would have been available to us \textit{as of}
-September 1 (imagine that we ``rewind'' the clock to September 1, and query the
-COVIDcast API to get the latest data it would have had available at that point
-in time.)  This is made possible by the COVIDcast API's comprehensive data  
+September 1 (imagine that we can ``rewind'' the clock to September 1, and query
+the COVIDcast API to get the latest data it would have had available at that
+point in time.)  This is made possible by the COVIDcast API's comprehensive data   
 versioning system (described in more detail in our companion paper).  We also
 use the \texttt{evalcast} R package \cite{EvalcastR}, which streamlines the
 process of training arbitrary prediction models over a sequence of prediction
 dates, by constructing the proper sequence of vintage training data sets.   
 
 \begin{figure}[tb!]
-  \includegraphics[width=\columnwidth]{fig/revisions-dv-jhu-1.pdf}
-  \caption{Revision behavior for signals in the New York City HRR from two
-    sources. Each colored line corresponds to the data as reported on that
-    date. DV-CLI is revised upward throughout the month of December, though the
-    amount fades as we look further back in time. In contrast, JHU-CSSE data
-    remains ``as reported'' on December 3 until a major correction is made on
-    December 31, affecting all data over the period. }
+  \includegraphics[width=\columnwidth]{fig/revisions.pdf}
+  \caption{Revision behavior for two signals in the HRR containing New York City
+    HRR.  Each colored line corresponds to the data as reported on a particular
+    date (\textit{as of} dates varying from September 28 through October
+    19). The left panel shows the DV-CLI signal, which was regularly revised
+    throughout the period, though the effects fade as we look further back in   
+    time. In contrast, the right panel shows case rates reported by JHU CSSE,
+    which remain ``as reported'' on September 28, with a huge spike towards the 
+    end of this period, until a major correction is made on October 19, which
+    brings down this spike and affects all prior data as well.}
   \label{fig:vintage}
 \end{figure}
 
@@ -365,8 +368,8 @@ using data from all 306 HRRs, and within each HRR, using the most recent 21 days
 of training data.  This gives us 6,426 training samples for each quantile 
 regression problem.    
 
-In addition to the above ``pure'' autoregressive model, we consider five
-probabilistic forecasting models of the form: 
+In addition to this pure autoregressive model, we also consider five
+probabilistic forecasting models of the form:  
 \begin{multline}
 \label{eq:forecast_ar_x}
 \Quantile_\tau(Y_{\ell,t+a} \,|\, Y_{\ell,s}, X_{\ell,s}, s \leq t)  
@@ -390,10 +393,9 @@ for an example forecast.
 \begin{figure}[t]
 \includegraphics[width=\columnwidth]{fig/ny-trajectory-1.pdf}
 \caption{Forecast from the autoregressive model for the New York City HRR made
-  on October 15 (vertical line). 
-  The fan displays 50\%, 80\% and 95\% intervals while the orange curve shows
-  the median forecast. The connected black points represent ``finalized'' data,
-  as reported in May 2021.}
+  on October 15 (vertical line).  The fan displays 50\%, 80\% and 95\% intervals
+  while the orange curve shows the median forecast. The connected black points
+  represent ``finalized'' data, as reported in May 2021.}
 \label{fig:trajectory}
 \end{figure}
 
@@ -422,7 +424,7 @@ simple logistic model:
 \end{equation}
 where $\logit(p) = \log(p/(1-p))$, the log-odds of $p$.
 
-In addition to this ``pure'' autoregressive model, we also consider five
+In addition to this pure autoregressive model, we also consider five
 logistic models of the form:  
 \begin{multline}
 \label{eq:hotspot_ar_x}
@@ -621,15 +623,15 @@ be found at
 Figure~\ref{fig:forecast} displays the results for forecasting, stratified by
 ahead value and averaged over all HRRs and forecast dates (June 9--December 31,
 2020).  Shown is the average WIS for each forecast model divided by the averaged
-WIS from a ``baseline'' model, which is basically a flat-line forecaster (its
+WIS from a baseline model, which is basically a flat-line forecaster (its
 median forecast for $Y_{\ell,t+a}$ is always $Y_{\ell,t}$, with predicted
 quantiles defined around this flat line based on historical variation). This is
 the same baseline model as that used in the COVID-19 Forecast Hub.  Here, we  
 divide by the average WIS of the baseline model in order to put the y-axis on an 
 interpretable scale.  We can see that all curves are well below 1, which means
-that all of the models, including AR, outperform the baseline on average over
-the forecast period (though their advantage over the baseline clearly narrows as
-the ahead value grows).    
+(smaller WIS is better) that all of the models, including AR, outperform the
+baseline on average over the forecast period (though this advantage narrows as
+the ahead value grows).      
 
 We can also see from the figure that CHNG-COVID and DV-CLI offer the biggest
 gains over AR at small ahead values, followed by CTIS-CLI-in-community and
@@ -650,29 +652,28 @@ supplement).
   \label{fig:forecast}
 \end{figure}
 
-
-
 Figure~\ref{fig:hotspot} displays the results for hotspot prediction, again
 stratified by ahead value and averaged over all HRRs and prediction dates (June 
 16--December 31, 2020).  We can see many similarities to the forecasting
-results: CHNG-COVID and DV-CLI offer the biggest improvement over AR, all models
-including AR degrade in performance towards the baseline (this is now just a
-classifier based on random guessing, which achieves an AUC of 0.5) as the ahead
-values grow.  However, one clear difference is that the CHNG-CLI model performs
-quite well in hotspot prediction, close to the best-performing indicator models
-for many of the ahead values. [TODO: should we insert one line explaining
-this---you're somewhat protected form volatiliy in a logistic model thanks to
+results (recall larger AUC is better): CHNG-COVID and DV-CLI offer the biggest
+improvement over AR, all models including AR degrade in performance towards the
+baseline (this is now just a classifier based on random guessing, which achieves
+an AUC of 0.5) as the ahead values grow.  However, one clear difference is that
+the CHNG-CLI model performs quite well in hotspot prediction, close to the
+best-performing indicator models for many of the ahead values. 
+
+[TODO: should we
+insert one line explaining this---you're somewhat protected form volatiliy in a
+logistic model thanks to 
 the sigmoid function used to define the probabilities?]  
-
-
 
 \subsection{Implicit Regularization Hypothesis}
 
 One might ask if the benefits we observe in forecasting and hotspot
 prediction have
 anything to do with the actual indicator themselves; could it instead be that
-the indicators are simply providing ``implicit regularization'' on top of the
-basic AR model, when we include them as lagged features in
+the indicators are simply providing \textit{implicit regularization} on top of 
+the basic AR model, when we include them as lagged features in
 \eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar_x}?  
 
 To test this implicit regularization hypothesis, we reran all of the prediction
