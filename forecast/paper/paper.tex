@@ -120,7 +120,7 @@ do not move us all the way there. The question about \textit{utility for
 about correlations; to be useful in forecast or hotspot models, an indicator
 must provide relevant information that is not otherwise contained in past values
 of the case rate series itself. We will assess this in the most direct way
-possible: by inpsecting the difference in predictive performance of simple
+possible: by inspecting the difference in predictive performance of simple
 autoregressive models trained with and without access to past values of a
 particular indicator.   
 
@@ -264,10 +264,13 @@ Figure~\ref{fig:vintage} for an example.
 
 Lastly, our treatment of the Google-AA signal is different from the rest.
 Because Google's team did not start publishing this signal until early
-September, 2020, we do not have true vintage data before then.  However, this
+September, 2020, we do not have true vintage data before then.
+Furthermore, the latency of the signal was always at least one week
+through 2020.  However, this
 signal is never revised after initial publication (confirmed via personal
-communication with the Google team that produces this signal), so we simply use
-finalized values for it in our analysis.   
+communication with the Google team that produces this signal) and
+furthermore the latency of the signal is not an unavoidable property
+of the data type, so we simply use finalized values for it in our analysis.   
 
 \subsection{Analysis Tasks}
 
@@ -501,7 +504,7 @@ $\ell$.
 Over the prediction period, all auxiliary indicators are available (in the
 proper vintage sense) for all locations and prediction times, except for the
 Google-AA signal, which is only observed for an average of 105 (of 306) HRRs.
-This is due to the fact that that the COVID-19 search trends data is released
+This is due to the fact that the COVID-19 search trends data is released
 after applying differential privacy techniques \cite{Bavadekar:2020}, and a
 missing signal value means that the level of noise added in the differential
 privacy mechanism is high compared to the underyling search count.  In other
@@ -601,12 +604,20 @@ proper vintage data, we ran a parallel set of forecasting and hotspot prediction
 experiments using finalized data. The results, given in the supplement, show
 that training and making predictions on finalized data can result in overly
 optimistic estimates of true test-time performance (up to 10\% better in terms
-of average WIS or AUC).
+of average WIS or AUC). Furthermore, since indicators can have
+greatly different backfill profiles, the use of finalized data in
+retrospective evaluations can even change the relative ordering of
+methods.  For example, CHNG-CLI and DV-CLI
+when trained on finalized data perform very similarly for
+the forecasting task.  This makes sense since they are both claims-based indicators measuring supposedly the
+same thing.  However, DV-CLI outperforms CHNG-CLI on vintage data,
+reflecting its less severe backfill profile.
+
 % TODO note what we said here about the supplement
 
 Code to reproduce all results (which uses the \texttt{evalcast} R package) can 
 be found at
-\url{https://www.github.com/cmu-delphi/covidcast-pnas/forecast/code/}. 
+\url{https://github.com/cmu-delphi/covidcast-pnas/tree/main/forecast/code}. 
 
 \subsection{Aggregate Results by Ahead Value}
 
@@ -660,7 +671,8 @@ the sigmoid function used to define the probabilities?]
 
 \subsection{Implicit Regularization Hypothesis}
 
-One might ask if the benefits we observe in forecasting and hotspot have
+One might ask if the benefits we observe in forecasting and hotspot
+prediction have
 anything to do with the actual indicator themselves; could it instead be that
 the indicators are simply providing ``implicit regularization'' on top of the
 basic AR model, when we include them as lagged features in
@@ -714,10 +726,10 @@ rejection (informally speaking) of the implicit regularization hypothesis.
 
 \section{Discussion}
 
-Can axuiliary indicators improve COVID-19 forecasting and hotspot prediction
+Can auxiliary indicators improve COVID-19 forecasting and hotspot prediction
 models?  Our answer, based on analyzing five auxiliary indicators from the  
 COVIDcast API (defined using from medical insurance claims, internet-based
-surveys, and Google search trends) is undoubtedbly ``yes''. However, there are 
+surveys, and Google search trends) is undoubtedly ``yes''. However, there are 
 levels of nuance to such an answer that must be explained.  None of the
 indicators that we have investigated appear to be the ``silver bullet'' that 
 one might have hoped for, revolutionizing the tractability of the prediction 

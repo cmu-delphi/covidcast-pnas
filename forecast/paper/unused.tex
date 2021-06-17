@@ -1,13 +1,6 @@
 
 %%%%%
 
-Using instead the geometric mean makes the order of aggregation and
-scaling immaterial since the ratio of geometric means is the same as
-the geometric mean of ratios.  Figure \ref{fig:geometric-mean} shows how the
-results in forecasting would change if one replaces the arithmetic mean by the
-geometric mean. 
-
-%%%%%
 
 We also investigate the effect of lengthening the time window to include 2021. 
 \begin{itemize}
@@ -19,7 +12,6 @@ We also investigate the effect of lengthening the time window to include 2021.
   \item For hotspots: Alden will write something explaining why we
     don't do hotspot detection in 2021.
 \end{itemize}
-
 
 %%%%% 
 
@@ -38,68 +30,4 @@ for XX HRRs.
 
 %%%%%
 
-Figure \ref{fig:finalized-vs-honest} quantifies the effect of
-not properly accounting for the question of ``what was known when'' in
-performing retrospective evaluations of forecasters.  When methods are
-given the finalized version of the data rather than the version available at the time that the forecast would have been made, all methods
-appear (falsely) to have better performance.  For example, for forecasting case rates
-7-days ahead, the WIS of all methods is at least 8\% larger than what would have been
-recorded using the finalized values of the data.  This effect
-diminishes as the forecasting horizon increases, reflecting the fact
-that these forecasters rely less heavily on recent data than very
-short-term forecasters.  Crucially, some methods are
-``helped'' more than others by the less scrupulous retrospective
-evaluation, underscoring the difficulty of avoiding misleading
-conclusions when performing retrospective evaluations of forecasters.
-
-The \chngcli~indicator (along with the other claims-based signals) is the most
-affected by this distinction, reflecting the latency in claims-based
-reporting. \attn{Actually, \dv~is the least affected for forecasting
-  whereas it is one of the most affected for hotspots.}  This supports
-the importance of efforts to provide ``nowcasts'' for claims signals
-(which corresponds to a 0-ahead ``forecast'' of what the claims
-signal's value will be once all data has been collected).
-
-Even the \ar~model is affected by this distinction, reflecting the
-fact that the case rates themselves (i.e., the response values) are also
-subject to revision.  The forecasters based on indicators are thus
-affected both by revisions to the indicators and by revisions to the
-case rates.
-
-\begin{itemize}
-%\item Motivates the importance of nowcasting for claims signals.
-  \item For forecasting task: Also, \chngcli~and \dv~perform very similarly here, which is
-    reassuring because they're measuring the same thing (in
-    principle).  Yet they must have very different backfill profiles…
-  \item For hotspots task: dv seems to get a bigger boost than
-    \chngcov - interesting dichotomy to forecasting
-\item But in both forecasting/hotspots \chngcli~is affected a lot by backfill
-\item \attn{We should be careful about which indicators we were not
-      able to track latency for.  In fact, we should probably remove
-      these from the plot since they would be more strongly affected
-      than is shown in the plot.}
-
-\item \attn{We can also discuss the distinction
-      between indicators that could in principle have low latency
-      (e.g. GS) versus those where latency is inherent
-      (e.g. claims-based indicators). If the goal is assessing the
-      performance of GS ``for the next pandemic'' then it would make
-      sense to give GS a pass since in theory they could have had it
-      with very low latency (as opposed to claims based signals where
-      backfill may be unavoidable).  Of course, in
-    ``the next pandemic'' there might not be such highly specific
-    symptoms such as A+A as there was in the COVID-19 case.} 
-\end{itemize}
-
-\begin{figure}[t]
-     \centering
-     \includegraphics[width=\textwidth]{fig/fcast-honest-v-finalized-1.pdf}
-     \includegraphics[width=\textwidth]{fig/hot-honest-v-finalized-1.pdf}
-     \caption{How misleading is a retrospective analysis that uses the
-       finalized version of the data rather than the version that was
-       in fact available at the time the forecast was made?  Plots
-       show the ratio in performance (using mean WIS fore the
-       forecasting task and AUC for the hotspot prediction
-       task). \label{fig:finalized-vs-honest} Cheating vs. honest plots.} 
-\end{figure}
 
