@@ -1,0 +1,149 @@
+---
+bibliography: [../../common/covidcast.bib, pnas-materials/pnas-sample.bib]
+output:
+  pdf_document:
+    keep_tex: true
+    template: pnas-suppl-template.tex
+params:
+  fd_casefloor: 30
+  flag_jumps: 15
+---
+
+
+<!-- PNAS materials -->
+
+<!-- Comment out or remove this line before generating final copy for submission; this will also remove the warning re: "Consecutive odd pages found". -->
+\instructionspage
+
+
+
+<!-- we need this -->
+\maketitle
+
+<!-- Adds the main heading for the SI text. Comment out this line if you do not have any supporting information text. -->
+
+\SItext
+
+All our text goes here. Reference figures with the R chuck label as Figure~\ref{fig:fcast-finalized}.
+
+All figures go on their own page after all of the text...
+
+Edit `pnas-suppl-template.tex` for the correct Author list and Title.
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.width = 6.5, fig.height = 4.5,
+                      fig.align = "center",
+                      fig.path = "fig/",
+                      cache = TRUE,
+                      out.width = "\\textwidth",
+                      autodep = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
+
+library(covidcast)
+library(gridExtra)
+library(ggplot2)
+library(ggforce) # for splitting across pages
+library(scales)
+library(dplyr)
+```
+
+\begin{figure}
+\includegraphics[width=\textwidth]{fig/severity-pyramid.pdf}
+\caption{The epidemiological "severity pyramid" represents the progression of
+cases from the public, through infection, through increasingly severe stages of
+disease. The annotations here represent the data sources collected by Delphi's
+COVIDcast Epidata API.}
+\end{figure}
+
+\clearpage
+
+```{r state-trends}
+SOURCES <- c("jhu-csse", "chng", "chng", "fb-survey")
+SIGNALS <- c("confirmed_7dav_incidence_prop",
+             "smoothed_adj_outpatient_cli",
+             "smoothed_adj_outpatient_covid",
+             "smoothed_whh_cmnty_cli")
+colors <- c("black", scales::hue_pal()(5))
+names <- c("Cases", "CHNG-CLI", "CHNG-COVID", "CTIS-CLI-in-community")
+
+# geo_labeler is a function from geo_value to human-readable name
+get_trend_grid <- function(trends, geo_labeler) {
+  case_max <- max(trends[[1]]$value)
+
+  trends <- aggregate_signals(trends, format = "long") %>%
+    group_by(signal) %>%
+    mutate(value = value / max(value, na.rm = TRUE) * case_max) %>%
+    ungroup() %>%
+    mutate(signal = factor(signal, levels = SIGNALS, labels = names),
+           geo_value = geo_labeler(geo_value))
+
+  g <- ggplot(trends, aes(x = time_value, y = value, color = signal)) +
+    geom_line() +
+    scale_color_manual(breaks = names, values = colors) +
+    labs(x = "Date", y = "Signal value (scaled)") +
+    scale_x_date(date_breaks = "3 months", date_labels = "%b %Y",
+                 date_minor_breaks = "1 month", guide = guide_axis(angle = 45)) +
+    theme_bw() +
+    theme(legend.position = "bottom", legend.title = element_blank())
+
+  return(g)
+}
+
+state_trends <- covidcast_signals(
+  SOURCES,
+  SIGNALS,
+  "2020-04-15", "2021-04-15",
+  geo_type = "state"
+)
+
+g <- get_trend_grid(state_trends, function(val) { abbr_to_name(toupper(val)) })
+```
+
+```{r state-trend-grids-1, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for states across the United States. Cases are reported cases per 100,000 population. Other signals are scaled to have the same global maximum, so they can be presented in the same range. (part 1 of 4)", fig.height=8}
+g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 1)
+```
+
+```{r state-trend-grids-2, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for states across the United States. (part 2 of 4)", fig.height=8}
+g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 2)
+```
+
+```{r state-trend-grids-3, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for states across the United States. (part 3 of 4)", fig.height=8}
+g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 3)
+```
+
+```{r state-trend-grids-4, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for states across the United States. (part 4 of 4)", fig.height=8}
+g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 4)
+```
+
+\clearpage
+
+```{r county-trends}
+# Same thing again, but the 50 largest counties
+## top_counties <- county_census %>%
+##   filter(COUNTY != 0) %>% # these are states
+##   arrange(desc(POPESTIMATE2019)) %>%
+##   head(n = 50) %>%
+##   pull(FIPS)
+
+## county_trends <- covidcast_signals(
+##   SOURCES,
+##   SIGNALS,
+##   "2020-04-15", "2021-04-15",
+##   geo_type = "county",
+##   geo_values = top_counties
+## )
+
+## g <- get_trend_grid(state_trends, county_fips_to_name)
+```
+
+```{r county-trend-grids-1, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for the 50 most populous counties in the United States. (part 1 of 4)"}
+## g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 1)
+```
+
+
+<!-- PNAS says: Add this line AFTER all your figures and tables -->
+\FloatBarrier

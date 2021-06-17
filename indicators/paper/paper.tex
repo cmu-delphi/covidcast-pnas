@@ -10,17 +10,30 @@
 
 \title{An Open Repository of Real-Time COVID-19 Indicators}
 
-% Use letters for affiliations, numbers to show equal authorship (if applicable) and to indicate the corresponding author
-\author[a,c,1]{Author One}
-\author[b,1,2]{Author Two}
-\author[a]{Author Three}
+% Use letters for affiliations, numbers to show equal authorship (if applicable)
+% and to indicate the corresponding author
 
-\affil[a]{Affiliation One}
-\affil[b]{Affiliation Two}
-\affil[c]{Affiliation Three}
+% Writing group
+\author[a,1]{Alex Reinhart}
+\author[b,2]{Logan Brooks}
+\author[a,2]{Maria Jahja}
+\author[b,2]{Aaron Rumack}
+\author[c,2]{Jingjing Tang}
+
+% Middle authors
+\author[d]{Middle Authors to be Added}
+
+% Senior authors
+\author[b]{Roni Rosenfeld}
+\author[a]{Ryan Tibshirani}
+
+\affil[a]{Department of Statistics \& Data Science, Carnegie Mellon University}
+\affil[b]{Machine Learning Department, Carnegie Mellon University}
+\affil[c]{Department of Computational Biology, Carnegie Mellon University}
+\affil[d]{Remaining affiliations to be added}
 
 % Please give the surname of the lead author for the running footer
-\leadauthor{Lead author last name}
+\leadauthor{Reinhart}
 
 % Please add a significance statement to explain the relevance of your work
 \significancestatement{To study the COVID-19 pandemic, its effects on society,
@@ -29,42 +42,45 @@
   inconsistent reporting and frequent, unexpected revisions. They also miss
   other aspects of a population's behavior that are worthy of consideration. We
   present an open database of COVID signals in the United States, measured at
-  the county level and updated daily. These include traditionally reported COVID
-  cases and deaths, and many others: signals based on measures of mobility,
-  social distancing, Internet search trends, self-reported symptoms, and
-  patterns COVID-related activity in de-identified medical insurance claims. The
-  database provides all signals in a common, easy-to-use format, empowering both
-  public health research and operational decision-making.
+  the county level and updated daily. This includes traditionally reported COVID
+  cases and deaths, and many others: measures of mobility, social distancing,
+  Internet search trends, self-reported symptoms, and patterns COVID-related
+  activity in de-identified medical insurance claims. The database provides all
+  signals in a common, easy-to-use format, empowering both public health
+  research and operational decision-making.  
 }
 
 % Please include corresponding author, author contribution and author declaration information
 \authorcontributions{Please provide details of author contributions here.}
 \authordeclaration{Please declare any competing interests here.}
-\equalauthors{\textsuperscript{1}A.O.(Author One) contributed equally to this work with A.T. (Author Two) (remove if not applicable).}
-\correspondingauthor{\textsuperscript{2}To whom correspondence should be addressed. E-mail: author.two\@email.com}
+\correspondingauthor{\textsuperscript{1}To whom correspondence should be addressed. E-mail: areinhar@stat.cmu.edu}
+\equalauthors{\textsuperscript{2}L.B., M.J., A.R., and J.T. contributed equally
+  to this work.}
 
 % At least three keywords are required at submission. Please provide three to five keywords, separated by the pipe symbol.
 \keywords{open data $|$ COVID-19 $|$ digital surveillance $|$ medical insurance
   claims $|$ internet surveys $|$ search trends $|$ mobility patterns}
 
-\begin{abstract} % 250 words max, one paragraph
-  The COVID-19 pandemic in the United States presented enormous data challenges.
-  Policymakers, epidemiological modelers, and health researchers all require
+\begin{abstract} 
+  The COVID-19 pandemic presented enormous data challenges in the United States.
+  Policy makers, epidemiological modelers, and health researchers all require
   up-to-date data on the pandemic and relevant public behavior, ideally at fine
-  spatial and temporal resolution. We present the COVIDcast API, which provides
-  an open database of both traditional public health surveillance signals (such
-  as cases, deaths, and hospitalizations) and unique indicators of COVID-19
-  activity, such as signals extracted from de-identified medical claims data,
-  massive online surveys, cell phone mobility data, and Internet search trends.
-  These signals are available at a fine geographic resolution (mostly at the
-  county level) and are updated daily. Unlike most public health databases, the
-  COVIDcast API also tracks all revisions to historical data, allowing modelers
-  to account for the frequent revisions and backfill that are common for many
-  public health data sources. All data is available in a common format through
-  an API and software packages. We describe the data and formats, and present
-  examples demonstrating that the non-traditional data sources present in the
-  COVIDcast API present information relevant to tracking COVID activity,
-  augmenting standard public health reporting and enabling research.
+  spatial and temporal resolution. The COVIDcast API is our attempt to fill this
+  need: operational since April 2020, it provides open access to both
+  traditional public health surveillance signals (cases, deaths, and
+  hospitalizations) and many auxiliary indicators of COVID-19 activity, such as
+  signals extracted from de-identified medical claims data, massive online
+  surveys, cell phone mobility data, and Internet search trends. These 
+  are available at a fine geographic resolution (mostly at the county level) and
+  are updated daily. The COVIDcast API also tracks all revisions to historical
+  data, allowing modelers to account for the frequent revisions and backfill
+  that are common for many public health data sources. All of the data is
+  available in a common format through the API and accompanying R and Python
+  software packages. This paper describes the data sources and signals, and
+  provides examples demonstrating that the auxiliary signals in the COVIDcast
+  API present information relevant to tracking COVID activity, augmenting
+  traditional public health reporting and empowering research and
+  decision-making.         
 \end{abstract}
 
 \dates{This manuscript was compiled on \today}
@@ -99,8 +115,8 @@ emerging pathogens such as H1N1 \cite{Kass-Hout:2012}; and digital surveillance
 (based on, e.g., search and social media trends) enable more accurate
 ``nowcasts'' and forecasts of traditional disease surveillance streams such as
 the CDC's ILINet \cite{Santillana:2015, Farrow:2016}, as do publication formats
-providing access to historical versions of a data set \cite{Brooks:2018,
-  Brooks:2020}. Numerous other examples exist spanning a wide variety of data
+providing access to historical versions of a given data set \cite{Brooks:2018, 
+  Brooks:2020}. Several other examples exist that span a wide variety of data  
 platforms and diseases \cite{Browstein:2009, Kass-Hout:2011, Salathe:2012,
   Kass-Hout:2013}. During the COVID-19 pandemic, digital data streams have
 permitted faster prediction of case increases \cite{Ahmad:2020, Kogan:2021},
@@ -324,22 +340,22 @@ have additional restrictions imposed by the data source; see
 
 Since April 2020, Delphi has been maintaining and continually improving various
 online visualization tools for the COVIDcast indicators \cite{CovidcastViz}.
-These tools fetch data directly from the API, and allow for exploration of both 
+These tools fetch data directly from the API, and allow for exploration of both
 temporal (e.g., time series graphs) and spatial (e.g., choropleth maps) trends
 in the signals, as well as many other aspects, such as correlations, anomalies,
-and backfill.  There is also a dedicated dashboard for exploring results from
-the COVID Trends and Impact Survey.   
+and backfill. There is also a dedicated dashboard for exploring results from the
+COVID Trends and Impact Survey.
 
 \subsection{COVID Forecasting} 
 
 Since July 2020, Delphi has been regularly submitting short-term forecasts of
 COVID-19 case and death incidence, at the state and county levels, to the
-COVID-19 Forecast Hub \cite{ForecastHub}, under the name ``CMU-TimeSeries''.  
-The process of building, training, and deploying our forecasting models
-leverages much of the infrastructure described in this paper (such as the
-COVIDcast API's \textit{as of} feature), and some of our forecasting systems
-rely on auxiliary indicators (such as survey-based and claims-based COVID-like 
-illness signals, described below, which we have used in case forecasting).  
+COVID-19 Forecast Hub \cite{ForecastHub}, with ``CMU-TimeSeries'' as the
+team-model name.  The process of building, training, and deploying our
+forecasting models leverages much of the infrastructure described in this paper
+(such as the COVIDcast API's \textit{as of} feature), and some of our
+forecasting systems rely on auxiliary indicators (such as survey-based and
+claims-based COVID-like illness signals, which are described below).
 
 \section{Results}
 
@@ -356,18 +372,6 @@ the pandemic \cite{Adjodah:2021, Pierri:2021, Jewell:2021, Chakrabarti:2020,
   Doerr:2021}. The API currently serves hundreds of thousands of requests to
 thousands of users every day.
 
-In what follows, we present examples of the usefulness of some of the novel
-signals available in the API. These examples demonstrate that such indicators
-are meaningfully related to COVID activity, that they provide alternate views on
-pandemic activity that are not subject to the same reporting glitches and delays
-as traditional public health surveillance streams, and that they provide
-information about public behavior and attitudes that are not available from any
-other source. Code to reproduce all examples (which uses the \texttt{covidcast}
-R package and fetches data directly from the API) can be found at
-\url{https://www.github.com/cmu-delphi/covidcast-pnas/indicators/code/}. 
-
-\subsection{Tracking Trends}
-
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/time_trends_national.pdf}
   \caption{National trends, from April 2020 to April 2021, of four signals in 
@@ -377,6 +381,18 @@ R package and fetches data directly from the API) can be found at
     100,000 people.)}
   \label{fig:time_trends_national}
 \end{figure}
+
+In what follows, we present examples of the usefulness of some of the novel
+signals available in the API. These examples demonstrate that such indicators
+are meaningfully related to COVID activity, that they provide alternate views on
+pandemic activity that are not subject to the same reporting glitches and delays
+as traditional public health surveillance streams, and that they provide
+information about public behavior and attitudes that are not available from any
+other source. Code to reproduce all examples (which uses the \texttt{covidcast}
+R package and fetches data from the API) can be found at
+\url{https://github.com/cmu-delphi/covidcast-pnas/tree/main/indicators/code/}. 
+
+\subsection{Tracking Trends}
 
 Many of the indicators in the COVIDcast API are intended to track COVID
 activity. Five indicators in particular have the closest connections to
@@ -398,6 +414,14 @@ confirmed cases:
   results among Quidel COVID antigen tests.  
 \end{itemize}
 
+\begin{figure}[t]
+  \includegraphics[width=\columnwidth]{fig/geo_wise_corr.pdf}
+  \caption{Geo-wise correlations with case rates, from April 15, 2020 to April 
+    15, 2021, calculated over all counties for which all signals were available
+    and which had at least 500 cumulative cases by the end of this period.}
+  \label{fig:geo_wise_correlation} 
+\end{figure}
+
 Figure~\ref{fig:time_trends_national} compares the first three of these signals
 to COVID cases in the United States (from JHU CSSE, smoothed with a 7-day
 trailing average) over a year of the pandemic (April 15, 2020 to April 15,
@@ -407,39 +431,11 @@ smaller geographic regions such as states and counties, as shown in the
 supplement.  This will also be illustrated in a more detailed correlation 
 analysis in the next subsection.   
 
-% TODO
-% RJT: @AR Note what I claimed we would do above!  I'm thinking we can just
-% produce a big batch of case trends over the same time period and for the same
-% signals, but for each US state (and territory?), and for the 50 most populous
-% counties. AND maybe for this (below national) we should use CLI-in-community
-% rather than CLI, from the survey
-
 Besides tracking contemporaneous COVID activity, these and other indicators can
 be used to improve forecasts of future COVID case trends, as investigated in a
 companion paper.
 
-% TODO 
-% RJT: @AR Consider for the supplement.  [Or skip it?  Not all that important 
-% but I think it would be nice to do.  Maybe you can delegate this to Logan,
-% Aaron, Jingjing, etc.] 
-% - Hospitalization trends?
-% - Hospitalization correlations?
-%  (I see you already have a plot for the first ... but I'm a bit bothered by
-%  the fact that the HHS data looks to have such strong weekday effects that we
-%  don't attempt to correct for ... perhaps we use do a 7-day rolling avg. Made
-%  easy with modeltools)
-% If we do so, we should refer to it in the text, this subsection (for time
-% trends) and next (for correlations)
-
 \subsection{Correlation Analyses}
-
-\begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/geo_wise_corr.pdf}
-  \caption{Geo-wise correlations with case rates, from April 15, 2020 to April 
-    15, 2021, calculated over all counties for which all signals were available
-    and which had at least 500 cumulative cases by the end of this period.}
-  \label{fig:geo_wise_correlation} 
-\end{figure}
 
 To quantify the ability of the signals described above to track trends in COVID
 cases, we use the Spearman (rank) correlation and analyze two key correlation
@@ -495,8 +491,8 @@ There are two noteworthy points:
 \begin{itemize}
 \item This is different from what is observed in
   Figure~\ref{fig:geo_wise_correlation}, where the CTIS-CLI-in-community signal
-  achieves clearly the highest correlations for most of the time
-  period. However, it is worth emphasizing that time-wise and geo-wise
+  achieves clearly the highest correlations for most of the time period. 
+  However, it is worth emphasizing that time-wise and geo-wise 
   correlations are truly measuring different properties of a signal; and the
   claims signals (CHNG-COVID and CHNG-CLI) seem more appropriate for
   temporal---rather than spatial---comparisons.  We revisit this point in the
@@ -657,9 +653,10 @@ features and capabilities.) These signals have already supported pandemic
 research and  policy-making.  
 
 Third, the underlying database tracks all revisions made to the data, allowing
-us to query the API to learn ``what was known when'', critical for understanding
-the behavior (and potential pitfalls) of real-time surveillance signals. Such
-revision data is rarely available in standardized format from other sources. 
+us to query the API to learn ``what was known when'', which is critical for
+understanding the behavior (and potential pitfalls) of real-time surveillance
+signals. Such revision data is rarely available in standardized format from
+other sources.    
 
 Finally, we emphasize that unifying many relevant signals into a single common
 format, with comprehensive revision tracking, is a valuable goal in and of

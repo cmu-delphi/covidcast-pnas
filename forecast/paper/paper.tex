@@ -235,15 +235,14 @@ process of training arbitrary prediction models over a sequence of prediction
 dates, by constructing the proper sequence of vintage training data sets.   
 
 \begin{figure}[tb!]
-\includegraphics[width=\columnwidth]{fig/revisions-dv-jhu-1.pdf}
-\caption{Revision behavior for signals in the New York City HRR from two
-  sources. Each colored line 
-  corresponds to the data as reported on that date. DV-CLI is revised upward
-  throughout the month of December, though the amount fades as we look further
-  back in time. In contrast, JHU-CSSE data remains ``as reported'' on
-  December 3 until a major correction is made on December 31, affecting all data
-  over the period. }
-\label{fig:vintage}
+  \includegraphics[width=\columnwidth]{fig/revisions-dv-jhu-1.pdf}
+  \caption{Revision behavior for signals in the New York City HRR from two
+    sources. Each colored line corresponds to the data as reported on that
+    date. DV-CLI is revised upward throughout the month of December, though the
+    amount fades as we look further back in time. In contrast, JHU-CSSE data
+    remains ``as reported'' on December 3 until a major correction is made on
+    December 31, affecting all data over the period. }
+  \label{fig:vintage}
 \end{figure}
 
 Vintage training data means different things, in practice, for different
@@ -266,13 +265,12 @@ Figure~\ref{fig:vintage} for an example.
 
 Lastly, our treatment of the Google-AA signal is different from the rest.
 Because Google's team did not start publishing this signal until early
-September, 2020, we do not have true vintage data before then.
-Furthermore, the latency of the signal was always at least one week
-through 2020.  However, this
+September, 2020, we do not have true vintage data before then.  Furthermore, the
+latency of the signal was always at least one week through 2020.  However, this
 signal is never revised after initial publication (confirmed via personal
-communication with the Google team that produces this signal) and
-furthermore the latency of the signal is not an unavoidable property
-of the data type, so we simply use finalized values for it in our analysis.   
+communication with the Google team that produces this signal) and furthermore
+the latency of the signal is not an unavoidable property of the data type, so we
+simply use finalized signal values it, with zero latency, in our analysis.   
 
 \subsection{Analysis Tasks}
 
@@ -347,7 +345,7 @@ pandemic in 2021.
 
 Recall $Y_{\ell,t}$ denotes the 7-day trailing average of COVID-19 case
 incidence rates in location $\ell$ and at time $t$.  Separately for each
-$a=7,\ldots,28$, to predict $Y_{\ell,t+a}$ for ahead value $a$, we consider a
+$a=7,\ldots,21$, to predict $Y_{\ell,t+a}$ for ahead value $a$, we consider a
 simple probabilistic forecasting model of the form:     
 \begin{equation}
 \label{eq:forecast_ar}
@@ -416,12 +414,12 @@ location-time pairs as hotspots, during the prediction period (June 16--December
 
 We treat hotspot prediction as a binary classification problem and use a setup 
 altogether quite similar to the forecasting setup described previously.
-Separately for each $a=7,\ldots,28$, to predict $Z_{\ell,t+a}$, we consider a
+Separately for each $a=7,\ldots,21$, to predict $Z_{\ell,t+a}$, we consider a
 simple logistic model:
 \begin{equation}
 \label{eq:hotspot_ar}
 \logit \big( \P(Z_{\ell,t+a} = 1 \,|\, Y_{\ell,s}, s \leq t) \big) 
-= \alpha^{a,\tau} + \sum_{j=0}^2 \^{a,\tau}_j Y^\Delta_{\ell,t-7j},
+= \alpha^{a,\tau} + \sum_{j=0}^2 \beta^{a,\tau}_j Y^\Delta_{\ell,t-7j},
 \end{equation}
 where $\logit(p) = \log(p/(1-p))$, the log-odds of $p$.
 
@@ -506,8 +504,8 @@ $\ell$.
 Over the prediction period, all auxiliary indicators are available (in the
 proper vintage sense) for all locations and prediction times, except for the
 Google-AA signal, which is only observed for an average of 105 (of 306) HRRs.
-This is due to the fact that the COVID-19 search trends data is released
-after applying differential privacy techniques \cite{Bavadekar:2020}, and a
+Such missingness occurs because the COVID-19 search trends data is
+constructed using differential privacy methods \cite{Bavadekar:2020}, and a 
 missing signal value means that the level of noise added in the differential
 privacy mechanism is high compared to the underyling search count.  In other
 words, values of the Google-AA signal are clearly \textit{not} missing at
@@ -606,15 +604,13 @@ proper vintage data, we ran a parallel set of forecasting and hotspot prediction
 experiments using finalized data. The results, given in the supplement, show
 that training and making predictions on finalized data can result in overly
 optimistic estimates of true test-time performance (up to 10\% better in terms
-of average WIS or AUC). Furthermore, since indicators can have
-greatly different backfill profiles, the use of finalized data in
-retrospective evaluations can even change the relative ordering of
-methods.  For example, CHNG-CLI and DV-CLI
-when trained on finalized data perform very similarly for
-the forecasting task.  This makes sense since they are both claims-based indicators measuring supposedly the
-same thing.  However, DV-CLI outperforms CHNG-CLI on vintage data,
-reflecting its less severe backfill profile.
-
+of average WIS or AUC). Furthermore, since indicators can have greatly different
+backfill profiles, the use of finalized data in retrospective evaluations can
+even change the relative ordering of models.  For example, CHNG-CLI and DV-CLI
+when trained on finalized data perform very similarly for the forecasting task.
+This makes sense since they are both claims-based indicators measuring
+supposedly the same thing.  However, DV-CLI outperforms CHNG-CLI on vintage
+data, reflecting its has a less severe backfill profile.
 % TODO note what we said here about the supplement
 
 Code to reproduce all results (which uses the \texttt{evalcast} R package) can 
@@ -823,31 +819,36 @@ COVIDcast API (defined using from medical insurance claims, internet-based
 surveys, and Google search trends) is undoubtedly ``yes''. However, there are 
 levels of nuance to such an answer that must be explained.  None of the
 indicators that we have investigated appear to be the ``silver bullet'' that 
-one  might have hoped for, revolutionizing the tractability of the prediction 
+one might have hoped for, revolutionizing the tractability of the prediction 
 problem, rendering it easy when it was once hard (in the absence of auxiliary 
-information).  Rather, the gains in accuracy offered by the indicator models 
-(over an autoregressive model based on past case rates along) appear to be
-nontrivial, and consistent across modes of analysis, but modest.  In
-forecasting, the indicator models appear to be most useful in periods in which 
-case rates are flat or trending down, rather than periods in which case rates
-are trending up (as one might hope to see, as the hypothetical benefit provided
-by an idealized ``leading indicator'').  
+information).  Rather, the gains in accuracy from the indicator models (over an
+autoregressive model based only on past case rates) appear to be nontrivial, and
+consistent across modes of analysis, but modest.  In forecasting, the indicator 
+models appear to be most useful in periods in which case rates are flat or
+trending down, rather than periods in which case rates are trending up (as one 
+might hope to see is the benefit provided by a hypothetical ``leading
+indicator'').    
 
-As mentioned previously, the indicator models could certainly benefit from a 
-careful handling of location-specific effects (to account for spatial
-heterogeneity in the search trends and claims-based indicators in particular),
-as well as nowcasting techniques to estimate finalized indicator values before
-using them as features (to account for backfill in the claims-based indicators
-in particular).  Beyond this, it is certainly possible that more sophisticated 
-models for forecasting or hotspot prediction would lead to different results,
-and potentially even different insights.  Natural directions to explore include  
-using interactions, using multiple indicators in tandem in a single model, and 
-leveraging HRR demographics or mobility patterns.  That said, we are doubtful
-that the ``topline'' conclusion would change--that auxiliary indicators can
-provide a nontrivial, consistent, but modest improvement in forecasting and
-hotspot prediction.  
+As mentioned previously, the indicator models could likely be improved by using 
+location-specific effects, as well as using nowcasting techniques to estimate
+finalized indicator values before using them as features (in order to account
+for backfill in the claims-based signals in particular).  Beyond this, it is
+certainly possible that more sophisticated models for forecasting or hotspot
+prediction would lead to different results, and even different
+insights. Natural directions to explore include using interactions, using
+multiple indicators in a single model, and leveraging HRR demographics or
+mobility patterns.  That said, we are doubtful that more sophisticated modeling
+techniques would change the ``topline'' conclusion---that auxiliary indicators 
+can provide nontrivial, consistent, but modest gains in forecasting and
+hotspot prediction. Whether a more sophisticated model would be able to leverage
+the indicators in such a way as to change some of the finer conclusions---e.g.,
+by offering clear improvements in periods in which cases are trending up---is 
+less clear to us. 
 
-Furthermore, from our experience working on forecasting  TODO
+Reiterate importance of AS OF
+
+Not the end of the story.  Should we even be forecasting case rates?  More
+careful models---combine hotspots and forecasting?
 
 [  Finish by reiterating the importance of vintage data.  Emphasizing the rigor
 or our approach, how we have provided a template for others to be able to do the
