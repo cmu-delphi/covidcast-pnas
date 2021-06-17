@@ -666,7 +666,8 @@ best-performing indicator models for many of the ahead values.
 [TODO: should we
 insert one line explaining this---you're somewhat protected form volatiliy in a
 logistic model thanks to 
-the sigmoid function used to define the probabilities?]  
+the sigmoid function used to define the probabilities? DJM: I think not, seems a
+bit far afield.]  
 
 \subsection{Implicit Regularization Hypothesis}
 
@@ -718,18 +719,20 @@ are either flat or decreasing. For the ``down'' scenario, we simply use the oppo
 the hotspot definition: $Y_{\ell,t}$ decreases by more than 25\% relative to the
 preceding week.
 
-While the performance of all forecast degrades during up periods (WIS is on the
+While the performance of all forecasters degrades during up periods (WIS is on the
 scale of cases, so higher case counts means higher WIS) there are pronounced
 patterns for the different models. 
 Google-AA is the only model that
-significantly outperforms the AR model during upswings. Both Google-AA and
-CTIS-CLI-in-community have large right tails during the flat periods while the
-claims signals have large left tails (indicating some large, relatively poor
-forecasts) during flat and up periods. CHNG-CLI, CHNG-COVID, Google-AA and
+outperforms the AR model, on average, during upswings (see the supplement for
+these averaged conclusions). Both Google-AA and
+CTIS-CLI-in-community have large right tails during the flat periods. CHNG-CLI
+and DV-CLI have large left tails (indicating some large, relatively poor
+forecasts) during flat and up periods. CHNG-CLI, CHNG-COVID, Google-AA, and
 especially CTIS-CLI-in-community have large positive outliers during the down
 period. Overall, the indicators seem to help more during periods of flat or down
-cases than during up periods, with the exception of Google-AA. In the
-supplement, we examine classification accuracy and log-likelihood for the
+cases than during periods of increasing case rates, with the exception of
+Google-AA.
+In the supplement, we examine classification accuracy and log-likelihood for the
 hotspot task. We see a similar phenomenon: the indicators dramatically improve
 hotspot prediction accuracy during flat and down periods with more mixed
 behavior during periods of increasing cases, with CHNG-CLI, CHNG-COVID, and DV-CLI
@@ -745,6 +748,14 @@ leading to decreased performance.
     emphasize outliers.}
   \label{fig:up-down-flat}
 \end{figure}
+
+The supplement pursues this analysis further. Essentially, during downswings,
+improved performance is strongly correlated with predicing larger declines than
+the AR model. The AR model tends to overpredict relative to the decline, but
+adding indicators tends to diminish this effect. During upswings, the AR model
+tends to underpredict, but when the addition of an indicator improves
+performance (a more rare occurrence) it is rarely due to higher median
+predictions.   
 
 \subsection{Effects of Leading or Lagging Behavior}
 
