@@ -264,13 +264,12 @@ Figure~\ref{fig:vintage} for an example.
 
 Lastly, our treatment of the Google-AA signal is different from the rest.
 Because Google's team did not start publishing this signal until early
-September, 2020, we do not have true vintage data before then.
-Furthermore, the latency of the signal was always at least one week
-through 2020.  However, this
+September, 2020, we do not have true vintage data before then.  Furthermore, the
+latency of the signal was always at least one week through 2020.  However, this
 signal is never revised after initial publication (confirmed via personal
-communication with the Google team that produces this signal) and
-furthermore the latency of the signal is not an unavoidable property
-of the data type, so we simply use finalized values for it in our analysis.   
+communication with the Google team that produces this signal) and furthermore
+the latency of the signal is not an unavoidable property of the data type, so we
+simply use finalized signal values it, with zero latency, in our analysis.   
 
 \subsection{Analysis Tasks}
 
@@ -504,8 +503,8 @@ $\ell$.
 Over the prediction period, all auxiliary indicators are available (in the
 proper vintage sense) for all locations and prediction times, except for the
 Google-AA signal, which is only observed for an average of 105 (of 306) HRRs.
-This is due to the fact that the COVID-19 search trends data is released
-after applying differential privacy techniques \cite{Bavadekar:2020}, and a
+Such missingness occurs because the COVID-19 search trends data is
+constructed using differential privacy methods \cite{Bavadekar:2020}, and a 
 missing signal value means that the level of noise added in the differential
 privacy mechanism is high compared to the underyling search count.  In other
 words, values of the Google-AA signal are clearly \textit{not} missing at
@@ -604,15 +603,13 @@ proper vintage data, we ran a parallel set of forecasting and hotspot prediction
 experiments using finalized data. The results, given in the supplement, show
 that training and making predictions on finalized data can result in overly
 optimistic estimates of true test-time performance (up to 10\% better in terms
-of average WIS or AUC). Furthermore, since indicators can have
-greatly different backfill profiles, the use of finalized data in
-retrospective evaluations can even change the relative ordering of
-methods.  For example, CHNG-CLI and DV-CLI
-when trained on finalized data perform very similarly for
-the forecasting task.  This makes sense since they are both claims-based indicators measuring supposedly the
-same thing.  However, DV-CLI outperforms CHNG-CLI on vintage data,
-reflecting its less severe backfill profile.
-
+of average WIS or AUC). Furthermore, since indicators can have greatly different
+backfill profiles, the use of finalized data in retrospective evaluations can
+even change the relative ordering of models.  For example, CHNG-CLI and DV-CLI
+when trained on finalized data perform very similarly for the forecasting task.
+This makes sense since they are both claims-based indicators measuring
+supposedly the same thing.  However, DV-CLI outperforms CHNG-CLI on vintage
+data, reflecting its has a less severe backfill profile.
 % TODO note what we said here about the supplement
 
 Code to reproduce all results (which uses the \texttt{evalcast} R package) can 
