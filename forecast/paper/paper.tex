@@ -155,6 +155,7 @@ conclusions with respect to numerous modes of analysis.
 \section{Methods}
 
 \subsection{Signals and Locations}
+\label{sec:signals-locations}
 
 We consider prediction of future COVID-19 case rates or case hotspots (to be
 defined precisely shortly).  By case rate, we mean the case count per 100,000
@@ -693,16 +694,105 @@ rejection (informally speaking) of the implicit regularization hypothesis.
 \label{fig:hotspot}
 \end{figure}
 
-\subsection{Performance in Up, Down, Flat Periods}
+\subsection{Performance in Up, Down, and Flat Periods}
+
+The course of the pandemic has played out very differently across space and
+time. Aggregating case rates nationally shows three pronounced waves, but the
+behavior is more nuanced at the HRR level. 
+Figure \ref{fig:trajectory} is a single example of what a forecast looks like
+during a period of relatively flat cases as New York City begins what will
+become its second wave. The AR forecast's 50\% confidence interval contains this
+upswing, but the median forecast is clearly below the finalized data.
+Unfortunately, this behavior is typical of all forecasters: during upswings, the
+median forecast tends to fall below the target while the reverse is true during
+downswings.
+
+Figure \ref{fig:up-down-flat} shows histograms of the difference between the WIS for the
+forecasters with the benefit of the indicators and the WIS of the AR model, but
+it stratifies these differences by
+whether the target occurs during a period of increasing cases rates (up),
+decreasing case rates (down), or flat. To define the increasing period, we use
+the same definition we used for the hotspot task in Table
+\ref{tab:analysis_tasks}. Thus all hotspots are ``up'' while all non-hotspots
+are either flat or decreasing. For the ``down'' scenario, we simply use the opposite of
+the hotspot definition: $Y_{\ell,t}$ decreases by more than 25\% relative to the
+preceding week.
+
+While the performance of all forecast degrades during up periods (WIS is on the
+scale of cases, so higher case counts means higher WIS) there are pronounced
+patterns for the different models. 
+Google-AA is the only model that
+significantly outperforms the AR model during upswings. Both Google-AA and
+CTIS-CLI-in-community have large right tails during the flat periods while the
+claims signals have large left tails (indicating some large, relatively poor
+forecasts) during flat and up periods. CHNG-CLI, CHNG-COVID, Google-AA and
+especially CTIS-CLI-in-community have large positive outliers during the down
+period. Overall, the indicators seem to help more during periods of flat or down
+cases than during up periods, with the exception of Google-AA. In the
+supplement, we examine classification accuracy and log-likelihood for the
+hotspot task. We see a similar phenomenon: the indicators dramatically improve
+hotspot prediction accuracy during flat and down periods with more mixed
+behavior during periods of increasing cases, with CHNG-CLI, CHNG-COVID, and DV-CLI
+leading to decreased performance. 
+
+
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/upswing-histogram-1.pdf}
   \caption{Histogram of the difference in WIS for the AR model relative to each
-    forecaster. Larger values are better for the indicator assisted model.}
+    forecaster. Larger values are better for the indicator assisted model. The
+    $y$-axis is on the logarithmic scale to 
+    emphasize outliers.}
   \label{fig:up-down-flat}
 \end{figure}
 
 \subsection{Effects of Leading or Lagging Behavior}
+
+As described in Section \ref{sec:signals-locations}, each of the indicators we
+examine could be said to measure aspects on disease progression that would
+precede a positive test. That is, we imagine that these signals should ``lead''
+cases. It is entirely reasonable to imagine that, prior to an increase of
+confirmed COVID-19 tests reported by public health in a particular location, we
+would see an increase in insurance claims for COVID-19-related medical visits.
+However, it may well be the case that this leading behavior is different during
+different periods. In fact, we find that the ``leadingness'' of the indicators
+is more pronounced during downswings and flat periods than during upswings, a
+plausible explanation for the decreased performance noted above.
+
+In order to measure the leadingness on an indicator, we use the cross
+correlation function. Essentially this examines the Pearson correlation between a
+shifted version of the indicator and the case rate. So if $X_{\ell,t}$ is
+shifted forward by 7 days, and the magnitude of the correlation of that shifted series with
+$Y_{\ell,t}$ (unshifted) is high, we would say that $X_{\ell}$ leads $Y_{\ell}$
+by 7 days. This process is repeated for a range of shifts, forward and backward,
+resulting in leadingness and laggingness scores. Further details are given in
+the supplement.
+
+Figure \ref{fig:leading-lagging} shows the correlations between the difference
+in the WIS of the AR model relative to $F$ with the leading and laggingness
+scores stratified by whether the target is classified as up, down, or flat. One
+would expect that increases in $\WIS(AR) - \WIS(AR)$ would be positively
+correlated with leadingness. This relationship is strongest during down periods
+and weakest during up periods with flat in the middle. In fact, for each
+indicator, the strength of correlations between improved performance and
+leadingness can be ordered down $>$ flat $>$ up. The relationship with
+laggingness is the opposite, though less pronounced. CHNG-CLI's forecast
+performance doesn't correlate very strongly with laggingness while any
+laggingness in Google-AA during down and flat periods results in realtively
+worse forecasting performance.
+
+Because a time series can, to a degree, both simultaneously leading and lagging,
+we also examine the correlation between performance and the difference between
+leadingness and laggingness. Figure \ref{fig:diff-btw-leading-lagging} shows
+this behavior. Again, indicators that are more leading then lagging tend to
+are positively correlated with improved relative performance. This relationship
+is most pronounced during periods of decreasing case rates and attenuates in
+other scenarios.
+
+
+
+
+
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/leading-and-lagging-1.pdf}

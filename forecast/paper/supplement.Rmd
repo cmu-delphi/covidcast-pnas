@@ -388,12 +388,12 @@ ggplot(pct_chng_df %>%
          group_by(forecaster) %>% 
          mutate(median = median(cor_wisratio_pctchange)), 
        aes(x = cor_wisratio_pctchange)) +
-  geom_histogram(aes(y = ..count.. / sum(..count..), fill = forecaster)) +
+  geom_histogram(aes(y = ..count.. / sum(..count..), fill = forecaster), nbins = 100) +
   scale_fill_manual(values = fcast_colors) +
   theme_bw() +
   theme(legend.position = "none") +
-  geom_vline(aes(xintercept = median)) + 
-  geom_vline(xintercept = 0, linetype = "dotted") +
+  geom_vline(aes(xintercept = median), linetype = "dotted") + 
+  geom_vline(xintercept = 0) +
   facet_wrap(~forecaster) + 
   xlab("Spearman correlation") + ylab("Relative frequency") +
   scale_y_continuous(labels = scales::label_percent(accuracy = 1))
@@ -406,12 +406,12 @@ ggplot(pct_chng_df %>%
          group_by(forecaster) %>% 
          mutate(median = median(cor_abs_wisratio_minus_1_pctchange)), 
        aes(x = cor_abs_wisratio_minus_1_pctchange)) +
-  geom_histogram(aes(y = ..count.. / sum(..count..), fill = forecaster)) +
+  geom_histogram(aes(y = ..count.. / sum(..count..), fill = forecaster), nbins = 100) +
   scale_fill_manual(values = fcast_colors) +
   theme_bw() +
   theme(legend.position = "none") +
-  geom_vline(aes(xintercept = median)) + 
-  geom_vline(xintercept = 0, linetype = "dotted") +
+  geom_vline(aes(xintercept = median), linetype = "dotted") + 
+  geom_vline(xintercept = 0) +
   facet_wrap(~forecaster) + 
   xlab("Spearman correlation") + ylab("Relative frequency") +
   scale_y_continuous(labels = scales::label_percent(accuracy = 1))
@@ -472,7 +472,8 @@ df <- left_join(corr_df %>%
 # Figure 5 in the manuscript
 df %>% 
   filter(period != "jm") %>%
-  group_by(forecaster, geo_value, udf) %>%
+  group_by(forecaster, udf) %>%
+  mutate(m = Mean(AR_wis - wis)) %>%
   ggplot(aes(AR_wis - wis, fill = forecaster)) +
   geom_histogram(bins = 100) +
   facet_grid(udf ~ forecaster) +
@@ -483,7 +484,8 @@ df %>%
   scale_y_log10(breaks = c(10,1000,100000), 
                 labels = trans_format("log10", math_format(10^.x))) +
   xlab("AR WIS - forecaster WIS") +
-  geom_vline(xintercept = 0)
+  geom_vline(xintercept = 0) +
+  geom_vline(aes(xintercept = m), linetype = "dashed")
 ```
 
 ```{r upswing-histogram-logged, fig.cap="Not sure if we want this here. Similar to Figure 5 in the manuscript but taking logs. "}

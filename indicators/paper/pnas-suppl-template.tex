@@ -1,0 +1,32 @@
+\documentclass[9pt,twoside,lineno]{pnas-new}
+% Use the lineno option to display guide line numbers if required.
+
+\templatetype{pnassupportinginfo}
+
+\input{../../common/prelim.tex}
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+$for(header-includes)$
+$header-includes$
+$endfor$
+
+\title{An Open Repository of Real-Time COVID-19 Indicators}
+\author{Author1, Author2 and Author3 (complete author list)}
+\correspondingauthor{Corresponding Author name.\\E-mail: author.two@email.com}
+
+\begin{document}
+
+
+
+$body$
+
+
+
+
+
+
+\bibliography{$for(bibliography)$$bibliography$$sep$,$endfor$}
+
+\end{document}
