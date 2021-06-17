@@ -345,7 +345,7 @@ pandemic in 2021.
 
 Recall $Y_{\ell,t}$ denotes the 7-day trailing average of COVID-19 case
 incidence rates in location $\ell$ and at time $t$.  Separately for each
-$a=7,\ldots,28$, to predict $Y_{\ell,t+a}$ for ahead value $a$, we consider a
+$a=7,\ldots,21$, to predict $Y_{\ell,t+a}$ for ahead value $a$, we consider a
 simple probabilistic forecasting model of the form:     
 \begin{equation}
 \label{eq:forecast_ar}
@@ -414,12 +414,12 @@ location-time pairs as hotspots, during the prediction period (June 16--December
 
 We treat hotspot prediction as a binary classification problem and use a setup 
 altogether quite similar to the forecasting setup described previously.
-Separately for each $a=7,\ldots,28$, to predict $Z_{\ell,t+a}$, we consider a
+Separately for each $a=7,\ldots,21$, to predict $Z_{\ell,t+a}$, we consider a
 simple logistic model:
 \begin{equation}
 \label{eq:hotspot_ar}
 \logit \big( \P(Z_{\ell,t+a} = 1 \,|\, Y_{\ell,s}, s \leq t) \big) 
-= \alpha^{a,\tau} + \sum_{j=0}^2 \^{a,\tau}_j Y^\Delta_{\ell,t-7j},
+= \alpha^{a,\tau} + \sum_{j=0}^2 \beta^{a,\tau}_j Y^\Delta_{\ell,t-7j},
 \end{equation}
 where $\logit(p) = \log(p/(1-p))$, the log-odds of $p$.
 
