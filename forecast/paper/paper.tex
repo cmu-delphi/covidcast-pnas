@@ -420,7 +420,7 @@ simple logistic model:
 \begin{equation}
 \label{eq:hotspot_ar}
 \logit \big( \P(Z_{\ell,t+a} = 1 \,|\, Y_{\ell,s}, s \leq t) \big) 
-= \alpha^{a,\tau} + \sum_{j=0}^2 \^{a,\tau}_j Y^\Delta_{\ell,t-7j},
+= \alpha^{a,\tau} + \sum_{j=0}^2 \beta^{a,\tau}_j Y^\Delta_{\ell,t-7j},
 \end{equation}
 where $\logit(p) = \log(p/(1-p))$, the log-odds of $p$.
 
