@@ -45,19 +45,18 @@
 \leadauthor{McDonald} 
 
 % Please add a significance statement to explain the relevance of your work
-\significancestatement{Forecasting is a key component in the public health
-  response to any fast-moving epidemic or pandemic.  Forecasting the future
+\significancestatement{Forecasting is a critical element of the public health
+  response to any fast-moving epidemic or pandemic.  Predicting the future
   spread some disease process, based on disease activity in the recent
   past---say, using what is known as autoregressive modeling in the time series
-  literature---is a basic and widely-used method, which can be especially 
-  effective in noisy data settings.  In this paper we ask whether including
-  auxiliary indicators as additional features in such an autoregressive model
-  can be useful in COVID-19 case forecasting and hotspot prediction.  We find 
-  that auxiliary indicators based on de-identified medical insurance claims,
-  self-reported symptoms through online surveys, and COVID-related Internet
-  search activity all provide a nontrivial boost in accuracy, though their
-  utility generally depends the phase of the pandemic that we are in at
-  prediction time (upswing, downswing, or flat period).
+  literature---is a basic and widely-used method.  In this paper we study
+  whether including auxiliary indicators as additional features in such an
+  autoregressive model can be useful in COVID-19 case forecasting and hotspot
+  prediction.  We find that indicators based on de-identified medical insurance 
+  claims, self-reported symptoms through online surveys, and COVID-related
+  Internet search activity all provide a nontrivial boost in accuracy, though
+  their utility generally depends the pandemic's local dynamics (upswing,
+  downswing, or flat period) at prediction time.
 }
 
   % TODO % For reference, below is the indicators paper one.
@@ -119,7 +118,7 @@ fundamental prediction tasks: probabilistic forecasting of COVID-19 case
 rates and prediction of future COVID-19 case hotspots (defined by the event that
 a relative increase in COVID-19 cases exceeds a certain threshold). 
 
-At the outset, we should be clear that our intent in this paper is \textit{not}
+ At the outset, we should be clear that our intent in this paper is \textit{not}
 to provide an authoritative take on cutting-edge COVID-19 forecasting methods.
 Instead, our purpose here is to provide a rigorous, quantitative assessment of
 the utility that several auxiliary indicators---such as those derived from
@@ -654,20 +653,20 @@ be found at
 
 \subsection{Aggregate Results by Ahead Value}
 
-Figure~\ref{fig:forecast} (right panel) displays the results for forecasting, stratified by
-ahead value and averaged over all HRRs and forecast dates (June 9--December 31,
-2020).  Shown is the average WIS for each forecast model divided by the averaged
-WIS from a baseline model, which is basically a flat-line forecaster (its
-median forecast for $Y_{\ell,t+a}$ is always $Y_{\ell,t}$, with predicted
-quantiles defined around this flat line based on historical variation). This is
-the same baseline model as that used in the COVID-19 Forecast Hub.  Here, we  
-divide by the average WIS of the baseline model in order to put the y-axis on an 
-interpretable scale.  We can see that all curves are below 1, which means
-(smaller WIS is better) that all of the models, including AR, outperform the
-baseline on average over the forecasting period.  On the other hand, the models 
-deliver at best an improvement of about 20\% in mean WIS over the baseline
-model, with this gap narrowing to only 10\% at the largest ahead values,
-illustrating the difficulty of the forecasting problem.   
+Figure~\ref{fig:forecast} (left panel) displays evaluation results for
+forecasting, stratified by ahead value and averaged over all HRRs and forecast
+dates.  Shown is the average WIS for each forecast model divided by that from a
+baseline model, which is basically a flat-line forecaster (its median forecast
+for $Y_{\ell,t+a}$ is always $Y_{\ell,t}$, with predicted quantiles defined
+around this based on historical variation). This is the same baseline model as
+in the COVID-19 Forecast Hub. Here, we use the baseline model in order to scale
+mean WIS so that it gets put on an interpretable, unitless scale.  In the
+figure, we can see that all curves are below 1, which means (smaller WIS is
+better) that all of the models, including AR, outperform the baseline on average
+over the forecasting period.  On the other hand, the models deliver at best an
+improvement of about 20\% in average WIS over the baseline model, with this gap
+narrowing to about 10\% at the largest ahead values, illustrating the difficulty 
+of the forecasting problem.
 
 We can also see from the figure that CHNG-COVID and DV-CLI offer the biggest
 gains over AR at small ahead values, followed by CTIS-CLI-in-community and
@@ -681,36 +680,28 @@ gain over AR, on par with the best-performing models (also shown in the
 supplement).
 % TODO note what we said here about the supplement
 
-% \begin{figure}[t]
-%   \includegraphics[width=\columnwidth]{fig/fcast-1.pdf}
-%   \caption{Average WIS for each forecast model, over all forecast dates and all
-%     HRRs, divided by the average WIS achieved by a baseline model (a
-%     probabilistic version of the flat-line forecaster).  Here and in all figures
-%   we abbreviate CTIS-CLI-in-community by CTIS-CLIIC.}  
-%   \label{fig:forecast}
-% \end{figure}
-
-Figure~\ref{fig:forecast} (left panel) displays the results for hotspot prediction, again
-stratified by ahead value and averaged over all HRRs and prediction dates (June 
-16--December 31, 2020).  We can see many similarities to the forecasting
-results (now larger AUC is better); for example, CHNG-COVID and DV-CLI offer the
-biggest improvement over AR, and all models including AR degrade in performance 
-towards the baseline (this is now just a classifier based on random guessing,
-which achieves an AUC of 0.5) as the ahead values grow.  A clear difference,
-however, is that the CHNG-CLI model performs quite well in hotspot prediction,
-close to the best-performing indicator models for many of the ahead values. This
-may be because volatility in the CHNG-CLI indicator plays less of a role in the
-associated logistic model's predicted probabilities (in general, a sigmoid
-function can absorb a lot of the variability in its input).
+Figure~\ref{fig:forecast} (right panel) displays the results for hotspot
+prediction, again stratified by ahead value and averaged over all HRRs and
+prediction dates.  We can see many similarities to the forecasting results (now
+larger AUC is better); for example, CHNG-COVID and DV-CLI offer the biggest
+improvement over AR, and all models including AR degrade in performance towards
+the baseline (this is now just a classifier based on random guessing, which
+achieves an AUC of 0.5) as the ahead values grow, illustrating the difficulty of
+the hotspot prediction problem A clear difference, however, is that the CHNG-CLI
+model performs quite well in hotspot prediction, close to the best-performing
+indicator models for many of the ahead values. This may be because volatility in
+the CHNG-CLI indicator plays less of a role in the associated logistic model's
+predicted probabilities (in general, a sigmoid function can absorb a lot of the
+variability in its input).
 
 \begin{figure*}[t]
   \includegraphics[width=\textwidth]{fig/fcast-hot-combo-1.pdf}
-  \caption{Left: Average WIS for each forecast model, over all forecast dates and all
-    HRRs, divided by the average WIS achieved by a baseline model (a
-    probabilistic version of the flat-line forecaster).  Here and in all figures
-    we abbreviate CTIS-CLI-in-community by CTIS-CLIIC.
-    Right: Area under the curve for each hotspot prediction model, calculated over
-    all prediction dates and all HRRs.
+  \caption{Left: average WIS for each forecast model, over all forecast dates
+    and all HRRs, divided by the average WIS achieved by a baseline model (a
+    probabilistic version of the flat-line forecaster).  Right: area under the
+    curve for each hotspot prediction model, calculated over all prediction
+    dates and all HRRs.  Here and in all figures we abbreviate
+    CTIS-CLI-in-community by CTIS-CLIIC.  
   }  
   \label{fig:forecast}
 \end{figure*}
