@@ -121,16 +121,26 @@ names(hrr_tab) <- pull(hrr_names, hrrnum)
 
 ```{r fcast, include=FALSE}
 # Figure 3 in the paper
-plotter(fcasts_honest %>% filter(period != "jm"), 
+fig3 <- plotter(fcasts_honest %>% filter(period != "jm"), 
         "wis", Mean, scaler = "strawman_wis", 
         order_of_operations = c("aggr","scale")) +
   ylab("Mean WIS (relative to baseline)")
+fig3
 ```
 
 ```{r hot, include=FALSE}
 # Figure 4 in the manuscript
-plotter_hotspots(hotspots_honest %>% filter(period != "jm")) + 
+fig4 <- plotter_hotspots(hotspots_honest %>% filter(period != "jm")) + 
   geom_hline(yintercept = 0.5)
+fig4
+```
+
+```{r fcast-hot-combo, include=FALSE, fig.width=8, fig.height=4}
+leg <- get_legend(fig3)
+comb1 <- plot_grid(fig3 + theme(legend.position = "none"),
+                   fig4 + theme(legend.position = "none"), 
+                   nrow = 1)
+plot_grid(comb1, leg, ncol = 1, rel_heights = c(1,.1))
 ```
 
 
