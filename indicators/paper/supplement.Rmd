@@ -56,7 +56,7 @@ library(dplyr)
 \caption{The epidemiological "severity pyramid" represents the progression of
 cases from the public, through infection, through increasingly severe stages of
 disease. The annotations here represent the data sources collected by Delphi's
-COVIDcast Epidata API.}
+COVIDcast Epidata API. TODO Edit to use consistent language to paper}
 \end{figure}
 
 \clearpage
@@ -103,17 +103,23 @@ state_trends <- covidcast_signals(
 g <- get_trend_grid(state_trends, function(val) { abbr_to_name(toupper(val)) })
 ```
 
-```{r state-trend-grids-1, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for states across the United States. Cases are reported cases per 100,000 population. Other signals are scaled to have the same global maximum, so they can be presented in the same range. (part 1 of 4)", fig.height=8}
+```{r state-trend-grids-1, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for states across the United States. Cases are reported cases per 100,000 population. Other signals are scaled to have the same global maximum across all counties and times, so they can be presented in the same range. (part 1 of 4)", fig.height=8}
 g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 1)
 ```
+
+\clearpage
 
 ```{r state-trend-grids-2, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for states across the United States. (part 2 of 4)", fig.height=8}
 g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 2)
 ```
 
+\clearpage
+
 ```{r state-trend-grids-3, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for states across the United States. (part 3 of 4)", fig.height=8}
 g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 3)
 ```
+
+\clearpage
 
 ```{r state-trend-grids-4, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for states across the United States. (part 4 of 4)", fig.height=8}
 g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 4)
@@ -123,25 +129,66 @@ g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 4)
 
 ```{r county-trends}
 # Same thing again, but the 50 largest counties
-## top_counties <- county_census %>%
-##   filter(COUNTY != 0) %>% # these are states
-##   arrange(desc(POPESTIMATE2019)) %>%
-##   head(n = 50) %>%
-##   pull(FIPS)
+top_counties <- county_census %>%
+  filter(COUNTY != 0) %>% # these are states
+  arrange(desc(POPESTIMATE2019)) %>%
+  head(n = 50) %>%
+  pull(FIPS)
 
-## county_trends <- covidcast_signals(
-##   SOURCES,
-##   SIGNALS,
-##   "2020-04-15", "2021-04-15",
-##   geo_type = "county",
-##   geo_values = top_counties
-## )
+# Work around an API problem: specifying geo_values in the query causes it to
+# fail on the CHNG data because of bad database indexing. Filter after the
+# fact instead. DANGER: Very slow.
+county_trends_nochng <- covidcast_signals(
+  SOURCES[c(1,4)], SIGNALS[c(1,4)],
+  "2020-04-15", "2021-04-15",
+  geo_type = "county",
+  geo_values = top_counties
+)
 
-## g <- get_trend_grid(state_trends, county_fips_to_name)
+county_trends_chng <- covidcast_signals(
+  SOURCES[2:3], SIGNALS[2:3],
+  "2020-04-15", "2021-04-15",
+  geo_type = "county"
+)
+
+county_trends_chng <- lapply(
+  county_trends_chng,
+  function(df) {
+    filter(df, geo_value %in% top_counties)
+  }
+)
+
+county_trends <- append(county_trends_nochng, county_trends_chng[1])
+county_trends <- append(county_trends, county_trends_chng[2])
 ```
 
-```{r county-trend-grids-1, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for the 50 most populous counties in the United States. (part 1 of 4)"}
-## g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 1)
+```{r county-trend-grids-1, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for the 50 most populous counties in the United States. Cases are reported cases per 100,000 population. Other signals are scaled to have the same global maximum across all counties and times, so they can be presented in the same range. (part 1 of 4)", fig.height=8}
+g <- get_trend_grid(
+  county_trends,
+  function(fipsen) {
+    paste0(county_fips_to_name(fipsen), ", ", name_to_abbr(state_fips_to_name(fipsen)))
+  }
+)
+
+g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 1)
+```
+
+\clearpage
+
+```{r county-trend-grids-2, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for the 50 most populous counties in the United States. (part 2 of 4)", fig.height=8}
+g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 2)
+```
+
+\clearpage
+
+```{r county-trend-grids-3, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for the 50 most populous counties in the United States. (part 3 of 4)", fig.height=8}
+g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 3)
+```
+
+\clearpage
+
+```{r county-trend-grids-4, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for the 50 most populous counties in the United States. (part 4 of 4)", fig.height=8}
+g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 4)
 ```
 
 

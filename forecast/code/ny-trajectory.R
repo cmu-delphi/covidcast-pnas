@@ -1,20 +1,23 @@
 library(covidcast)
 library(tidyverse)
 
-ny_preds <- readRDS(file.path(path_to_data, "predictions_honest.RDS")) %>%
-  filter(geo_value == "303", 
-         forecast_date == "2020-10-15",
-         forecaster == "AR3") %>%
-  mutate(target_end_date = forecast_date + days(ahead),
-         incidence_period = "day")
+# ny_preds <- readRDS(file.path(path_to_data, "predictions_honest.RDS")) %>%
+#   filter(geo_value == "303", 
+#          forecast_date == "2020-10-15",
+#          forecaster == "AR3") %>%
+#   mutate(target_end_date = forecast_date + days(ahead),
+#          incidence_period = "day")
+# 
+# ny_actuals <- readRDS(file.path(path_to_data, "actuals.RDS")) %>%
+#   filter(geo_value == "303", 
+#          target_end_date > "2020-09-01", 
+#          target_end_date < "2020-11-15") %>%
+#   rename(value = actual, time_value = target_end_date)
+#   
+ny_preds <- readRDS("../data/ny_predictions.RDS")
+ny_actuals <- readRDS("../data/ny_actuals.RDS")
 
-actuals <- readRDS(file.path(path_to_data, "actuals.RDS")) %>%
-  filter(geo_value == "303", 
-         target_end_date > "2020-09-01", 
-         target_end_date < "2020-11-15") %>%
-  rename(value = actual, time_value = target_end_date)
-
-pd <- evalcast:::setup_plot_trajectory(ny_preds, side_truth = actuals)
+pd <- evalcast:::setup_plot_trajectory(ny_preds, side_truth = ny_actuals)
 pd$truth_df <- pd$truth_df %>% rename(target_end_date = time_value)
 
 gg <- ggplot(pd$truth_df, mapping = aes(x = target_end_date)) +
