@@ -687,13 +687,13 @@ models (with random noise as auxiliary features) offered essentially no
 improvement over the pure AR model, which provides a strong rejection
 (informally speaking) of the implicit regularization hypothesis.     
 
-Along the lines of regularization, it is also worth noting that the use of
+On the topic of regularization, it is also worth noting that the use of 
 $\ell_1$ regularization (tuned by cross-validation) in fitting any of the models
 in \eqref{eq:forecast_ar}, \eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar}, 
 \eqref{eq:hotspot_ar_x} did not improve their generally performance at all
 (experiments not shown).  This is likely due to the fact that the number of
-training samples is quite large compared to the number of features (6,426
-training samples and only 3--6 features).  
+training samples is large compared to the number of features (6,426 training
+samples and only 3--6 features).   
 
 \begin{figure}[t]
 \includegraphics[width=\columnwidth]{fig/hot-1.pdf}
@@ -702,7 +702,7 @@ training samples and only 3--6 features).
 \label{fig:hotspot}
 \end{figure}
 
-\subsection{Performance in Up, Down, and Flat Periods}
+\subsection{Evaluation in Up, Down, and Flat Periods}
 
 The course of the pandemic has played out quite differently across space and
 time. Aggregating case rates nationally shows three pronounced waves, but the
@@ -738,9 +738,10 @@ Google-AA.
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/upswing-histogram-1.pdf}
   \caption{Histogram of the difference in WIS for the AR model and that for each
-    indicator model, stratified by up, down, or flat periods, measured in terms
-    of case activity. (Larger values are better for the indicator model.) The
-    y-axis is on the log scale to emphasize tail behavior.} 
+    indicator model, stratified by up, down, or flat period, measured in terms
+    of case trends. Note that \textit{larger} differences here are better for
+    each indicator model.  The y-axis is on the log scale to emphasize tail 
+    behavior.}   
   \label{fig:up_down_flat}
 \end{figure}
 
@@ -768,128 +769,91 @@ As described in the methods section, each of the indicators we examine could be
 said to measure aspects on disease progression that would precede a positive
 test. That is, we imagine that these signals should ``lead'' cases. It is
 entirely reasonable to imagine that, prior to an increase of confirmed COVID-19
-tests reported by public health in a particular location, we would see an
-increase in insurance claims for COVID-19-related medical visits.  However, it
-may well be the case that this leading behavior is different during different
-periods. In fact, we find that the ``leadingness'' of an indicator (degree to
-which it leads) tends to be more pronounced during down and flat periods than up
-periods, a plausible explanation for the decreased performance noted above.   
+tests reported by a public health authority in a particular location, we would
+see an increase in medical insurance claims for COVID-related outpatient
+visits. However, it may well be the case that such behavior is different
+during different periods. In fact, we find empirically that the ``leadingness''
+of an indicator (degree to which it leads case activity) tends to be more
+pronounced in down or flat periods than up periods, a plausible explanation
+for the decreased performance in up periods noted above.
 
-In order to measure the leadingness on af indicator, we examine its cross
-correlations to case rates over a short time window
-
- the cross
-correlation function. Essentially this examines the Pearson correlation between 
-
-shifted version of the indicator and the case rate. So if $X_{\ell,t}$ is
-shifted forward by 7 days, and the magnitude of the correlation of that shifted series with
-$Y_{\ell,t}$ (unshifted) is high, we would say that $X_{\ell}$ leads $Y_{\ell}$
-by 7 days. This process is repeated for a range of shifts, forward and backward,
-resulting in leadingness and laggingness scores. Further details are given in
-the supplement.
-
-Figure \ref{fig:leading-lagging} shows the correlations between the difference
-in the WIS of the AR model relative to $F$ with the leading and laggingness
-scores stratified by whether the target is classified as up, down, or flat. One
-would expect that increases in $\WIS(AR) - \WIS(AR)$ would be positively
-correlated with leadingness. This relationship is strongest during down periods
-and weakest during up periods with flat in the middle. In fact, for each
-indicator, the strength of correlations between improved performance and
-leadingness can be ordered down $>$ flat $>$ up. The relationship with
-laggingness is the opposite, though less pronounced. CHNG-CLI's forecast
-performance doesn't correlate very strongly with laggingness while any
-laggingness in Google-AA during down and flat periods results in realtively
-worse forecasting performance.
-
-Because a time series can, to a degree, both simultaneously leading and lagging,
-we also examine the correlation between performance and the difference between
-leadingness and laggingness. Figure \ref{fig:diff-btw-leading-lagging} shows
-this behavior. Again, indicators that are more leading then lagging tend to
-are positively correlated with improved relative performance. This relationship
-is most pronounced during periods of decreasing case rates and attenuates in
-other scenarios.
-
-
-
-
-
+In the supplement, we show how to define a quantitative score to measure the
+leadingness of an indicator, at any time $t$ and any location $\ell$, based on
+cross correlations to case rates over a short time window around $t$.
+The higher this score, the greater it ``leads'' case activity.  Figure 
+\ref{fig:leading} displays correlations between the leadingness score of an 
+indicator and the WIS difference (AR model minus an indicator model), stratified
+by whether the target is classified as up, down, or flat.  One would expect that  
+the WIS difference would be positively correlated with leadingness.  Somewhat
+surprisingly, this relationship turns out to be the strongest in down periods,
+and weakest in up periods.  In fact, it is very nearly the case that for each
+indicator, the strength of correlations only decreases as we move from down to
+flat to up  periods.  In the supplement, we extend this analysis by examining
+analogous ``laggingness'' scores, but we do not find as clear patterns. 
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/leading-and-lagging-1.pdf}
-  \caption{Correlation of the difference in WIS with the ``leadingness'' and
-    ``laggingness'' of the indicator at the target date.}
-  \label{fig:leading-lagging}
+  \caption{Correlation of the difference in WIS with the ``leadingness'' of the
+    indicator at the target date, stratified by up, down, or flat period.} 
+  \label{fig:leading}
 \end{figure}
-
-
-\begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/diff-in-lead-lag-1.pdf}
-  \caption{Correlation of the difference in WIS with difference between the
-    ``leadingness'' and ``laggingness'' of the indicator at the target date.}
-  \label{fig:diff-btw-leading-lagging}
-\end{figure}
-
 
 
 
 \section{Discussion}
 
 Can auxiliary indicators improve COVID-19 forecasting and hotspot prediction
-models?  Our answer, based on analyzing five auxiliary indicators from the  
+models?  Our answer, based on analyzing five auxiliary indicators from the
 COVIDcast API (defined using from medical insurance claims, internet-based
-surveys, and Internet search trends) is undoubtedly ``yes''. However, there are  
+surveys, and Internet search trends) is undoubtedly ``yes''. However, there are
 levels of nuance to such an answer that must be explained.  None of the
-indicators that we have investigated appear to be the ``silver bullet'' that 
-one might have hoped for, revolutionizing the tractability of the prediction 
-problem, rendering it easy when it was once hard (in the absence of auxiliary 
+indicators that we have investigated appear to be the ``silver bullet'' that one
+might have hoped for, revolutionizing the tractability of the prediction
+problem, rendering it easy when it was once hard (in the absence of auxiliary
 information).  Rather, the gains in accuracy from the indicator models (over an
 autoregressive model based only on past case rates) appear to be nontrivial, and
-consistent across modes of analysis, but modest.  In forecasting, the indicator 
-models appear to be most useful in periods in which case rates are flat or
-trending down, rather than periods in which case rates are trending up (as one 
+consistent across modes of analysis, but modest.  In forecasting, the indicator
+models are found to be most useful in periods in which case rates are flat or
+trending down, rather than periods in which case rates are trending up (as one
 might hope to see is the benefit provided by a hypothetical ``leading
-indicator'').    
+indicator'').
 
-As mentioned previously, the indicator models could likely be improved by using 
-location-specific effects, as well as using nowcasting techniques to estimate
-finalized indicator values before using them as features (in order to account
+As described previously, it is likely that we could improve the indicator models
+by using location-specific effects, as well as using nowcasting techniques to
+estimate finalized indicator values before we use them as features (to account
 for backfill in the claims-based signals in particular).  Beyond this, it is
 certainly possible that more sophisticated models for forecasting or hotspot
-prediction would lead to different results, and even different
-insights. Natural directions to explore include using interactions, using
-multiple indicators in a single model, and leveraging HRR demographics or
+prediction would lead to different results, and possibly even different
+insights. Natural directions to explore include using multiple indicators in a
+single model, allowing for interaction terms, and leveraging HRR demographics or
 mobility patterns.  That said, we are doubtful that more sophisticated modeling
-techniques would change the ``topline'' conclusion---that auxiliary indicators 
-can provide nontrivial, consistent, but modest gains in forecasting and
-hotspot prediction. Whether a more sophisticated model would be able to leverage
-the indicators in such a way as to change some of the finer conclusions---e.g.,
-by offering clear improvements in periods in which cases are trending up---is 
-less clear to us. 
+techniques would change the ``topline'' conclusion---that auxiliary indicators
+can provide nontrivial, consistent, but modest gains in forecasting and hotspot
+prediction. Whether a more sophisticated model would be able to leverage the
+indicators in such a way as to change some of the finer conclusions---e.g., by
+offering clear improvements in periods in which cases are trending up---is less
+clear to us.
 
-Reiterate importance of AS OF
+We reiterate the importance of using vintage data for rigorous backtesting. Data
+sources that are relevant to public health surveillance are often subject to
+revision, sometimes regularly (such as medical claims data) and sometimes
+unpredictably (such as COVID-19 case reports).  When analyzing models that are
+designed to predict future events, if we train these models and make predictions
+using finalized data, then we are missing a big part of the story.  Not only
+will our sense of accuracy be unrealistic, but certain models may degrade by a
+greater or lesser extent when they are forced to work with vintage data, so 
+backtesting them with finalized data may lead us to make modeling decisions that
+may not be relevant for true test-time performance.    
 
-Not the end of the story.  Should we even be forecasting case rates?  More
-careful models---combine hotspots and forecasting?
-
-[  Finish by reiterating the importance of vintage data.  Emphasizing the rigor
-or our approach, how we have provided a template for others to be able to do the
-same thing with new models ]
-
-% RJT: some text commented out below.  May be useful for finishing off the
-% discussion   
-
-% This paper is as much about demonstrating how one might go about answering
-% such questions about feature importance in forecasting and hotspot prediction 
-% general, as providing an empirically rigorous answer to this precise question
-% in the context of the COVID-19 pandemic. 
-
-% We conclude by observing that the approach we have taken in this paper is
-% somewhat opposite to that of much of the COVID-19 forecasting literature.  We
-% have chosen to consider only very simple forecasting models while devoting
-% most of our effort to accounting for as much of the complexity of the data and 
-% evaluation as possible.  By contrast, many papers focus on very complicated
-% forecasting approaches but then evaluate them under unrealistic, retrospective 
-% conditions.
+In this paper, we have chosen to consider only very simple forecasting models,
+while devoting most of our effort to accounting for as much of the complexity of
+the data and evaluation as possible.  In fact, our paper is as much about
+demonstrating how one might address questions about model comparisons and
+evaluation in forecasting and hotspot prediction in general, as it is about
+providing rigorous answers to such questions in the context of COVID-19 case
+rates in particular.  We hope that others will leverage our framework, and build
+on it, so that it can be used to guide work that advances the frontier of
+predictive modeling for epidemics and pandemics.
 
 \showmatmethods{} % Display the Materials and Methods section
 

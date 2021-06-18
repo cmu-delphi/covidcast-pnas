@@ -1,4 +1,31 @@
 
+Essentially this examines the Pearson correlation between 
+shifted version of the indicator and the case rate. So if $X_{\ell,t}$ is
+shifted forward by 7 days, and the magnitude of the correlation of that shifted series with
+$Y_{\ell,t}$ (unshifted) is high, we would say that $X_{\ell}$ leads $Y_{\ell}$
+by 7 days. This process is repeated for a range of shifts, forward and backward,
+resulting in leadingness and laggingness scores. Further details are given in
+the supplement.
+
+%%%%%
+
+Because a time series can, to a degree, both simultaneously leading and lagging,
+we also examine the correlation between performance and the difference between
+leadingness and laggingness. Figure \ref{fig:diff-btw-leading-lagging} shows
+this behavior. Again, indicators that are more leading then lagging tend to
+are positively correlated with improved relative performance. This relationship
+is most pronounced during periods of decreasing case rates and attenuates in
+other scenarios.
+
+
+\begin{figure}[t]
+  \includegraphics[width=\columnwidth]{fig/diff-in-lead-lag-1.pdf}
+  \caption{Correlation of the difference in WIS with difference between the
+    ``leadingness'' and ``laggingness'' of the indicator at the target date.}
+  \label{fig:diff-btw-leading-lagging}
+\end{figure}
+
+
 %%%%%
 
 
