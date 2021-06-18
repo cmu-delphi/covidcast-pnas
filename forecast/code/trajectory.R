@@ -28,4 +28,4 @@ ggplot(pd$truth_df, mapping = aes(x = target_end_date)) +
   ylab("Cases per 100,000 people") + 
   xlab("Date")
 
-ggsave("../paper/fig/trajectory.pdf", width = 6, height = 4)
+ggsave("../paper/fig/trajectory.pdf", width = 6.5, height = 4.5)
