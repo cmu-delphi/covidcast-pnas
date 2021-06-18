@@ -155,7 +155,6 @@ conclusions with respect to numerous modes of analysis.
 \section{Methods}
 
 \subsection{Signals and Locations}
-\label{sec:signals-locations}
 
 We consider prediction of future COVID-19 case rates or case hotspots (to be
 defined precisely shortly).  By case rate, we mean the case count per 100,000
@@ -392,11 +391,11 @@ predicted quantile at level $\tau$ exceeds a predicted quantile at level $\tau'
 for an example forecast. 
 
 \begin{figure}[t]
-\includegraphics[width=\columnwidth]{fig/ny-trajectory-1.pdf}
-\caption{Forecast from the autoregressive model for the New York City HRR made
+\includegraphics[width=\columnwidth]{fig/trajectory.pdf}
+\caption{Forecast from an autoregressive model for the New York City HRR made 
   on October 15 (vertical line).  The fan displays 50\%, 80\% and 95\% intervals
-  while the orange curve shows the median forecast. The connected black points
-  represent ``finalized'' data, as reported in May 2021.}
+  while the orange curve shows the median forecast. The black curve represents
+  ``finalized'' data, as reported in May 2021.} 
 \label{fig:trajectory}
 \end{figure}
 
@@ -412,7 +411,7 @@ newly reported cases over the past 7 days has increased by at least 25\%
 compared to the preceding week.  When this occurs, we say location $\ell$ is a
 \textit{hotspot} at time $t$.  Empirically, this rule labels about 27\% of
 location-time pairs as hotspots, during the prediction period (June 16--December
-31, 2020).  
+31, 2020).   
 
 We treat hotspot prediction as a binary classification problem and use a setup 
 altogether quite similar to the forecasting setup described previously.
@@ -435,8 +434,8 @@ logistic models of the form:
 \end{multline}
 where we use \smash{$X^\Delta_{\ell,t} = (X_{\ell,t} - X_{\ell,
     t-7})/(X_{\ell,t-7})$}, and again $X_{\ell,t}$ stands for any of the five  
-auxiliary indicators at location $\ell$ and time $t$.  We fit all models
-\eqref{eq:hotspot_ar}, \eqref{eq:hotspot_ar_x} using logistic regression, 
+auxiliary indicators at location $\ell$ and time $t$.  We fit the above models,
+\eqref{eq:hotspot_ar}, \eqref{eq:hotspot_ar_x}, using logistic regression,   
 pooling all 306 HRRs and using a 21-day trailing window for the training data.   
 
 An important detail is that in hotspot prediction we remove all data from
@@ -452,7 +451,7 @@ quantile models in \eqref{eq:forecast_ar}, \eqref{eq:forecast_ar_x} using
 \cite{Gneiting:2007}.  WIS is a proper score, meaning that its expectation
 is minimized by the population quantiles of the target variable.  The use of WIS
 in COVID-19 forecast scoring is discussed in \cite{Bracher:2021}; WIS is also
-the main evaluation metric used in the COVID-19 Forecast Hub.   
+the main evaluation metric used in the COVID-19 Forecast Hub.
 
 WIS is typically defined for quantile-based forecasts where the quantile levels
 are symmetric around 0.5.  This is the case for our choice in
@@ -480,13 +479,13 @@ representation in terms of the predicted quantiles themselves:
 where $\phi_\tau(x) = \tau |x|$ for $x \geq 0$ and $\phi_\tau(x) = (1-\tau)
 |x|$ for $x<0$, which is often called the ``tilted absolute'' loss.  While
 \eqref{eq:wis_quantiles} is more general (it can accomodate asymmetric quantile
-levels), the first definition \eqref{eq:wis_intervals} is usually preferred in
+levels), the first form in \eqref{eq:wis_intervals} is typically preferred in
 presentation, because the score nicely decouples into a ``sharpness'' component
 (first term in each summand) and ``under/overprediction'' component (second term
 in each summand).  The second form given in \eqref{eq:wis_quantiles} is
 especially noteworthy in our current study as it reveals WIS is the same as the
 quantile regression loss that we use to train our forecasting models (i.e., our
-models are fit to optimize WIS averaged over the training set).    
+models are fit to optimize WIS averaged over the training set).
 
 For hotspot prediction, we evaluate the probabilistic classifiers produced by
 the logistic models in \eqref{eq:hotspot_ar}, \eqref{eq:hotspot_ar_x} using the 
@@ -511,8 +510,8 @@ constructed using differential privacy methods \cite{Bavadekar:2020}, and a
 missing signal value means that the level of noise added in the differential
 privacy mechanism is high compared to the underyling search count.  In other
 words, values of the Google-AA signal are clearly \textit{not} missing at
-random.  It seems most appropriate to impute missing values by zero, and this 
-is what we do in our analysis.
+random.  It seems most appropriate to impute missing values by zero, and this is
+what we do in our analysis. 
 
 \paragraph{Backfill and Nowcasting}  
 
@@ -547,21 +546,21 @@ the models involving Google-AA and the claims-based indicators.
 
 We begin with a summary of the high-level conclusions.  Here, and in the
 following subsections, we will use ``AR'' to refer to the pure autoregressive
-model both in forecasting \eqref{eq:forecast_ar} and in hotspot prediction
-\eqref{eq:hotspot_ar} (where the reference to the task should be clear from the
-context). We will also use the name of an auxiliary indicator---``CHNG-CLI'', 
-``CHNG-CLI'', ``CHNG-COVID'', ``CTIS-CLI-in-community'', ``DV-CLI'', or
-``Google-AA''---interchangeably with the model in forecasting
-\eqref{eq:forecast_ar_x} or hotspot prediction \eqref{eq:hotspot_ar_x} that uses
-this particular indicator as a feature (the meaning should be clear from the
-context).  So, e.g., the CHNG-CLI model in forecasting is the one in
-\eqref{eq:forecast_ar_x} that sets $X_{\ell,t}$ to be the value of the CHNG-CLI
-indicator at location $\ell$ and time $t$, fits the coefficients based on the
-training data, and makes its predictions by setting $X_{\ell,t}$ to the
-appropriate CHNG-CLI values.  Finally, we use the term ``indicator model'' to 
-refer to any one of the ten models of the form \eqref{eq:forecast_ar_x},
-\eqref{eq:hotspot_ar_x} (five from each of the forecasting and hotspot
-prediction tasks).
+model both in forecasting, \eqref{eq:forecast_ar}, and in hotspot prediction,
+\eqref{eq:hotspot_ar} (the reference to the prediction task should always be
+clear from the context). We will also use the name of an auxiliary
+indicator---namely ``CHNG-CLI'',  ``CHNG-COVID'', ``CTIS-CLI-in-community'',
+``DV-CLI'', or ``Google-AA''---interchangeably with the model in forecasting, 
+\eqref{eq:forecast_ar_x}, or hotspot prediction, \eqref{eq:hotspot_ar_x}, that
+uses this particular indicator as a feature (the meaning should be clear from
+the context).  So, for example, the CHNG-CLI model in forecasting is the one in  
+\eqref{eq:forecast_ar_x} that sets $X_{\ell,t}$ to be the value of the CHNG-CLI 
+indicator at location $\ell$ and time $t$.
+% fits the coefficients based on the training data, and makes its predictions by
+% setting $X_{\ell,t}$ to the appropriate CHNG-CLI values.  
+Finally, we use the term ``indicator model'' to refer to any one of the ten
+models of the form \eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar_x} (five from
+each of the forecasting and hotspot prediction tasks).
 
 \begin{itemize}
 \item Stratifying predictions by the ahead value ($a=7,\ldots,21$), and
@@ -629,10 +628,12 @@ median forecast for $Y_{\ell,t+a}$ is always $Y_{\ell,t}$, with predicted
 quantiles defined around this flat line based on historical variation). This is
 the same baseline model as that used in the COVID-19 Forecast Hub.  Here, we  
 divide by the average WIS of the baseline model in order to put the y-axis on an 
-interpretable scale.  We can see that all curves are well below 1, which means
+interpretable scale.  We can see that all curves are below 1, which means
 (smaller WIS is better) that all of the models, including AR, outperform the
-baseline on average over the forecast period (though this advantage narrows as
-the ahead value grows).      
+baseline on average over the forecasting period.  On the other hand, the models 
+deliver at best an improvement of about 20\% in mean WIS over the baseline
+model, with this gap narrowing to only 10\% at the largest ahead values,
+illustrating the difficulty of the forecasting problem.   
 
 We can also see from the figure that CHNG-COVID and DV-CLI offer the biggest
 gains over AR at small ahead values, followed by CTIS-CLI-in-community and
@@ -648,130 +649,138 @@ supplement).
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/fcast-1.pdf}
-  \caption{Average WIS for each forecast model divided by the averaged WIS of
-    the flat-line forecaster.}
+  \caption{Average WIS for each forecast model, over all forecast dates and all
+    HRRs, divided by the average WIS achieved by a baseline model (a
+    probabilistic version of the flat-line forecaster).  Here and in all figures
+  we abbreviate CTIS-CLI-in-community by CTIS-CLIIC.}  
   \label{fig:forecast}
 \end{figure}
 
 Figure~\ref{fig:hotspot} displays the results for hotspot prediction, again
 stratified by ahead value and averaged over all HRRs and prediction dates (June 
 16--December 31, 2020).  We can see many similarities to the forecasting
-results (recall larger AUC is better): CHNG-COVID and DV-CLI offer the biggest
-improvement over AR, all models including AR degrade in performance towards the
-baseline (this is now just a classifier based on random guessing, which achieves
-an AUC of 0.5) as the ahead values grow.  However, one clear difference is that
-the CHNG-CLI model performs quite well in hotspot prediction, close to the
-best-performing indicator models for many of the ahead values. 
-
-[TODO: should we
-insert one line explaining this---you're somewhat protected form volatiliy in a
-logistic model thanks to 
-the sigmoid function used to define the probabilities? DJM: I think not, seems a
-bit far afield.]  
+results (now larger AUC is better); for example, CHNG-COVID and DV-CLI offer the
+biggest improvement over AR, and all models including AR degrade in performance 
+towards the baseline (this is now just a classifier based on random guessing,
+which achieves an AUC of 0.5) as the ahead values grow.  A clear difference,
+however, is that the CHNG-CLI model performs quite well in hotspot prediction,
+close to the best-performing indicator models for many of the ahead values. This
+may be because volatility in the CHNG-CLI indicator plays less of a role in the
+associated logistic model's predicted probabilities (in general, a sigmoid
+function can absorb a lot of the variability in its input).  
 
 \subsection{Implicit Regularization Hypothesis}
 
 One might ask if the benefits we observe in forecasting and hotspot
-prediction have
-anything to do with the actual indicator themselves; could it instead be that
-the indicators are simply providing \textit{implicit regularization} on top of 
-the basic AR model, when we include them as lagged features in
-\eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar_x}?  
+prediction have anything to do with the actual indicator themselves; could it
+instead be that the indicators are simply providing \textit{implicit
+  regularization} on top of  the basic AR model, when we include them as lagged
+features in \eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar_x}?   
 
-To test this implicit regularization hypothesis, we reran all of the prediction
-experiments but with $X_{\ell,t}$ in each indicator model \eqref{eq:forecast_ar_x},
-\eqref{eq:hotspot_ar_x} replaced with suitable random noise (bootstrap
-samples form an indicator's historical distribution).  The results, shown and
-explained more precisely in the supplement, are vastly different (worse) than
-the original set of results.  In both forecasting and hotspot prediction, the
-``fake'' indicator models (with random noise as auxiliary features) offered
-essentially no improvement over the pure AR model, which provides a strong
-rejection (informally speaking) of the implicit regularization hypothesis.     
+To test this hypothesis, we reran all of the prediction experiments but with
+$X_{\ell,t}$ in the each indicator models in \eqref{eq:forecast_ar_x},
+\eqref{eq:hotspot_ar_x} replaced with suitable random noise (bootstrap samples
+from a signal's historical distribution).  The results, shown and explained more
+precisely in the supplement, are vastly different (worse) than the original set
+of results.  In both forecasting and hotspot prediction, the ``fake'' indicator
+models (with random noise as auxiliary features) offered essentially no
+improvement over the pure AR model, which provides a strong rejection
+(informally speaking) of the implicit regularization hypothesis.     
+
+Along the lines of regularization, it is also worth noting that the use of
+$\ell_1$ regularization (tuned by cross-validation) in fitting any of the models
+in \eqref{eq:forecast_ar}, \eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar}, 
+\eqref{eq:hotspot_ar_x} did not improve their generally performance at all
+(experiments not shown).  This is likely due to the fact that the number of
+training samples is quite large compared to the number of features (6,426
+training samples and only 3--6 features).  
 
 \begin{figure}[t]
 \includegraphics[width=\columnwidth]{fig/hot-1.pdf}
-\caption{Area under the curve for each forecast model averaged over all
-  prediction dates and HRRS.}
+\caption{Area under the curve for each hotspot prediction model, calculated over
+  all prediction dates and all HRRs.} 
 \label{fig:hotspot}
 \end{figure}
 
 \subsection{Performance in Up, Down, and Flat Periods}
 
-The course of the pandemic has played out very differently across space and
+The course of the pandemic has played out quite differently across space and
 time. Aggregating case rates nationally shows three pronounced waves, but the
-behavior is more nuanced at the HRR level. 
-Figure \ref{fig:trajectory} is a single example of what a forecast looks like
-during a period of relatively flat cases as New York City begins what will
-become its second wave. The AR forecast's 50\% confidence interval contains this
-upswing, but the median forecast is clearly below the finalized data.
-Unfortunately, this behavior is typical of all forecasters: during upswings, the
-median forecast tends to fall below the target while the reverse is true during
-downswings.
+behavior is more nuanced at the HRR level.  Figure \ref{fig:trajectory} is a
+single example of a forecast in a period of relatively flat case trends, as New
+York City enters what would become its second wave. The AR forecaster's 50\%
+prediction interval contains this upswing, but its forecasted median is clearly
+below the finalized case data.  Unfortunately, this behavior is fairly typical
+of all forecasters: during upswings, the forecasted median tends to fall below 
+the target, while the reverse is true during downswings.
 
-Figure \ref{fig:up-down-flat} shows histograms of the difference between the WIS for the
-forecasters with the benefit of the indicators and the WIS of the AR model, but
-it stratifies these differences by
+Figure~\ref{fig:up_down_flat} shows histograms of the differences in WIS of the 
+AR model and each indicator model, where we stratify these differences by
 whether the target occurs during a period of increasing cases rates (up),
-decreasing case rates (down), or flat. To define the increasing period, we use
-the same definition we used for the hotspot task in Table
-\ref{tab:analysis_tasks}. Thus all hotspots are ``up'' while all non-hotspots
-are either flat or decreasing. For the ``down'' scenario, we simply use the opposite of
-the hotspot definition: $Y_{\ell,t}$ decreases by more than 25\% relative to the
-preceding week.
+decreasing case rates (down), or flat case rates (flat). To define the
+increasing period, we use the same definition we used for the hotspot task in
+Table \ref{tab:analysis_tasks}.  Therefore all hotspots are ``up'', while all
+non-hotspots are either ``flat'' or ``down''.  For the ``down'' scenario, we 
+simply use the opposite of the hotspot definition: $Y_{\ell,t}$ decreases by
+more than 25\% relative to the preceding week.  
 
-While the performance of all forecasters degrades during up periods (WIS is on the
-scale of cases, so higher case counts means higher WIS) there are pronounced
-patterns for the different models. 
-Google-AA is the only model that
-outperforms the AR model, on average, during upswings (see the supplement for
-these averaged conclusions). Both Google-AA and
-CTIS-CLI-in-community have large right tails during the flat periods. CHNG-CLI
-and DV-CLI have large left tails (indicating some large, relatively poor
-forecasts) during flat and up periods. CHNG-CLI, CHNG-COVID, Google-AA, and
-especially CTIS-CLI-in-community have large positive outliers during the down
-period. Overall, the indicators seem to help more during periods of flat or down
-cases than during periods of increasing case rates, with the exception of
-Google-AA.
-In the supplement, we examine classification accuracy and log-likelihood for the
-hotspot task. We see a similar phenomenon: the indicators dramatically improve
-hotspot prediction accuracy during flat and down periods with more mixed
-behavior during periods of increasing cases, with CHNG-CLI, CHNG-COVID, and DV-CLI
-leading to decreased performance. 
-
-
+While the performance of all forecasters, including AR, will generally degrade
+in up periods, different models exhibit different and interesting patterns.
+CHNG-CLI, CHNG-COVID, Google-AA, and especially CTIS-CLI-in-community have
+large right tails (displaying improvements over AR) over the down periods.
+Google-AA and CTIS-CLI-in-community have large right tails during the flat
+periods. CHNG-CLI and DV-CLI have large left tails (poor forecasts relative to
+AR) in flat and up periods.  Google-AA is the only model that outperforms
+the AR model, on average, over up periods.  Overall, the indicators seem to help
+more during flat or down periods than up periods, with the exception of
+Google-AA.    
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/upswing-histogram-1.pdf}
-  \caption{Histogram of the difference in WIS for the AR model relative to each
-    forecaster. Larger values are better for the indicator assisted model. The
-    $y$-axis is on the logarithmic scale to 
-    emphasize outliers.}
-  \label{fig:up-down-flat}
+  \caption{Histogram of the difference in WIS for the AR model and that for each
+    indicator model, stratified by up, down, or flat periods, measured in terms
+    of case activity. (Larger values are better for the indicator model.) The
+    y-axis is on the log scale to emphasize tail behavior.} 
+  \label{fig:up_down_flat}
 \end{figure}
 
-The supplement pursues this analysis further. Essentially, during downswings,
-improved performance is strongly correlated with predicing larger declines than
-the AR model. The AR model tends to overpredict relative to the decline, but
-adding indicators tends to diminish this effect. During upswings, the AR model
-tends to underpredict, but when the addition of an indicator improves
-performance (a more rare occurrence) it is rarely due to higher median
-predictions.   
+The supplement pursues this analysis further.  For example, we examine
+classification accuracy and log-likelihood for the hotspot task, and find a
+similar phenomenon: the indicators considerably improve accuracy or
+log-likelihood during flat or down periods, with more mixed behavior during up
+periods, with the CHNG-CLI, CHNG-COVID, and DV-CLI leading to decreased
+performance in particular.
+
+% Essentially, during downswings, improved performance is strongly correlated
+% with predicing larger declines than the AR model. The AR model tends to
+% overpredict relative to the decline, but adding indicators tends to diminish
+% this effect. During upswings, the AR model tends to underpredict, but when the
+% addition of an indicator improves performance (a more rare occurrence) it is 
+% rarely due to higher median predictions.
+
+% RJT: Commented out the last paragraph for now, because this is kind of a tough
+% thing to explain succintly. Can revisit if we really want to include it here,
+% or just let them find it in the supplement? 
 
 \subsection{Effects of Leading or Lagging Behavior}
 
-As described in Section \ref{sec:signals-locations}, each of the indicators we
-examine could be said to measure aspects on disease progression that would
-precede a positive test. That is, we imagine that these signals should ``lead''
-cases. It is entirely reasonable to imagine that, prior to an increase of
-confirmed COVID-19 tests reported by public health in a particular location, we
-would see an increase in insurance claims for COVID-19-related medical visits.
-However, it may well be the case that this leading behavior is different during
-different periods. In fact, we find that the ``leadingness'' of the indicators
-is more pronounced during downswings and flat periods than during upswings, a
-plausible explanation for the decreased performance noted above.
+As described in the methods section, each of the indicators we examine could be
+said to measure aspects on disease progression that would precede a positive
+test. That is, we imagine that these signals should ``lead'' cases. It is
+entirely reasonable to imagine that, prior to an increase of confirmed COVID-19
+tests reported by public health in a particular location, we would see an
+increase in insurance claims for COVID-19-related medical visits.  However, it
+may well be the case that this leading behavior is different during different
+periods. In fact, we find that the ``leadingness'' of an indicator (degree to
+which it leads) tends to be more pronounced during down and flat periods than up
+periods, a plausible explanation for the decreased performance noted above.   
 
-In order to measure the leadingness on an indicator, we use the cross
-correlation function. Essentially this examines the Pearson correlation between a
+In order to measure the leadingness on af indicator, we examine its cross
+correlations to case rates over a short time window
+
+ the cross
+correlation function. Essentially this examines the Pearson correlation between 
+
 shifted version of the indicator and the case rate. So if $X_{\ell,t}$ is
 shifted forward by 7 days, and the magnitude of the correlation of that shifted series with
 $Y_{\ell,t}$ (unshifted) is high, we would say that $X_{\ell}$ leads $Y_{\ell}$
@@ -828,7 +837,7 @@ other scenarios.
 Can auxiliary indicators improve COVID-19 forecasting and hotspot prediction
 models?  Our answer, based on analyzing five auxiliary indicators from the  
 COVIDcast API (defined using from medical insurance claims, internet-based
-surveys, and Google search trends) is undoubtedly ``yes''. However, there are 
+surveys, and Internet search trends) is undoubtedly ``yes''. However, there are  
 levels of nuance to such an answer that must be explained.  None of the
 indicators that we have investigated appear to be the ``silver bullet'' that 
 one might have hoped for, revolutionizing the tractability of the prediction 
