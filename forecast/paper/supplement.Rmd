@@ -359,7 +359,7 @@ up_down_df_summary %>%
 ```  
   
 
-```{r upswing-histogram, include=FALSE}
+```{r upswing-histogram, include=FALSE, fig.width=12}
 up_down_df %>% 
   filter(period != "jm") %>%
   group_by(forecaster, udf) %>%
@@ -370,8 +370,9 @@ up_down_df %>%
   ylab("Count") +
   theme(legend.position = "none") +
   scale_fill_manual(values = fcast_colors) +
-  scale_y_log10(breaks = c(10,1000,100000), 
+  scale_y_log10(breaks = c(1,100,10000), 
                 labels = trans_format("log10", math_format(10^.x))) +
+  coord_cartesian(ylim=c(1,2e4)) +
   xlab("AR WIS - forecaster WIS") +
   geom_vline(xintercept = 0)
 ```
