@@ -23,19 +23,22 @@ dv_as_of <-  map_dfr(as_ofs, function(as_of) {
 
   
 bind_rows(cases_as_of, dv_as_of) %>% 
-  mutate(as_of = fct_relabel(factor(as_of), function(x) strftime(x, "%b %d")),
-         data_source = recode(data_source, `doctor-visits` = "DV-CLI",
-                              `jhu-csse` = "JHU-CSSE")) %>%
+  mutate(as_of = fct_relabel(factor(as_of), function(x) strftime(x, "%b %d"))) %>%
   ggplot(aes(x = time_value, y = value)) + 
   geom_line(aes(color = factor(as_of))) + 
   facet_wrap(~data_source, scales = "free_y",
              strip.position = "left", 
-             labeller = as_labeller(c(`DV-CLI` = "% doctor's visits due to CLI",
-                                      `JHU-CSSE` = "Cases per 100,000 people"))) +
+             labeller = as_labeller(
+               c(`doctor-visits` = "% doctor's visits due to CLI",
+                 `jhu-csse` = "Cases per 100,000 people"))) +
   theme_bw() +
   labs(x = "", y = "", color = "As of:") +
-  theme(legend.position = "bottom") +
-  scale_color_viridis_d(end = .9, begin = .1)
+  theme(legend.position = c(.5, -.15),
+        legend.direction = "horizontal",
+        plot.margin = margin(b = 20),
+        legend.background = element_rect(fill = "transparent")) +
+  scale_color_viridis_d(end = .9, begin = .1) +
+  guides(color = guide_legend(nrow = 1))
 
 ggsave("../paper/fig/revisions.pdf", width = 5, height = 4)
 

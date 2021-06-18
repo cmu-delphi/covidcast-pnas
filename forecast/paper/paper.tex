@@ -641,7 +641,7 @@ be found at
 
 \subsection{Aggregate Results by Ahead Value}
 
-Figure~\ref{fig:forecast} displays the results for forecasting, stratified by
+Figure~\ref{fig:forecast} (right panel) displays the results for forecasting, stratified by
 ahead value and averaged over all HRRs and forecast dates (June 9--December 31,
 2020).  Shown is the average WIS for each forecast model divided by the averaged
 WIS from a baseline model, which is basically a flat-line forecaster (its
@@ -668,16 +668,16 @@ gain over AR, on par with the best-performing models (also shown in the
 supplement).
 % TODO note what we said here about the supplement
 
-\begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/fcast-1.pdf}
-  \caption{Average WIS for each forecast model, over all forecast dates and all
-    HRRs, divided by the average WIS achieved by a baseline model (a
-    probabilistic version of the flat-line forecaster).  Here and in all figures
-  we abbreviate CTIS-CLI-in-community by CTIS-CLIIC.}  
-  \label{fig:forecast}
-\end{figure}
+% \begin{figure}[t]
+%   \includegraphics[width=\columnwidth]{fig/fcast-1.pdf}
+%   \caption{Average WIS for each forecast model, over all forecast dates and all
+%     HRRs, divided by the average WIS achieved by a baseline model (a
+%     probabilistic version of the flat-line forecaster).  Here and in all figures
+%   we abbreviate CTIS-CLI-in-community by CTIS-CLIIC.}  
+%   \label{fig:forecast}
+% \end{figure}
 
-Figure~\ref{fig:hotspot} displays the results for hotspot prediction, again
+Figure~\ref{fig:forecast} (left panel) displays the results for hotspot prediction, again
 stratified by ahead value and averaged over all HRRs and prediction dates (June 
 16--December 31, 2020).  We can see many similarities to the forecasting
 results (now larger AUC is better); for example, CHNG-COVID and DV-CLI offer the
@@ -688,7 +688,20 @@ however, is that the CHNG-CLI model performs quite well in hotspot prediction,
 close to the best-performing indicator models for many of the ahead values. This
 may be because volatility in the CHNG-CLI indicator plays less of a role in the
 associated logistic model's predicted probabilities (in general, a sigmoid
-function can absorb a lot of the variability in its input).  
+function can absorb a lot of the variability in its input).
+
+\begin{figure*}[t]
+  \includegraphics[width=\textwidth]{fig/fcast-hot-combo-1.pdf}
+  \caption{Left: Average WIS for each forecast model, over all forecast dates and all
+    HRRs, divided by the average WIS achieved by a baseline model (a
+    probabilistic version of the flat-line forecaster).  Here and in all figures
+    we abbreviate CTIS-CLI-in-community by CTIS-CLIIC.
+    Right: Area under the curve for each hotspot prediction model, calculated over
+    all prediction dates and all HRRs.
+  }  
+  \label{fig:forecast}
+\end{figure*}
+
 
 \subsection{Implicit Regularization Hypothesis}
 
@@ -716,12 +729,12 @@ in \eqref{eq:forecast_ar}, \eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar},
 training samples is large compared to the number of features (6,426 training
 samples and only 3--6 features).   
 
-\begin{figure}[t]
-\includegraphics[width=\columnwidth]{fig/hot-1.pdf}
-\caption{Area under the curve for each hotspot prediction model, calculated over
-  all prediction dates and all HRRs.} 
-\label{fig:hotspot}
-\end{figure}
+% \begin{figure}[t]
+% \includegraphics[width=\columnwidth]{fig/hot-1.pdf}
+% \caption{Area under the curve for each hotspot prediction model, calculated over
+%   all prediction dates and all HRRs.} 
+% \label{fig:hotspot}
+% \end{figure}
 
 \subsection{Evaluation in Up, Down, and Flat Periods}
 

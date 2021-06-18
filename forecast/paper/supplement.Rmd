@@ -369,7 +369,7 @@ up_down_df_summary %>%
 ```  
   
 
-```{r upswing-histogram, include=FALSE, fig.width=12}
+```{r upswing-histogram, include=FALSE, fig.width=8, fig.height=4}
 up_down_df %>% 
   filter(period != "jm") %>%
   group_by(forecaster, udf) %>%
@@ -642,7 +642,7 @@ df2 <- left_join(
 ```
 
 
-```{r leading-only, include=FALSE}
+```{r leading-only, include=FALSE, fig.width=6, fig.height=4}
 # Figure 6 in the manuscript
 df2 %>%
   filter(period != "jm") %>%
@@ -655,10 +655,16 @@ df2 %>%
            stat = "identity") +
   geom_hline(yintercept = 0) +
   scale_fill_manual(values = fcast_colors) +
-  theme_bw() +
+  guides(fill = guide_legend(nrow = 1)) +
+  theme_bw(base_size = 16) +
   ylab("Correlation") +
   xlab("") +
-  theme(legend.position = "bottom", legend.title = element_blank())
+  theme(legend.position = c(1,-.15), 
+        legend.justification = "right",
+        legend.title = element_blank(), 
+        legend.text = element_text(size = 10),
+        plot.margin = margin(b = 20, l = 4),
+        legend.background = element_rect(fill = "transparent"))
 ```
 
 
