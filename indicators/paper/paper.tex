@@ -458,6 +458,14 @@ people):
   over time correspond to changes in reported cases at the same location.
 \end{enumerate}
 
+\begin{figure}[t]
+  \includegraphics[width=\columnwidth]{fig/time_wise_correlation.pdf}
+  \caption{Time-wise correlations with case rates, from April 15, 2020 to April
+    15, 2021, calculated over all counties for which all signals were available
+    and which had at least 500 cumulative cases by the end of this period.}
+  \label{fig:time_wise_correlation}
+\end{figure} 
+
 Figure~\ref{fig:geo_wise_correlation} shows the geo-wise correlations achieved
 by the five signals and COVID case rates (from JHU CSSE, smoothed using a 7-day
 trailing average), from April 15, 2020 to April 15, 2021. This calculation is
@@ -469,14 +477,6 @@ at a given time). Somewhat surprisingly, the survey-based CLI-in-community
 signal shows the strongest correlations for much of the time period. This
 clearly demonstrates the value of a large-scale survey such as CTIS for tracking
 symptoms and case trends, especially when other data is unavailable.
-
-\begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/time_wise_correlation.pdf}
-  \caption{Time-wise correlations with case rates, from April 15, 2020 to April
-    15, 2021, calculated over all counties for which all signals were available
-    and which had at least 500 cumulative cases by the end of this period.}
-  \label{fig:time_wise_correlation}
-\end{figure}
 
 Figure~\ref{fig:time_wise_correlation} summarizes time-wise correlations from
 these five signals over the same time period, and for the same set of
