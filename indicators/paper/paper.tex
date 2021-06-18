@@ -44,7 +44,7 @@
   present an open database of COVID signals in the United States, measured at
   the county level and updated daily. This includes traditionally reported COVID
   cases and deaths, and many others: measures of mobility, social distancing,
-  Internet search trends, self-reported symptoms, and patterns COVID-related
+  Internet search trends, self-reported symptoms, and patterns of COVID-related
   activity in de-identified medical insurance claims. The database provides all
   signals in a common, easy-to-use format, empowering both public health
   research and operational decision-making.  
@@ -112,7 +112,7 @@ deaths) coming from the public health reporting system. For example, in the
 context of other infectious diseases: syndromic surveillance in ambulatory
 clinics and emergency rooms improves the accuracy of outbreak detection for
 emerging pathogens such as H1N1 \cite{Kass-Hout:2012}; and digital surveillance
-(based on, e.g., search and social media trends) enable more accurate
+(based on, e.g., search and social media trends) enables more accurate
 ``nowcasts'' and forecasts of traditional disease surveillance streams such as
 the CDC's ILINet \cite{Santillana:2015, Farrow:2016}, as do publication formats
 providing access to historical versions of a given data set \cite{Brooks:2018, 
@@ -267,7 +267,7 @@ below. This allows tracking of revisions made to individual observations, as
 each revision is tagged with its own issue date.  
 
 When appropriate, additional post-processing (often nontrivial) is applied to
-the data. For example, data on visits to doctor's offices is subject to strong
+the data. For example, data on visits to doctors' offices is subject to strong
 day-of-week effects, and so regression is used to adjust for these
 effects. Other indicators are available in raw versions and versions smoothed 
 with a 7-day trailing average. All processing is done using open-source code 
@@ -297,17 +297,17 @@ tracking cases and deaths). Many external sources do not keep a public or
 conveniently accessible record of revisions of their data.
 
 For many purposes it is sufficient to use the most recently issued observation
-at any a given time value, and the COVIDcast API returns the most recent issue
-as its default. However, for some applications it is crucial to know what was
-known \textit{as of} a specific date. For example, an epidemic forecasting model
-will be called upon to make its forecasts based on preliminary data about recent
+at a given time value, and the COVIDcast API returns the most recent issue as
+its default. However, for some applications it is crucial to know what was known
+\textit{as of} a specific date. For example, an epidemic forecasting model will
+be called upon to make its forecasts based on preliminary data about recent
 trends, so when it is trained using historical data, it should be trained using
 the initial versions of that data, not updates that would have been received
 later. Moreover, these revision records allow models to be modified to account
 for noise and bias in early data versions, or to exclude data that is too new to
 be considered stable, and to ``rewind'' time and simulate how these revised
 models would have performed using only the versions of data available \textit{as
-of} those times.
+  of} those times.
 
 Research on data revisions in the context of influenza-like illness has shown
 that backfill can significantly alter forecast performance \cite{Brooks:2018,
@@ -409,7 +409,7 @@ confirmed cases:
   Facebook users.
 \item COVID Trends and Impact Survey CLI in the community
   (CTIS-CLI-in-community): The estimated percentage of the population who know 
-  someone in their local community that is sick, based the same surveys.
+  someone in their local community that is sick, based on the same surveys.
 \item Quidel test positivity rate (Quidel-TPR): The percentage of positive
   results among Quidel COVID antigen tests.  
 \end{itemize}
@@ -453,9 +453,10 @@ people):
 \item \textit{Time-wise correlations} (i.e., at a specific location, do values
   of the signal correlate with case rates across time?): Formally, let $X_\ell$
   and $Y_\ell$ be vectors of a values of a particular signal and case rates,
-  over all times, at location $\ell$. The time-wise correlation at time $t$ is
-  defined as $\cor(X_\ell, Y_\ell)$. This examines whether changes in a signal
-  over time correspond to changes in reported cases at the same location.
+  over all times, at location $\ell$. The time-wise correlation at location
+  $\ell$ is defined as $\cor(X_\ell, Y_\ell)$. This examines whether changes in
+  a signal over time correspond to changes in reported cases at the same
+  location.
 \end{enumerate}
 
 \begin{figure}[t]
@@ -471,22 +472,22 @@ by the five signals and COVID case rates (from JHU CSSE, smoothed using a 7-day
 trailing average), from April 15, 2020 to April 15, 2021. This calculation is
 performed over counties with at least 500 cumulative cases by the end of this
 period, and at which all indicators are available (956 counties in total). The
-significantly positive correlations suggest that these signals could be useful
-in hotspot detection (identifying counties with relatively high COVID activity,
-at a given time). Somewhat surprisingly, the survey-based CLI-in-community
-signal shows the strongest correlations for much of the time period. This
-clearly demonstrates the value of a large-scale survey such as CTIS for tracking
+large positive correlations suggest that these signals could be useful in
+hotspot detection (identifying counties with relatively high COVID activity, at
+a given time). Somewhat surprisingly, the survey-based CLI-in-community signal
+shows the strongest correlations for much of the time period. This clearly
+demonstrates the value of a large-scale survey such as CTIS for tracking
 symptoms and case trends, especially when other data is unavailable.
 
 Figure~\ref{fig:time_wise_correlation} summarizes time-wise correlations from
-these five signals over the same time period, and for the same set of
-counties. For each signal, we display the set correlations that it achieves in
+these five signals over the same time period, and for the same set of counties.
+For each signal, we display the set of correlations that it achieves in
 histogram form (more precisely, using a kernel density estimate). All signals
 produce positive correlations in the majority of counties considered (with very
 little mass in each estimated density being to the left of zero). The largest
 correlations, in bulk, are achieved by the CHNG-COVID signal; the
-CTIS-CLI-in-community is a close second, and the CHNG-CLI signal is third.
-There are two noteworthy points:
+CTIS-CLI-in-community is a close second, and the CHNG-CLI signal is third. There
+are two noteworthy points:
 
 \begin{itemize}
 \item This is different from what is observed in
@@ -510,10 +511,10 @@ There are two noteworthy points:
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/bexar_compare.pdf}
   \caption{Reported cases per day in Bexar County, Texas during the summer of
-    2020. Only July 16, 4,810 backlogged cases were reported, though they 
-    actually occurred over the preceding two weeks (this shows up as a prolonged 
-    spike in the left panel due to the 7-day trailing averaging applied to the 
-    case counts). Daily CTIS estimates of CLI-in-community showed more stable 
+    2020. On July 16, 4,810 backlogged cases were reported, though they actually
+    occurred over the preceding two weeks (this shows up as a prolonged spike in
+    the left panel due to the 7-day trailing averaging applied to the case
+    counts). Daily CTIS estimates of CLI-in-community showed more stable
     underlying trends.}
   \label{fig:bexar_compare}
 \end{figure}
@@ -648,7 +649,7 @@ aspects of the pandemic and its effects on the United States population that are
 not found in traditional public health streams, such as data on mobility
 patterns, Internet search trends, mask wearing, and vaccine hesitancy, to name
 just a few. (The latter two signals are derived from the COVID Trends and Impact
-Survey; our companion paper on this survey gives more a detailed view of its
+Survey; our companion paper on this survey gives a more detailed view of its
 features and capabilities.) These signals have already supported pandemic
 research and  policy-making.  
 
@@ -668,15 +669,16 @@ sum of its parts''.
 
 There are a number of open questions, and challenges that remain. Several
 signals are subject to biases, such as survey sampling and nonresponse biases,
-or geographic differences in market share for medical claims data. Claims data
-tends also to be subject to biases during major holidays and other events that
-change health-seeking behavior. Characterizing these biases will be important
-for future research and operational systems that use these signals. Several data
-sources are also subject to extensive revision and backfill, which must be
-studied and modeled to enable effective real-time use of these sources in
-forecasting and nowcasting systems. The breadth and unique features of the
+geographic differences in market share for medical claims data, or biases in the
+population represented in mobile phone mobility data \cite{Coston:2021}. Claims
+data tends also to be subject to biases during major holidays and other events
+that change health-seeking behavior. Characterizing these biases will be
+important for future research and operational systems that use these signals.
+Several data sources are also subject to extensive revision and backfill, which
+must be studied and modeled to enable effective real-time use of these sources
+in forecasting and nowcasting systems. The breadth and unique features of the
 COVIDcast API will help facilitate this and other related work, which will be
-vital to advancing pandemic modeling and preparedness.   
+vital to advancing pandemic modeling and preparedness.
 
 % \matmethods{Please describe your materials and methods here. This can be more than one paragraph, and may contain subsections and equations as required.
 
