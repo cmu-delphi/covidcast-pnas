@@ -11,14 +11,35 @@
 \title{Can Auxiliary Indicators Improve COVID-19 Forecasting and Hotspot  
   Prediction?} 
 
-% Use letters for affiliations, numbers to show equal authorship (if applicable) and to indicate the corresponding author
-\author[a,c,1]{Author One}
-\author[b,1,2]{Author Two} 
-\author[a]{Author Three}
+% Use letters for affiliations, numbers to show equal authorship (if applicable)
+% and to indicate the corresponding author 
 
-\affil[a]{Affiliation One}
-\affil[b]{Affiliation Two}
-\affil[c]{Affiliation Three}
+% Writing group
+\author[a,1]{Daniel McDonald}
+\author[b,2]{Jacob Bien}
+\author[c,2]{Alden Green}
+\author[c,d,2]{Addison Hu}
+
+% Middle authors
+\author[d]{Nat DeFries}
+\author[b]{Sangwon Hyun}
+\author[c,d]{Natalia L.\ Oliveira}
+\author[e]{James Sharpnack}
+\author[f]{Jingjing Tan}
+\author[g]{Robert Tibshirani}
+\author[c]{Valerie Ventura}
+\author[c,d]{Larry Wasserman}
+
+% Senior authors
+\author[c,d]{Ryan J.\ Tibshirani}
+
+\affil[a]{Department of Statistics, University of British Columbia}
+\affil[b]{Data Sciences and Operations, University of Southern California}
+\affil[c]{Department of Statistics \& Data Science, Carnegie Mellon University}
+\affil[d]{Machine Learning Department, Carnegie Mellon University}
+\affil[e]{Department of Statistics, University of California, Davis}
+\affil[f]{Computational Biology Department, Carnegie Mellon University}
+\affil[g]{Department of Statistics, Stanford University}
 
 % Please give the surname of the lead author for the running footer
 \leadauthor{Lead author last name} 
@@ -45,10 +66,10 @@
 % declaration information 
 \authorcontributions{Please provide details of author contributions here.}
 \authordeclaration{Please declare any competing interests here.}
-\equalauthors{\textsuperscript{1}A.O.(Author One) contributed equally to this
-  work with A.T. (Author Two) (remove if not applicable).} 
-\correspondingauthor{\textsuperscript{2}To whom correspondence should be
-  addressed. E-mail: author.two\@email.com} 
+\correspondingauthor{\textsuperscript{1}To whom correspondence should be
+  addressed. E-mail: daniel@stat.ubc.ca} 
+\equalauthors{\textsuperscript{2}J.B., A.G., and A.H.\ contributed equally to
+  this work.}  
 
 % At least three keywords are required at submission. Please provide three to
 % five keywords, separated by the pipe symbol. 
@@ -798,8 +819,6 @@ analogous ``laggingness'' scores, but we do not find as clear patterns.
   \label{fig:leading}
 \end{figure}
 
-
-
 \section{Discussion}
 
 Can auxiliary indicators improve COVID-19 forecasting and hotspot prediction
@@ -830,8 +849,8 @@ mobility patterns.  That said, we are doubtful that more sophisticated modeling
 techniques would change the ``topline'' conclusion---that auxiliary indicators
 can provide nontrivial, consistent, but modest gains in forecasting and hotspot
 prediction. Whether a more sophisticated model would be able to leverage the
-indicators in such a way as to change some of the finer conclusions---e.g., by
-offering clear improvements in periods in which cases are trending up---is less
+indicators in such a way as to change some of the finer conclusions (e.g., by 
+offering clear improvements in periods in which cases are trending up) is less 
 clear to us.
 
 We reiterate the importance of using vintage data for rigorous backtesting. Data
@@ -855,9 +874,11 @@ rates in particular.  We hope that others will leverage our framework, and build
 on it, so that it can be used to guide work that advances the frontier of
 predictive modeling for epidemics and pandemics.
 
-\showmatmethods{} % Display the Materials and Methods section
-
-\acknow{Please include your acknowledgments here, set in a single paragraph. Please do not include any acknowledgments in the Supporting Information, or anywhere else in the manuscript.}
+\acknow{We thank Matthew Biggerstaff, Logan Brooks, Johannes Bracher, Michael 
+  Johansson, Evan Ray, Nicholas Reich, and Roni Rosenfeld for several
+  enlightening conversations about forecast evaluation. The research was
+  supported by Centers for Disease Control and Prevention (CDC) grant
+  U01IP001121, and gifts from Facebook and Google.}   
 
 \showacknow{} % Display the acknowledgments section
 
