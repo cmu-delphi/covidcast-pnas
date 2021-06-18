@@ -98,10 +98,10 @@ for \chngcli.
 As explained in Section 2.B. of the main paper, a (somewhat cynical)
 hypothesis for why we see benefits in forecasting and hotspot
 prediction is that the indicators are not actually providing useful
-information but they are instead simply acting as a sort of implicit
-regularization,"  leading to shrinkage on the autoregressive
+information but they are instead simply acting as a sort of ``implicit
+regularization,''  leading to shrinkage on the autoregressive
 coefficients, leading to less volatile predictions.  To investigate
-this hypothesis, we consider fitting  "noise features" that in truth
+this hypothesis, we consider fitting  ``noise features'' that in truth
 should have zero coefficients.  Recall (from the main paper) that at each forecast date, we
 train a model on 6,426 location-time pairs.  Indicator models are
 based on six features, corresponding to the three autoregressive terms
@@ -114,10 +114,6 @@ sampled with replacement from the 6,426 location-time pairs.  Figures
 \ref{fig:fcast-booted}--\ref{fig:hot-booted} show the results.  No
 method exhibits a noticeable performance gain over the \ar~method,
 leading us to dismiss the implicit regularization hypothesis.
-
-\attn{Would be good for someone to double check that the bootstrap
-  procedure is correctly described.}
-
 
 
 % # Correlations with lagged actuals
