@@ -135,7 +135,7 @@ fig4 <- plotter_hotspots(hotspots_honest %>% filter(period != "jm")) +
 fig4
 ```
 
-```{r fcast-hot-combo, include=FALSE, fig.width=8, fig.height=4}
+```{r fcast-hot-combo, include=FALSE, fig.width=9, fig.height=4.5}
 leg <- get_legend(fig3)
 comb1 <- plot_grid(fig3 + theme(legend.position = "none"),
                    fig4 + theme(legend.position = "none"), 
@@ -326,7 +326,7 @@ up_down <- actuals %>%
   mutate(pct_change = (actual - lag(actual,7)) / lag(actual,7),
          udf = case_when(
            pct_change >= .25 ~ "up",
-           pct_change <= -.25 ~ "down",
+           pct_change <= -.2 ~ "down",
            TRUE ~ "flat")) %>%
   filter(case_num > 30, !is.na(pct_change)) #%>%
   #rename(forecast_date = target_end_date)
@@ -369,7 +369,8 @@ up_down_df_summary %>%
 ```  
   
 
-```{r upswing-histogram, include=FALSE, fig.width=8, fig.height=4}
+```{r upswing-histogram, include=FALSE, fig.width=9, fig.height=4.5}
+# Figure 4
 up_down_df %>% 
   filter(period != "jm") %>%
   group_by(forecaster, udf) %>%
@@ -656,7 +657,7 @@ df2 %>%
   geom_hline(yintercept = 0) +
   scale_fill_manual(values = fcast_colors) +
   guides(fill = guide_legend(nrow = 1)) +
-  theme_bw(base_size = 16) +
+  theme_bw() +
   ylab("Correlation") +
   xlab("") +
   theme(legend.position = c(1,-.15), 
