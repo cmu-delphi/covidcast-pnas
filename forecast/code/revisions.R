@@ -37,5 +37,5 @@ bind_rows(cases_as_of, dv_as_of) %>%
   theme(legend.position = "bottom") +
   scale_color_viridis_d(end = .9, begin = .1)
 
-ggsave("../paper/fig/revisions.pdf", width = 5.5, height = 4)
+ggsave("../paper/fig/revisions.pdf", width = 5, height = 4)
 
