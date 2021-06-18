@@ -47,14 +47,16 @@
 % Please add a significance statement to explain the relevance of your work
 \significancestatement{Forecasting is a critical element of the public health
   response to any fast-moving epidemic or pandemic.  Predicting the future
-  spread some disease process, based on disease activity in the recent
+  spread of some disease process, based on disease activity in the recent
   past---say, using what is known as autoregressive modeling in the time series
   literature---is a basic and widely-used method.  In this paper we study
   whether including auxiliary indicators as additional features in such an
   autoregressive model can be useful in COVID-19 case forecasting and hotspot
   prediction.  We find that indicators based on de-identified medical insurance 
   claims, self-reported symptoms through online surveys, and COVID-related
-  Internet search activity all provide a nontrivial boost in accuracy, though
+  internet% Capitalization is apparently
+  % in question: https://en.wikipedia.org/wiki/Capitalization_of_Internet
+  search activity all provide a nontrivial boost in accuracy, though
   their utility generally depends the pandemic's local dynamics (upswing,
   downswing, or flat period) at prediction time.
 }
@@ -89,27 +91,30 @@
 
 \begin{abstract}
 Reliable short-term, location-specific forecasts of a pandemic are a
-key ingredient in effective public health decision making. Through the
+key ingredient in effective public health decision making. Throughout the
 COVID-19 pandemic, a plethora of real-time data signals were
 collected, curated, and made publicly available by our team and data
 partners, providing multiple views of the pandemic's progress. The
 goal of this work is to measure the practical utility of these
 auxiliary indicators from a forecasting perspective. We focus on five
 indicators, derived from medical insurance claims data, web search
-queries, and survey responses. For each indicator, we ask whether
-including it in a simple model leads to improved forecasting
-performance relative to a similar model without it. Performance is considered across two tasks
-at the state level at a forecasting horizon of up to about one month:
-Probabilistic forecasting of seven-day average case rates and binary
+queries, and survey responses. For each indicator, we ask whether its
+inclusion in a simple model leads to improved forecasting
+performance relative to a similar model excluding it. Performance is considered across two tasks
+at a forecasting horizon of up to about one month:
+probabilistic forecasting of seven-day average case rates and binary
 prediction of ``hotspots.'' Since the values of indicators are
 commonly revised over time, we take special care to ensure that the data provided
 to a forecaster is the version that would have been available at the
 time that the forecast was made. We demonstrate how less careful
-backtesting can lead to misleading retrospective evaluations. Our analysis suggests consistent, although
+backtesting can lead to misleading retrospective evaluations. Our analysis
+suggests consistent, although 
 modest, gains in forecasting performance by using these indicators,
-and we investigate whether the auxiliary signals are acting as ``leading indicators'' of case rates.
-Evaluating forecasters thoroughly and fairly is an important way that
-we can learn from this pandemic to do better in the next.
+and further investigation suggests that these gains are related to periods when the
+auxiliary signals are acting as ``leading 
+indicators'' of case rates. 
+\attn{Evaluating forecasters thoroughly and fairly is an important way that
+we can learn from this pandemic to do better in the next. 251 :(}
 
 % Please provide an abstract of no more than 250 words in a single paragraph.
 % Abstracts should explain to the general reader the major contributions of the
@@ -215,9 +220,9 @@ conclusions with respect to numerous modes of analysis.
 We consider prediction of future COVID-19 case rates or case hotspots (to be
 defined precisely shortly).  By case rate, we mean the case count per 100,000
 people (the standard in epidemiology).  We use reported case data aggregated by 
-JHU CSSE \cite{Dong:2020}, which is accessible through the COVIDcast API
-\cite{CovidcastAPI}, like the auxiliary indicators that we use to supplement the
-basic purely autoregressive models.   
+JHU CSSE \cite{Dong:2020}, which, like the auxiliary indicators that we use to supplement the
+basic purely autoregressive models, is accessible through the COVIDcast API
+\cite{CovidcastAPI}.
 
 The indicators we focus on provide information not generally available from
 standard public health reporting. Among the many auxiliary indicators collected
@@ -228,7 +233,7 @@ in the API, we study the following five:
   de-identified Change Healthcare claims data.
 \item Change Healthcare COVID (CHNG-COVID): The percentage of outpatient visits
   with confirmed COVID-19, based on the same claims data.
-\item COVID Trends and Impact Survey CLI in the community
+\item COVID Trends and Impact Survey COVID-like illness in the community
   (CTIS-CLI-in-community): The estimated percentage of the population who know
   someone in their local community that is sick, based on Delphi's surveys of
   Facebook users, called the COVID Trends and Impact Survey. 
@@ -236,7 +241,7 @@ in the API, we study the following five:
   computed based on de-identified medical insurance claims from other health
   systems partners.  
 \item Google Search Trends for anosmia and ageusia (Google-AA): A measure of 
-  COVID-19 related Google search volume for queries relating to anosmia or
+  Google search volume for queries relating to anosmia or
   ageusia (loss of smell or taste), based on Google's Search Trends data set. 
 \end{itemize}
 In short, we choose these indicators because, conceptually speaking, they
@@ -250,8 +255,8 @@ computed from the underlying data streams) we refer to
 which documents all of the signals in the COVIDcast API, and our companion paper
 on the API and database. For CTIS in particular, we refer to our companion paper
 on this survey. For the Google Search Trends data set, see
-\cite{GoogleSymptoms}, and \cite{Klopfen:2020, Vaira:2020} for articles on the
-relevance of anosmia or ageusia (loss of smell or taste) to COVID.
+\cite{GoogleSymptoms}, and see \cite{Klopfen:2020, Vaira:2020} for justification of the
+relevance of anosmia or ageusia to COVID-19 infection.
 
 As for geographic resolution, we consider the prediction of COVID-19 case rates
 and hotspots aggregated at the level of an individual \textit{hospital referral
@@ -262,16 +267,16 @@ characteristics. They are contiguous regions such that most of the hospital
 services for the underlying population are performed by hospitals within the
 region. Each HRR also contains at least one city where major procedures
 (cardiovascular or neurological) are performed. The smallest HRR has a
-population of about 120,000. While some are quite large (such as the one
-containing Los Angeles, which has about 10 million people), generally HRRs 
+population of about 125,000. While some are quite large (such as the one
+containing Los Angeles, which has more than 10 million people), generally HRRs 
 are much more homogenous in size than the (approximately) 3200 counties,  
 and they serve as a nice middle ground in between counties and states.  
 
 HRRs, by their definition, would be most relevant for forecasting hospital
 demand.  We have chosen to focus on cases (forecasting and predicting
-hotspots) at the HRR level since the indicators considered should be more 
-useful in predicting case activity versus hospital demand, since the latter is
-intuitively more closely connected (in time) to the events that are measured by
+hotspots) at the HRR level because the indicators considered should be more 
+useful in predicting case activity rather than hospital demand. The \attn{former?} is
+intuitively more contemporaneous to the events that are measured by
 the given five indicators. Predicting case rates (and hotspots) at the HRR level
 is still a reasonable goal in its own right; and moreover, it could be used to
 feed predicted case information into downstream hospitalization models.
@@ -279,9 +284,9 @@ feed predicted case information into downstream hospitalization models.
 \subsection{Vintage Training Data}
 
 In this paper, all models are fit with ``vintage'' training data. This means
-that for a given prediction date, say, September 1, 2020, we train models 
+that for a given prediction date, say, September 28, 2020, we train models 
 using only the data that would have been available to us \textit{as of}
-September 1 (imagine that we can ``rewind'' the clock to September 1, and query
+September 28 (imagine that we can ``rewind'' the clock to September 28 and query
 the COVIDcast API to get the latest data it would have had available at that
 point in time.)  This is made possible by the COVIDcast API's comprehensive data   
 versioning system (described in more detail in our companion paper).  We also
@@ -291,8 +296,9 @@ dates, by constructing the proper sequence of vintage training data sets.
 
 \begin{figure}[tb!]
   \includegraphics[width=\columnwidth]{fig/revisions.pdf}
-  \caption{Revision behavior for two signals in the HRR containing New York City
-    HRR.  Each colored line corresponds to the data as reported on a particular
+  \caption{This figure displays revision behavior for two signals in the HRR
+    containing New York 
+    City.  Each colored line corresponds to the data as reported on a particular 
     date (\textit{as of} dates varying from September 28 through October
     19). The left panel shows the DV-CLI signal, which was regularly revised
     throughout the period, though the effects fade as we look further back in   
@@ -310,7 +316,7 @@ regular degree of revision or ``backfill'' after their initial publication date.
 The survey-based signal, CTIS-CLI-in-community, is 2 days latent, and rarely
 undergoes any revision at all.  The target variable itself, reported COVID-19
 case rates, is 1 day latent, and exhibits frequent, unpredictable revisions
-(sometimes clear anomalies) after initial publication.  Compared to the revision
+after initial publication.  Compared to the revision
 pattern in the medical claims signals, which are much more systematic in nature,
 revisions in case reports can be highly erratic. Big spikes or other anomalies
 can occur in the data as reporting backlogs are cleared, changes in case
@@ -318,7 +324,7 @@ definitions are made, etc. Groups like JHU CSSE then work tirelessly to correct
 such anomalies after first publication (e.g., they will attempt to
 back-distribute a spike when a reporting backlog is cleared, by working with a
 local authority to figure out how this should best be done), which can result
-in very nontrivial and often unpredictable revisions.  See
+in very nontrivial revisions.  See
 Figure~\ref{fig:vintage} for an example. 
 
 Lastly, our treatment of the Google-AA signal is different from the rest.
@@ -328,7 +334,7 @@ latency of the signal was always at least one week through 2020.  However, this
 signal is never revised after initial publication (confirmed via personal
 communication with the Google team that produces this signal) and furthermore
 the latency of the signal is not an unavoidable property of the data type, so we
-simply use finalized signal values it, with zero latency, in our analysis.   
+simply use finalized signal values, with zero latency, in our analysis.   
 
 \subsection{Analysis Tasks}
 
@@ -357,7 +363,7 @@ region (HRR) \\
 To fix notation, let $Y_{\ell,t}$ denote the 7-day trailing average of COVID-19
 case incidence rates in location (HRR) $\ell$ and at time (day) $t$.  To be
 clear, this is the number of new daily reported cases per 100,000
-people, averaged over the 7-day period $t-6, \ldots t$. The first task we
+people, averaged over the 7-day period $t-6, \ldots, t$. The first task we
 consider---\textit{forecasting}---is to predict $Y_{\ell,t+a}$ for each
 ``ahead'' value $a=7,\ldots,21$.  The second task---\textit{hotspot
   prediction}---is to predict a binary variable defined in terms of the relative
@@ -366,8 +372,8 @@ $Y_{\ell,t+a-7}$), again for each $a=7,\ldots,21$.
 
 Why do we define the response variables via 7-day averaging? The short answer 
 is robustness: averaging stabilizes the case time series, and accounts for 
-uninteresting artifacts like weekend-weekday differences in the series.  Note
-that we can of course equivalently view this (equivalent up to a constant
+uninteresting artifacts like day-of-the-week effects in the series.  Note
+that we can equivalently view this (equivalent up to a constant
 factor) as predicting the HRR-level COVID-19 case incidence rate \textit{summed}
 over some 7-day period in the future, and predicting a binary variable derived
 from this.  
@@ -390,8 +396,8 @@ In our analysis, we let the prediction date $t$ run over each day in between
 early/mid June and December 31, 2020.  The precise start date differs for 
 forecasting and hotspots prediction; for each task it was chosen to be the
 earliest date at which the data needed to train all models was available, which
-ends up being (per our setup, with 21 days of training data, and lagged values
-of signals for features as we will detail shortly) June 9, 2020 for forecasting,
+ends up being (per our setup, with 21 days of training data and lagged values
+of signals for features, as we will detail shortly) June 9, 2020 for forecasting,
 and June 16, 2020 for hotspot prediction. (The bottleneck here is the
 CTIS-CLI-in-community signal, which does not exist before early April 2020, when
 the survey was first launched). The end date was chosen again with a
@@ -407,7 +413,7 @@ $a=7,\ldots,21$, to predict $Y_{\ell,t+a}$ for ahead value $a$, we consider a
 simple probabilistic forecasting model of the form:     
 \begin{equation}
 \label{eq:forecast_ar}
-\Quantile_\tau(Y_{\ell,t+a} \,|\, Y_{\ell,s}, s \leq t)  
+\Quantile_\tau(Y_{\ell,t+a} \,|\, Y_{\ell,s},\ s \leq t)  
 = \alpha^{a,\tau} + \sum_{j=0}^2 \beta^{a,\tau}_j Y_{\ell,t-7j}.  
 \end{equation}
 This model uses current case rates, and the case rates 7 and 14 days ago, in
@@ -416,7 +422,7 @@ total of 7 quantile levels (chosen in accordance with the county-level quantile
 levels suggested by the COVID-19 Forecast Hub),      
 \begin{equation}
 \label{eq:quantile_levels}
-\tau \in \{0.025, 0.1, 0.25, 0.5, 0.75, 0.9, 0.975 \}.
+\tau \in \{0.025,\ 0.1,\ 0.25,\ 0.5,\ 0.75,\ 0.9,\ 0.975 \}.
 \end{equation}
 We fit \eqref{eq:forecast_ar} using \textit{quantile regression}
 \cite{Koenker:1978, Koenker:2005, Koenker:2006} separately for each $\tau$, 
@@ -428,7 +434,7 @@ In addition to this pure autoregressive model, we also consider five
 probabilistic forecasting models of the form:  
 \begin{multline}
 \label{eq:forecast_ar_x}
-\Quantile_\tau(Y_{\ell,t+a} \,|\, Y_{\ell,s}, X_{\ell,s}, s \leq t)  
+\Quantile_\tau(Y_{\ell,t+a} \,|\, Y_{\ell,s},\ X_{\ell,s},\ s \leq t)  
 = \\ \alpha^{a,\tau} + \sum_{j=0}^2 \beta^{a,\tau}_j Y_{\ell,t-7j} + 
 \sum_{j=0}^2 \gamma^{a,\tau}_j X_{\ell,t-7j},
 \end{multline}
@@ -441,14 +447,17 @@ in \eqref{eq:quantile_levels}, and fit quantile regression separately for each
 level $\tau$, using data from all 306 HRRs and a trailing window of 21 days of
 training data.
 
-At prediction time, in order to deal with possible crossing violations (a
-predicted quantile at level $\tau$ exceeds a predicted quantile at level $\tau'
-> \tau$), we apply a simple post-hoc sorting.  See Figure~\ref{fig:trajectory}
+At prediction time, in order to avoid crossing violations (that is,
+for two levels $\tau' > \tau$,
+the predicted quantile at level $\tau$ exceeds the predicted quantile at level
+$\tau'$), we apply a simple post-hoc sorting.  See Figure~\ref{fig:trajectory}
 for an example forecast. 
 
 \begin{figure}[t]
 \includegraphics[width=\columnwidth]{fig/trajectory.pdf}
-\caption{Forecast from an autoregressive model for the New York City HRR made 
+\caption{This figure displays a forecast from an autoregressive model for the
+  HRR containing
+  New York City made  
   on October 15 (vertical line).  The fan displays 50\%, 80\% and 95\% intervals
   while the orange curve shows the median forecast. The black curve represents
   ``finalized'' data, as reported in May 2021.} 
@@ -475,7 +484,7 @@ Separately for each $a=7,\ldots,21$, to predict $Z_{\ell,t+a}$, we consider a
 simple logistic model:
 \begin{equation}
 \label{eq:hotspot_ar}
-\logit \big( \P(Z_{\ell,t+a} = 1 \,|\, Y_{\ell,s}, s \leq t) \big) 
+\logit \big( \P(Z_{\ell,t+a} = 1 \,|\, Y_{\ell,s},\ s \leq t) \big) 
 = \alpha^{a,\tau} + \sum_{j=0}^2 \beta^{a,\tau}_j Y^\Delta_{\ell,t-7j},
 \end{equation}
 where $\logit(p) = \log(p/(1-p))$, the log-odds of $p$.
@@ -484,7 +493,7 @@ In addition to this pure autoregressive model, we also consider five
 logistic models of the form:  
 \begin{multline}
 \label{eq:hotspot_ar_x}
-\logit \big( \P(Z_{\ell,t+a} = 1 \,|\, Y_{\ell,s}, X_{\ell,s}, s \leq t) \big)
+\logit \big( \P(Z_{\ell,t+a} = 1 \,|\, Y_{\ell,s},\ X_{\ell,s},\ s \leq t) \big)
 = \\ \alpha^{a,\tau} + \sum_{j=0}^2 \beta^{a,\tau}_j Y^\Delta_{\ell,t-7j} +  
 \sum_{j=0}^2 \gamma^{a,\tau}_j X^\Delta_{\ell,t-7j},
 \end{multline}
@@ -502,7 +511,7 @@ make arbitrary calls for a hotspot (or lack thereof) based on small counts.
 \subsection{Evaluation Metrics}
 
 For forecasting, we evaluate the probabilistic forecasts produced by the
-quantile models in \eqref{eq:forecast_ar}, \eqref{eq:forecast_ar_x} using 
+quantile models in \eqref{eq:forecast_ar} and \eqref{eq:forecast_ar_x} using 
 \textit{weighted interval score} (WIS), a quantile-based scoring rule; see e.g.,
 \cite{Gneiting:2007}.  WIS is a proper score, meaning that its expectation
 is minimized by the population quantiles of the target variable.  The use of WIS
@@ -525,7 +534,7 @@ variable $Y$, is defined by:
 where $\dist(a, S)$ is the distance between a point $a$ and set $S$ (the
 smallest distance between $a$ and an element of $S$).  Note that, corresponding 
 to \eqref{eq:quantile_levels}, the exclusion probabilities are $\alpha \in
-\{0.05, 0.2, 0.5, 1\}$, resulting in 4 terms in the above sum.  By 
+\{0.05,\ 0.2,\ 0.5,\ 1\}$, resulting in 4 terms in the above sum.  By 
 straightforward algebra, it is not hard to see WIS has an alternative 
 representation in terms of the predicted quantiles themselves:
 \begin{equation}
@@ -537,21 +546,21 @@ where $\phi_\tau(x) = \tau |x|$ for $x \geq 0$ and $\phi_\tau(x) = (1-\tau)
 \eqref{eq:wis_quantiles} is more general (it can accomodate asymmetric quantile
 levels), the first form in \eqref{eq:wis_intervals} is typically preferred in
 presentation, because the score nicely decouples into a ``sharpness'' component
-(first term in each summand) and ``under/overprediction'' component (second term
+(first term in each summand) and an ``under/overprediction'' component (second term
 in each summand).  The second form given in \eqref{eq:wis_quantiles} is
-especially noteworthy in our current study as it reveals WIS is the same as the
+especially noteworthy in our current study because it reveals WIS to be the same as the
 quantile regression loss that we use to train our forecasting models (i.e., our
 models are fit to optimize WIS averaged over the training set).
 
 For hotspot prediction, we evaluate the probabilistic classifiers produced by
-the logistic models in \eqref{eq:hotspot_ar}, \eqref{eq:hotspot_ar_x} using the 
+the logistic models in \eqref{eq:hotspot_ar} and \eqref{eq:hotspot_ar_x} using the 
 area under the curve (AUC) of their true positive versus false positive rate
 curve (which is traced out by varying the discrimination threshold). 
 
 The primary aggregation scheme that we will use in model evaluation and
-comparisons will be to average WIS per forecaster per ahead value $a$, over all
+comparisons will be to average WIS per forecaster at ahead value $a$ over all
 forecast dates $t$ and locations $\ell$; and similarly, to compute AUC per
-classifier and per ahead value $a$, over all forecast dates $t$ and locations
+classifier at ahead value $a$ over all forecast dates $t$ and locations
 $\ell$.
 
 \subsection{Other Considerations}
@@ -572,7 +581,7 @@ what we do in our analysis.
 \paragraph{Backfill and Nowcasting}  
 
 As described previously, the auxiliary indicators defined in terms of medical
-claims, CHNG-CLI, CHNG-COVID, and DV-CLI, undergo a significant and systematic
+claims (CHNG-CLI, CHNG-COVID, and DV-CLI) undergo a significant and systematic
 pattern of revision, or ``backfill'', after their initial publication.  Given
 their somewhat statistically-regular backfill profiles, it would be reasonable
 to attempt to estimate their finalized values based on vintage data---a problem
