@@ -44,7 +44,7 @@
   present an open database of COVID signals in the United States, measured at
   the county level and updated daily. This includes traditionally reported COVID
   cases and deaths, and many others: measures of mobility, social distancing,
-  Internet search trends, self-reported symptoms, and patterns of COVID-related
+  Internet search trends, self-reported symptoms, and patterns of COVID-related 
   activity in de-identified medical insurance claims. The database provides all
   signals in a common, easy-to-use format, empowering both public health
   research and operational decision-making.  
@@ -446,17 +446,18 @@ people):
 \begin{enumerate}
 \item \textit{Geo-wise correlations} (i.e., on a specific date, do values of the
   signal correlate with case rates across locations?): Formally, let $X_t$ and
-  $Y_t$ be vectors of values of a particular signal and case rates, over all
-  locations, on date $t$. The geo-wise correlation at time $t$ is defined as
-  $\cor(X_t, Y_t)$. This examines whether a signal has the capability to help
-  spot locations with high case rates at any given time.
+  $Y_t$ be vectors of values of a signal and case rates, over all locations, on
+  date $t$. The geo-wise correlation at time $t$ is defined as $\cor(X_t, 
+  Y_t)$ (where here and throughout $\cor(\cdot,\cdot)$ denotes Spearman 
+  correlation). This examines whether a signal has the capability to help spot
+  locations with high case rates at any given time.  
 
 \item \textit{Time-wise correlations} (i.e., at a specific location, do values
   of the signal correlate with case rates across time?): Formally, let $X_\ell$
-  and $Y_\ell$ be vectors of a values of a particular signal and case rates,
-  over all times, at location $\ell$. The time-wise correlation at location
-  $\ell$ is defined as $\cor(X_\ell, Y_\ell)$. This examines whether changes in
-  a signal over time correspond to changes in reported cases at the same
+  and $Y_\ell$ be vectors of values of a signal and case rates, over all
+  times, at location $\ell$. The time-wise correlation at location $\ell$ is
+  defined as $\cor(X_\ell, Y_\ell)$. This examines whether changes in a signal
+  over time correspond to changes in reported cases at the same 
   location.
 \end{enumerate}
 
@@ -474,11 +475,11 @@ trailing average), from April 15, 2020 to April 15, 2021. This calculation is
 performed over counties with at least 500 cumulative cases by the end of this
 period, and at which all indicators are available (956 counties in total). The
 large positive correlations suggest that these signals could be useful in
-hotspot detection (identifying counties with relatively high COVID activity, at
-a given time). Somewhat surprisingly, the survey-based CLI-in-community signal
-shows the strongest correlations for much of the time period. This clearly
-demonstrates the value of a large-scale survey such as CTIS for tracking
-symptoms and case trends, especially when other data is unavailable.
+hotspot detection (identifying counties that have relatively high COVID
+activity, at a given time). Somewhat surprisingly, the survey-based
+CLI-in-community signal shows the strongest correlations for much of the time
+period. This clearly demonstrates the value of a large-scale survey such as CTIS
+for tracking symptoms and case trends, especially when other data is unavailable.
 
 Figure~\ref{fig:time_wise_correlation} summarizes time-wise correlations from
 these five signals over the same time period, and for the same set of counties.
@@ -487,8 +488,8 @@ histogram form (more precisely, using a kernel density estimate). All signals
 produce positive correlations in the majority of counties considered (with very
 little mass in each estimated density being to the left of zero). The largest
 correlations, in bulk, are achieved by the CHNG-COVID signal; the
-CTIS-CLI-in-community is a close second, and the CHNG-CLI signal is third. There
-are two noteworthy points:
+CTIS-CLI-in-community signal is a close second, and the CHNG-CLI signal is
+third. There are two noteworthy points:
 
 \begin{itemize}
 \item This is different from what is observed in
@@ -515,7 +516,7 @@ are two noteworthy points:
     2020. On July 16, 4,810 backlogged cases were reported, though they actually
     occurred over the preceding two weeks (this shows up as a prolonged spike in
     the left panel due to the 7-day trailing averaging applied to the case
-    counts). Daily CTIS estimates of CLI-in-community showed more stable
+    counts). Daily CTIS estimates of CLI-in-community showed more stable 
     underlying trends.}
   \label{fig:bexar_compare}
 \end{figure}
@@ -671,15 +672,19 @@ sum of its parts''.
 There are a number of open questions, and challenges that remain. Several
 signals are subject to biases, such as survey sampling and nonresponse biases,
 geographic differences in market share for medical claims data, or biases in the
-population represented in mobile phone mobility data \cite{Coston:2021}. Claims
-data tends also to be subject to biases during major holidays and other events
-that change health-seeking behavior. Characterizing these biases will be
-important for future research and operational systems that use these signals.
-Several data sources are also subject to extensive revision and backfill, which
-must be studied and modeled to enable effective real-time use of these sources
-in forecasting and nowcasting systems. The breadth and unique features of the
-COVIDcast API will help facilitate this and other related work, which will be
-vital to advancing pandemic modeling and preparedness.
+population represented in mobile device mobility data.
+% \cite{Coston:2021}. RJT: commenting out because if we cite only this, then I 
+% feel like we will have to provided references for the other sources of bias.
+% Since otherwise it might look like we don't think there's credible work on the
+% others. 
+Claims data tends also to be subject to biases during major national holidays
+and other events that change health-seeking behavior. Characterizing these
+biases will be important for future research and operational systems that use
+these signals.  Several data sources are also subject to extensive revision and
+backfill, which must be studied and modeled to enable effective real-time use of
+these sources in forecasting and nowcasting systems. The breadth and unique
+features of the COVIDcast API will help facilitate this and other related work,
+which will be vital to advancing pandemic modeling and preparedness.
 
 \acknow{We thank TODO.
   This research was supported by Centers for Disease Control and Prevention
