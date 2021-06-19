@@ -54,27 +54,10 @@
   autoregressive model can be useful in COVID-19 case forecasting and hotspot
   prediction.  We find that indicators based on de-identified medical insurance 
   claims, self-reported symptoms through online surveys, and COVID-related
-  internet% Capitalization is apparently
-  % in question: https://en.wikipedia.org/wiki/Capitalization_of_Internet
-  search activity all provide a nontrivial boost in accuracy, though
+  internet search activity all provide a nontrivial boost in accuracy, though
   their utility generally depends the pandemic's local dynamics (upswing,
   downswing, or flat period) at prediction time.
 }
-
-  % TODO % For reference, below is the indicators paper one.
-  % To study the COVID-19 pandemic, its effects on society,
-  % and measures for reducing its spread, researchers need detailed data on the
-  % course of the pandemic. Standard public health data streams suffer
-  % inconsistent reporting and frequent, unexpected revisions. They also miss
-  % other aspects of a population's behavior, worthy of consideration. We
-  % present an open database of COVID signals in the United States, measured at
-  % the county level and updated daily. These include traditionally reported
-  % COVID cases and deaths, and many others: signals based on measures of
-  % mobility, social distancing, internet search trends, self-reported symptoms,
-  % and patterns COVID-related activity in de-identified medical insurance 
-  % claims. The database provides all signals in a common, easy-to-use format,
-  % empowering both  public health research and operational decision-making. 
-%}
 
 % Please include corresponding author, author contribution and author
 % declaration information 
@@ -884,7 +867,7 @@ analogous ``laggingness'' scores, but we do not find as clear patterns.
 Can auxiliary indicators improve COVID-19 forecasting and hotspot prediction
 models?  Our answer, based on analyzing five auxiliary indicators from the
 COVIDcast API (defined using from medical insurance claims, internet-based
-surveys, and Internet search trends) is undoubtedly ``yes''. However, there are
+surveys, and internet search trends) is undoubtedly ``yes''. However, there are
 levels of nuance to such an answer that must be explained.  None of the
 indicators that we have investigated appear to be the ``silver bullet'' that one
 might have hoped for, revolutionizing the tractability of the prediction
@@ -922,7 +905,7 @@ using finalized data, then we are missing a big part of the story.  Not only
 will our sense of accuracy be unrealistic, but certain models may degrade by a
 greater or lesser extent when they are forced to work with vintage data, so 
 backtesting them with finalized data may lead us to make modeling decisions that
-may not be relevant for true test-time performance.    
+are suboptimal for true test-time performance.    
 
 In this paper, we have chosen to consider only very simple forecasting models,
 while devoting most of our effort to accounting for as much of the complexity of
