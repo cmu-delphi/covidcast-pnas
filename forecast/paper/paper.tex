@@ -215,9 +215,9 @@ in the API, we study the following five:
 \item Doctor Visits COVID-like illness (DV-CLI): The same as CHNG-CLI, but
   computed based on de-identified medical insurance claims from other health
   systems partners.  
-\item Google Search Trends for anosmia and ageusia (Google-AA): A measure of 
+\item Google search trends for anosmia and ageusia (Google-AA): A measure of  
   Google search volume for queries that relate to anosmia or ageusia (loss of
-  smell or taste), based on Google's Search Trends data set.  
+  smell or taste), based on Google's COVID-19 Search Trends data set.  
 \end{itemize}
 In short, we choose these indicators because, conceptually speaking, they
 measure aspects of an individual's disease progression that would plausibly
@@ -229,9 +229,9 @@ computed from the underlying data streams) we refer to
 \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html},
 which documents all of the signals in the COVIDcast API, and our companion paper
 on the API and database. For CTIS in particular, we refer to our companion paper
-on this survey. For the Google Search Trends data set, see
-\cite{GoogleSymptoms}, and see \cite{Klopfen:2020, Vaira:2020} for justification
-of the relevance of anosmia or ageusia to COVID-19 infection.
+on this survey. For the Google COVID-19 Search Trends data set, see
+\cite{GoogleSymptoms}; see also \cite{Klopfen:2020, Vaira:2020} for a 
+justification of the relevance of anosmia or ageusia to COVID-19 infection. 
 
 As for geographic resolution, we consider the prediction of COVID-19 case rates
 and hotspots aggregated at the level of an individual \textit{hospital referral
@@ -278,21 +278,22 @@ dates, by constructing the proper sequence of vintage training data sets.
     date (\textit{as of} dates varying from September 28 through October
     19). The left panel shows the DV-CLI signal, which was regularly revised
     throughout the period, though the effects fade as we look further back in   
-    time. In contrast, the right panel shows case rates reported by JHU CSSE,
-    which remain ``as reported'' on September 28, with a huge spike towards the 
-    end of this period, until a major correction is made on October 19, which
-    brings down this spike and affects all prior data as well.}
+    time. In contrast, the right panel shows case rates reported by JHU CSSE
+    (smoothed with a 7-day trailing average), which remain ``as reported'' on
+    September 28, with a spike towards the end of this period, until a major
+    correction is made on October 19, which brings this down and affects all
+    prior data as well.}  
   \label{fig:vintage}
 \end{figure}
 
 Vintage training data means different things, in practice, for different
 signals. The three signals based on medical claims, CHNG-CLI, CHNG-COVID, and
-DV-CLI, are most often 3-5 days latent, and subject to a considerable but
+DV-CLI, are typically 3-5 days latent, and subject to a considerable but
 regular degree of revision or ``backfill'' after their initial publication date.
 The survey-based signal, CTIS-CLI-in-community, is 2 days latent, and rarely
 undergoes any revision at all.  The target variable itself, reported COVID-19
 case rates, is 1 day latent, and exhibits frequent, unpredictable revisions
-after intial publication.  Compared to the revision pattern in the medical
+after intial publication.  Compared to the pattern of revisions in the medical 
 claims signals, which are much more systematic in nature, revisions in case
 reports can be highly erratic. Big spikes or other anomalies can occur in the
 data as reporting backlogs are cleared, changes in case definitions are made,
@@ -569,18 +570,18 @@ Some signals have a significant amount of spatial heterogeneity, by which we
 mean their values across different geographic locations are not comparable.
 This is the case for the Google-AA signal (due to the way in which the
 underlying search trends time series is self-normalized, see
-\cite{GoogleSymptoms}) and the claims-based signals (see the discussion in our
-companion paper on the API and database).  Such spatial heterogeneity likely
-hurts the performance of the predictive models that rely on these signals,
-because we train the models on data pooled over all locations.  In the current
-paper, we do not attempt to address this issue (it is again a topic of ongoing
-work in our group), and we simply note that location-specific effects (or
-pre-processing to remove spatial bias) would likely improve the performance of
-the models involving Google-AA and the claims-based indicators.
+\cite{GoogleSymptoms}) and the claims-based signals (due to market-share 
+differences, and/or differences in health-seeking behavior).  Such spatial
+heterogeneity likely hurts the performance of the predictive models that rely on
+these signals, because we train the models on data pooled over all locations.
+In the current paper, we do not attempt to address this issue (it is again a
+topic of ongoing work in our group), and we simply note that location-specific
+effects (or pre-processing to remove spatial bias) would likely improve the
+performance of the models involving Google-AA and the claims-based indicators.
 
 \section{Results}
 
-Here, and in the following subsections, we will use ``AR'' to refer to the pure
+Here, and in what follows, we will use ``AR'' to refer to the pure 
 autoregressive model both in forecasting, \eqref{eq:forecast_ar}, and in hotspot
 prediction, \eqref{eq:hotspot_ar} (the reference to the prediction task should
 always be clear from the context). We will also use the name of an auxiliary 
@@ -866,8 +867,8 @@ are suboptimal for true test-time performance.
 
 In this paper, we have chosen to consider only very simple forecasting models,
 while devoting most of our effort to accounting for as much of the complexity of
-the data and evaluation as possible.  In fact, our paper is as much about
-demonstrating how one might address questions about model comparisons and
+the underlying data and evaluation as possible.  In fact, our paper is as much
+about demonstrating how one might address questions about model comparisons and
 evaluation in forecasting and hotspot prediction in general, as it is about
 providing rigorous answers to such questions in the context of COVID-19 case
 rates in particular.  We hope that others will leverage our framework, and build
@@ -876,12 +877,13 @@ predictive modeling for epidemics and pandemics.
 
 \acknow{We thank Matthew Biggerstaff, Logan Brooks, Johannes Bracher, Michael 
   Johansson, Evan Ray, Nicholas Reich, and Roni Rosenfeld for several
-  enlightening conversations about forecast evaluation. The research was
-  supported by Centers for Disease Control and Prevention (CDC) grant
-  U01IP001121; gifts from Facebook, Google, McCune, and Optum; the Canadian
-  Statistical Sciences Institute; National Sciences and Engineering Research
-  Council of Canada (NSERC) RGPIN-2021-02618; and National Science Foundation
-  Graduate Research Fellowship Program (NSF GRFP) award DGE175016.}
+  enlightening conversations about scoring and evaluation.  The research was  
+  supported by gifts from Facebook, Google, McCune, and Optum; 
+  Centers for Disease Control and Prevention (CDC) grant U01IP001121; the 
+  Canadian Statistical Sciences Institute; National Sciences and Engineering
+  Research Council of Canada (NSERC) grant RGPIN-2021-02618; and National
+  Science Foundation Graduate Research Fellowship Program (NSF GRFP) award
+  DGE175016.}  
 
 \showacknow{} % Display the acknowledgments section
 
