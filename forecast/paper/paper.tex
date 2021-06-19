@@ -70,39 +70,31 @@
 
 % At least three keywords are required at submission. Please provide three to
 % five keywords, separated by the pipe symbol. 
-\keywords{Keyword 1 $|$ Keyword 2 $|$ Keyword 3 $|$ ...} 
+\keywords{COVID-19 $|$ forecasting $|$ hotspot prediction $|$ time series | 
+  digital surveillance} 
 
 \begin{abstract}
-Reliable short-term, location-specific forecasts of a pandemic are a
-key ingredient in effective public health decision making. Throughout the
-COVID-19 pandemic, a plethora of real-time data signals were
-collected, curated, and made publicly available by our team and data
-partners, providing multiple views of the pandemic's progress. The
-goal of this work is to measure the practical utility of these
-auxiliary indicators from a forecasting perspective. We focus on five
-indicators, derived from medical insurance claims data, web search
-queries, and survey responses. For each indicator, we ask whether its
-inclusion in a simple model leads to improved forecasting
-performance relative to a similar model excluding it. Performance is considered across two tasks
-at a forecasting horizon of up to about one month:
-probabilistic forecasting of seven-day average case rates and binary
-prediction of ``hotspots.'' Since the values of indicators are
-commonly revised over time, we take special care to ensure that the data provided
-to a forecaster is the version that would have been available at the
-time that the forecast was made. We demonstrate how less careful
-backtesting can lead to misleading retrospective evaluations. Our analysis
-suggests consistent, although 
-modest, gains in forecasting performance by using these indicators,
-and further investigation suggests that these gains are related to periods when the
-auxiliary signals are acting as ``leading 
-indicators'' of case rates. 
-\attn{Evaluating forecasters thoroughly and fairly is an important way that
-we can learn from this pandemic to do better in the next. 251 :(}
-
-% Please provide an abstract of no more than 250 words in a single paragraph.
-% Abstracts should explain to the general reader the major contributions of the
-% article. References in the abstract must be cited in full within the abstract
-% itself and cited in the text.
+  Reliable, short-term forecasts of traditional public health reporting streams
+  (such as cases, hospitalizations, and deaths) are a key ingredient in
+  effective public health decision-making during a pandemic. Since April 2020,
+  our research group has worked with data partners to collect, curate, and make
+  publicly available numerous real-time COVID-19 indicators, providing multiple
+  views of pandemic activity.  This paper studies the utility of these
+  indicators from a forecasting perspective. We focus on five indicators,
+  derived from medical insurance claims data, web search queries, and online
+  survey responses. For each indicator, we ask whether its inclusion in a simple
+  model leads to improved predictive accuracy relative to a similar model
+  excluding it. We consider both probabilistic forecasting of confirmed COVID-19 
+  case rates and binary prediction of case ``hotspots''.  Since the values of 
+  indicators (and case rates) are commonly revised over time, we take special
+  care to ensure that the data provided to a forecaster is the version that
+  would have been available at the time the forecast was made.   
+  % We demonstrate how less careful backtesting can lead to misleading
+  % retrospective evaluations.   
+  Our  analysis shows that consistent but modest gains in predictive accuracy 
+  are obtained by using these indicators, and furthermore, these gains are
+  related to periods in which the auxiliary indicators behave as ``leading
+  indicators'' of case rates.     
 \end{abstract}
 
 \dates{This manuscript was compiled on \today}
