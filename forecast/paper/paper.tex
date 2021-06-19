@@ -586,7 +586,7 @@ pattern of revision, or ``backfill'', after their initial publication.  Given
 their somewhat statistically-regular backfill profiles, it would be reasonable
 to attempt to estimate their finalized values based on vintage data---a problem
 we refer to as \textit{nowcasting}---as a pre-processing step before using them
-as features in the models in \eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar_x}. 
+as features in the models in \eqref{eq:forecast_ar_x} and \eqref{eq:hotspot_ar_x}. 
 Nowcasting is itself a highly nontrivial modeling problem, and we do not attempt
 it in this paper (it is a topic of ongoing work in our research group), but we
 note that nowcasting would likely improve the performance of the models
@@ -609,7 +609,7 @@ the models involving Google-AA and the claims-based indicators.
 
 \section{Results}
 
-We begin with a summary of the high-level conclusions.  Here, and in the
+Here, and in the
 following subsections, we will use ``AR'' to refer to the pure autoregressive
 model both in forecasting, \eqref{eq:forecast_ar}, and in hotspot prediction,
 \eqref{eq:hotspot_ar} (the reference to the prediction task should always be
@@ -624,8 +624,9 @@ indicator at location $\ell$ and time $t$.
 % fits the coefficients based on the training data, and makes its predictions by
 % setting $X_{\ell,t}$ to the appropriate CHNG-CLI values.  
 Finally, we use the term ``indicator model'' to refer to any one of the ten
-models of the form \eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar_x} (five from
-each of the forecasting and hotspot prediction tasks).
+models of the form \eqref{eq:forecast_ar_x} or \eqref{eq:hotspot_ar_x} (five from
+each of the forecasting and hotspot prediction tasks). We begin with a summary
+of the high-level conclusions.  
 
 \begin{itemize}
 \item Stratifying predictions by the ahead value ($a=7,\ldots,21$), and
@@ -636,7 +637,7 @@ each of the forecasting and hotspot prediction tasks).
   ahead value grows. 
 
 \item In the same aggregate view, CHNG-COVID and DV-CLI offer the biggest 
-  gains in each of forecasting and hotspot prediction.  CHNG-CLI is
+  gains in both forecasting and hotspot prediction.  CHNG-CLI is
   inconsistent: it provides a big gain in hotspot prediction, but little gain 
   in forecasting (it seems to be hurt by a notable lack of robustness, due
   to backfill).  CTIS-CLI-in-community and Google-AA each provide decent 
@@ -645,9 +646,12 @@ each of the forecasting and hotspot prediction tasks).
   ahead values.   
 
 \item In a more detailed analysis of forecasting performance, we find that the
-  indicator models tend to be worse than AR when case rates are increasing (this
-  is most notable in CHNG-CLI and DV-CLI), and better than AR when case rates
-  are flat or decreasing (most notable in CHNG-COVID and CTIS-CLI-in-community).
+  indicator models tend to be
+  better than AR when case rates
+  are flat or decreasing (most notable in CHNG-COVID and CTIS-CLI-in-community),
+  but they are
+  worse than AR when case rates are increasing (this
+  is most notable in CHNG-CLI and DV-CLI).
   More rarely does an indicator model tend to beat AR when case rates are 
   increasing, but there appears to be some evidence of this for the Google-AA
   model. 
@@ -659,10 +663,10 @@ each of the forecasting and hotspot prediction tasks).
 \item In this same analysis, when an indicator model performs better than AR in
   a decreasing period, this tends to co-occur with instances in which the
   indicator ``leads'' case rates (meaning, roughly, on a short-time scale in a
-  given location, its behavior mimics that of case rates some number of days
-  ahead).  On the other hand, neither leading nor lagging behavior tend to
-  co-occur as consistently with an indicator model doing better in periods of
-  increase, or worse in periods of increase or decrease.   
+  given location, its behavior mimics that of future case rate behavior).  On
+  the other hand, if an an indicator model does better in periods of
+  increase, or worse in periods of increase or decrease, its performance is
+  unrelated to leadingness.   
 \end{itemize}
 
 Finally, to quantify the importance of training and making predictions using
@@ -671,13 +675,13 @@ experiments using finalized data. The results, given in the supplement, show
 that training and making predictions on finalized data can result in overly
 optimistic estimates of true test-time performance (up to 10\% better in terms
 of average WIS or AUC). Furthermore, since indicators can have greatly different
-backfill profiles, the use of finalized data in retrospective evaluations can
-even change the relative ordering of models.  For example, CHNG-CLI and DV-CLI
-when trained on finalized data perform very similarly for the forecasting task.
-This makes sense since they are both claims-based indicators measuring
-supposedly the same thing.  However, DV-CLI outperforms CHNG-CLI on vintage
+backfill profiles, the use of finalized data in retrospective evaluations
+changes the relative ranking of models.  For example, CHNG-CLI and DV-CLI,
+when trained on finalized data, perform very similarly for the forecasting task.
+This makes sense since they are both claims-based indicators supposedly measuring
+the same thing.  However, DV-CLI outperforms CHNG-CLI on vintage
 data, reflecting its has a less severe backfill profile.
-% TODO note what we said here about the supplement
+
 
 Code to reproduce all results (which uses the \texttt{evalcast} R package) can 
 be found at
@@ -704,22 +708,22 @@ We can also see from the figure that CHNG-COVID and DV-CLI offer the biggest
 gains over AR at small ahead values, followed by CTIS-CLI-in-community and
 Google-AA, with the former providing the biggest gains at large ahead values.
 The CHNG-CLI model performs basically the same as AR.  This is likely due to the
-fact that CHNG-CLI suffers from some sort of volatility in forecasting due to
-backfill.  The evidence for this is twofold: the CHNG-CLI model benefits from a
-more robust method of aggregating WIS (geometric mean; shown in the supplement),
-and when we train and make predictions on all-finalized data, it provides a big
-gain over AR, on par with the best-performing models (also shown in the
+fact that CHNG-CLI suffers from spatially heterogeneous volatility due to
+backfill.  The evidence for this explanation is twofold: (1) the CHNG-CLI model benefits from a
+more robust method of aggregating WIS (geometric mean; shown in the supplement);
+and (2) when we train and make predictions on finalized data, it handily beats
+AR, on par with the best-performing models (also shown in the 
 supplement).
 % TODO note what we said here about the supplement
 
 Figure~\ref{fig:forecast} (right panel) displays the results for hotspot
 prediction, again stratified by ahead value and averaged over all HRRs and
 prediction dates.  We can see many similarities to the forecasting results (now
-larger AUC is better); for example, CHNG-COVID and DV-CLI offer the biggest
-improvement over AR, and all models including AR degrade in performance towards
-the baseline (this is now just a classifier based on random guessing, which
+larger AUC is better). For example, CHNG-COVID and DV-CLI offer the biggest
+improvement over AR, and all models, including AR, degrade in performance towards
+the baseline (in this context, a classifier based on random guessing, which
 achieves an AUC of 0.5) as the ahead values grow, illustrating the difficulty of
-the hotspot prediction problem A clear difference, however, is that the CHNG-CLI
+the hotspot prediction problem. A clear difference, however, is that the CHNG-CLI
 model performs quite well in hotspot prediction, close to the best-performing
 indicator models for many of the ahead values. This may be because volatility in
 the CHNG-CLI indicator plays less of a role in the associated logistic model's
@@ -728,7 +732,8 @@ variability in its input).
 
 \begin{figure*}[t]
   \includegraphics[width=\textwidth]{fig/fcast-hot-combo-1.pdf}
-  \caption{Left: average WIS for each forecast model, over all forecast dates
+  \caption{Main results for both tasks. Left: average WIS for each forecast
+    model, over all forecast dates 
     and all HRRs, divided by the average WIS achieved by a baseline model (a
     probabilistic version of the flat-line forecaster).  Right: area under the
     curve for each hotspot prediction model, calculated over all prediction
@@ -742,28 +747,33 @@ variability in its input).
 \subsection{Implicit Regularization Hypothesis}
 
 One might ask if the benefits we observe in forecasting and hotspot
-prediction have anything to do with the actual indicator themselves; could it
-instead be that the indicators are simply providing \textit{implicit
-  regularization} on top of  the basic AR model, when we include them as lagged
-features in \eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar_x}?   
+prediction have anything to do with the actual indicator themselves. A plausible
+alternative explanation is that the indicators are simply providing \textit{implicit
+  regularization} on top of  the basic AR model when we include them as lagged
+features in \eqref{eq:forecast_ar_x} and \eqref{eq:hotspot_ar_x}.
 
 To test this hypothesis, we reran all of the prediction experiments but with
-$X_{\ell,t}$ in the each indicator models in \eqref{eq:forecast_ar_x},
-\eqref{eq:hotspot_ar_x} replaced with suitable random noise (bootstrap samples
+$X_{\ell,t}$ in the each indicator models
+%in \eqref{eq:forecast_ar_x} \eqref{eq:hotspot_ar_x}
+replaced with suitable random noise (bootstrap samples
 from a signal's historical distribution).  The results, shown and explained more
 precisely in the supplement, are vastly different (worse) than the original set
 of results.  In both forecasting and hotspot prediction, the ``fake'' indicator
-models (with random noise as auxiliary features) offered essentially no
+models
+% (with random noise as auxiliary features)
+offered essentially no
 improvement over the pure AR model, which provides a strong rejection
 (informally speaking) of the implicit regularization hypothesis.     
 
 On the topic of regularization, it is also worth noting that the use of 
 $\ell_1$ regularization (tuned by cross-validation) in fitting any of the models
-in \eqref{eq:forecast_ar}, \eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar}, 
-\eqref{eq:hotspot_ar_x} did not improve their generally performance at all
+in \eqref{eq:forecast_ar}, \eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar}, or 
+\eqref{eq:hotspot_ar_x} did not generally improve their performance
 (experiments not shown).  This is likely due to the fact that the number of
 training samples is large compared to the number of features (6,426 training
-samples and only 3--6 features).   
+samples and only 3--6 features). [DJM: and that proper CV requires longer
+training windows, exacerbating the nonstationarity, a scenario in which its
+behavior is poorly understood.]
 
 % \begin{figure}[t]
 % \includegraphics[width=\columnwidth]{fig/hot-1.pdf}
@@ -797,7 +807,7 @@ more than 20\% relative to the preceding week.
 While the performance of all forecasters, including AR, will generally degrade
 in up periods, different models exhibit different and interesting patterns.
 CHNG-CLI, CHNG-COVID, Google-AA, and especially CTIS-CLI-in-community have
-large right tails (displaying improvements over AR) over the down periods.
+large right tails (displaying improvements over AR) during the down periods.
 Google-AA and CTIS-CLI-in-community have large right tails during the flat
 periods. CHNG-CLI and DV-CLI have large left tails (poor forecasts relative to
 AR) in flat and up periods.  Google-AA is the only model that outperforms
@@ -816,11 +826,11 @@ Google-AA.
 \end{figure*}
 
 The supplement pursues this analysis further.  For example, we examine
-classification accuracy and log-likelihood for the hotspot task, and find a
+classification accuracy and log-likelihood for the hotspot task and find a
 similar phenomenon: the indicators considerably improve accuracy or
 log-likelihood during flat or down periods, with more mixed behavior during up
-periods, with the CHNG-CLI, CHNG-COVID, and DV-CLI leading to decreased
-performance in particular.
+periods when  CHNG-CLI, CHNG-COVID, and DV-CLI, in particular, lead to decreased
+performance.
 
 % Essentially, during downswings, improved performance is strongly correlated
 % with predicing larger declines than the AR model. The AR model tends to
@@ -831,12 +841,13 @@ performance in particular.
 
 % RJT: Commented out the last paragraph for now, because this is kind of a tough
 % thing to explain succintly. Can revisit if we really want to include it here,
-% or just let them find it in the supplement? 
+% or just let them find it in the supplement?
+% DJM: Agreed. In the supplement.
 
 \subsection{Effects of Leading or Lagging Behavior}
 
 As described in the methods section, each of the indicators we examine could be
-said to measure aspects on disease progression that would precede a positive
+said to measure aspects of disease progression that would precede a positive
 test. That is, we imagine that these signals should ``lead'' cases. It is
 entirely reasonable to imagine that, prior to an increase of confirmed COVID-19
 tests reported by a public health authority in a particular location, we would
@@ -844,7 +855,7 @@ see an increase in medical insurance claims for COVID-related outpatient
 visits. However, it may well be the case that such behavior is different
 during different periods. In fact, we find empirically that the ``leadingness''
 of an indicator (degree to which it leads case activity) tends to be more
-pronounced in down or flat periods than up periods, a plausible explanation
+pronounced in down or flat periods than in up periods, a plausible explanation
 for the decreased performance in up periods noted above.
 
 In the supplement, we show how to define a quantitative score to measure the
@@ -855,7 +866,7 @@ The higher this score, the greater it ``leads'' case activity.  Figure
 indicator and the WIS difference (AR model minus an indicator model), stratified
 by whether the target is classified as up, down, or flat.  One would expect that  
 the WIS difference would be positively correlated with leadingness.  Somewhat
-surprisingly, this relationship turns out to be the strongest in down periods,
+surprisingly, this relationship turns out to be strongest in down periods
 and weakest in up periods.  In fact, it is very nearly the case that for each
 indicator, the strength of correlations only decreases as we move from down to
 flat to up  periods.  In the supplement, we extend this analysis by examining
