@@ -105,12 +105,17 @@ this hypothesis, we consider fitting  ``noise features'' that in truth
 should have zero coefficients.  Recall (from the main paper) that at each forecast date, we
 train a model on 6,426 location-time pairs.  Indicator models are
 based on six features, corresponding to the three autoregressive terms
-and the three lagged indicator values.  To form noise features
-we resample from other rows.  In particular, at each location $\ell$ and
-time $t$, we replace the triplet $(X_{\ell,t}, X_{\ell,t-7},
-X_{\ell,t-14})$ by the triplet $(X_{\ell^*,t^*}, X_{\ell^*,t^*-7},
+and the three lagged indicator values.  To form noise indicator features,
+we resample from other rows (while keeping the autoregressive
+features fixed).  In particular, at each location $\ell$ and
+time $t$, for the forecasting task we replace the triplet $(X_{\ell,t}, X_{\ell,t-7},
+X_{\ell,t-14})$ in Eq. (3) of the main paper with the triplet $(X_{\ell^*,t^*}, X_{\ell^*,t^*-7},
 X_{\ell^*,t^*-14})$, where $(\ell^*,t^*)$ is a location-time pair
-sampled with replacement from the 6,426 location-time pairs.  Figures
+sampled with replacement from the 6,426 location-time pairs.  
+Likewise in the hotspot prediction task, we replace the triplet $(X_{\ell,t}^\Delta, X_{\ell,t-7}^\Delta,
+X_{\ell,t-14}^\Delta)$ in Eq. (5) of the main paper with $(X_{\ell^*,t^*}^\Delta, X_{\ell^*,t^*-7}^\Delta,
+X_{\ell^*,t^*-14}^\Delta)$.
+Figures
 \ref{fig:fcast-booted}--\ref{fig:hot-booted} show the results.  No
 method exhibits a noticeable performance gain over the \ar~method,
 leading us to dismiss the implicit regularization hypothesis.
