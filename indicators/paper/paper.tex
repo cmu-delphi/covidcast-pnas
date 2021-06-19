@@ -453,7 +453,7 @@ people):
   locations with high case rates at any given time.  
 
 \item \textit{Time-wise correlations} (i.e., at a specific location, do values
-  of the signal correlate with case rates across time?): Formally, let $X_\ell$
+  of the signal correlate with case rates across time?): Let $X_\ell$
   and $Y_\ell$ be vectors of values of a signal and case rates, over all
   times, at location $\ell$. The time-wise correlation at location $\ell$ is
   defined as $\cor(X_\ell, Y_\ell)$. This examines whether changes in a signal
@@ -472,11 +472,11 @@ people):
 Figure~\ref{fig:geo_wise_correlation} shows the geo-wise correlations achieved
 by the five signals and COVID case rates (from JHU CSSE, smoothed using a 7-day
 trailing average), from April 15, 2020 to April 15, 2021. This calculation is
-performed over counties with at least 500 cumulative cases by the end of this
-period, and at which all indicators are available (956 counties in total). The
-large positive correlations suggest that these signals could be useful in
-hotspot detection (identifying counties that have relatively high COVID
-activity, at a given time). Somewhat surprisingly, the survey-based
+performed over all counties with at least 500 cumulative cases by the end of
+this period, and at which all indicators are available (956 counties in
+total). The large positive correlations suggest that these signals could be
+useful in hotspot detection (identifying counties that have relatively high
+COVID activity, at a given time). Somewhat surprisingly, the survey-based 
 CLI-in-community signal shows the strongest correlations for much of the time
 period. This clearly demonstrates the value of a large-scale survey such as CTIS
 for tracking symptoms and case trends, especially when other data is unavailable.
@@ -621,6 +621,7 @@ outreach efforts.
   \label{fig:mobility-drop}
 \end{figure}
 
+[TODO: improve/revisit this example?]
 As an illustration, Figure~\ref{fig:mobility-drop} maps the sharp increase in
 rates of people staying at home between March 1 and April 15, 2020. Using
 SafeGraph data on the fraction of mobile devices included in SafeGraph's panel
@@ -672,7 +673,7 @@ response, and how effective public communication is.
 There are a number of open questions, and challenges that remain. Several
 signals are subject to biases, such as survey sampling and nonresponse biases,
 geographic differences in market share for medical claims data, or biases in the
-population represented in mobile device mobility data.
+population represented in app-based mobility data.
 % \cite{Coston:2021}. RJT: commenting out because if we cite only this, then I 
 % feel like we will have to provided references for the other sources of bias.
 % Since otherwise it might look like we don't think there's credible work on the
