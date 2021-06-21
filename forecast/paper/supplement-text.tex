@@ -168,7 +168,61 @@ in the correct direction, for example, narrower confidence intervals.
 
 \section{Leadingness and laggingness}
 
-Currently, both figures are in the manuscript. Probably just need text here.
+In Section 2.D of the main text, we discuss the extent to which the indicators
+are leading or lagging case rates during different periods. To define the amount
+of leadingness or laggingness, we use the cross correlation function (CCF)
+between the two time series. The CCF is of an indicator $X_{\ell,t}$ and case
+rates $Y_{\ell,t}$ is defined as
+\[
+\CCF_{\ell,t}(a) = \frac{1}{n_a} \sum_{i=1}^{n_a} \left( ( X_{\ell,t,i+a} -
+  \overline{X}_{\ell,t}) / s^{X}_{\ell,t}\right) \left( ( Y_{\ell,t,i} -
+  \overline{Y}_{\ell,t}) / s^{Y}_{\ell,t}\right), 
+\]
+where $n_a$ is the number of available time points when $X_{\ell,t}$ has been
+shifted in time by $a$ days, and $\overline{X}_{\ell,t}$, $s^X_{\ell,t}$
+are the sample mean and
+standard deviation of $X_{\ell,t}$ (respectively $Y_{\ell,t}$). The result is a
+sequence of Pearson correlations for each selected $a$, where we align
+$X_{\ell,t}$ with the values of $Y_{\ell,t}$ that occurred $a$ days earlier.
+Thus, for $a>0$, $\CCF_{\ell,t}(a)>0$ indicates that
+$Y_{\ell,t}$ is moving together with the values of $X_{\ell,t}$ that occur $a$
+days in the future. In this case we say that $X_{\ell,t}$ is lagging
+$Y_{\ell,t}$. For $a<0$, $\CCF_{\ell,t}(a)>0$ means that $Y_{\ell,t}$ is
+positively correlated with $X_{\ell,t}$ shifted earlier, so we say that
+$X_{\ell,t}$ leads $Y_{\ell,t}$.
+
+Figure \ref{fig:ccf-dv-finalized} shows the standardized signals for the HRR
+containing Charlotte, North Carolina, from August 1, 2020 until the end of
+September. These are the same signals shown in Figure 1 in the manuscript. To
+define ``leadingness'' we compute $\CCF_{\ell,t}(a)$ for each $a\in
+\{-15,\ldots,15\}$ using the 56 days leading up to time $t$ (this is the same
+amount of data used to train the forecasters: 21 days of training data, 21 days
+to get the response at $a=21$, and 14 days for the longest lagged value). The
+orange dashed horizontal line represents the 97.5\% significance threshold for
+correlations based on 56 observations. Any correlations larger in magnitude than
+this value are considered statistically significant under the null hypothesis of
+no relationship. We define leadingness to be the sum of the significant
+correlations that are leading (those above the dashed line with $a<0$) while
+laggingness is the same but for $a>0$. In this case, there are no significant
+correlations, so both scores will be 0: on September 28, \dv~is neither
+leading nor lagging cases.
+
+Figure \ref{fig:lagging-only} shows the correlation between laggingness and the
+difference in indicator WIS and AR WIS. Unlike leadingness (Figure 5 in the
+manuscript) there is no obvious relationship. This is heartening as laggingness
+should not aid forecasting performance. On the other hand, if an indicator is
+more lagging than it is leading, this may suggest diminished performance.
+Figure~\ref{fig:diff-in-lead-lag} shows the correlation of the difference in
+leadingness and laggingness with the difference in WIS. The pattern here is
+largely similar to the pattern in leadingness described in the manuscript: the
+relationship is strongest in down periods and weakest in up periods with the
+strength diminishing as we move from down to flat to up for all indicators. 
+
+
+
+
+
+
 
 \section{Examining data in 2021}
 

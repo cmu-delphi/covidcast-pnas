@@ -691,7 +691,15 @@ df2 %>%
   theme(legend.position = "bottom", legend.title = element_blank())
 ```
 
-```{r lagging-only, eval=FALSE}
+```{r ccf-dv-finalized, eval=TRUE, fig.cap="Illustration of the cross-correlation function between DV-CLI and cases. The left panel shows the standardized signals over the period from August 1 to September 28 (as of September 28, 2020). The right panel shows $\\CCF(a)$ for different values of $a$ as vertical blue bars. The orange dashed lines indicate the 95\\% significance threshold. By our leadingness metric, DV-CLI is neither leading nor lagging cases over this period."}
+source("../code/ccf-dv-finalized.R")
+gg
+```
+
+\clearpage
+
+
+```{r lagging-only, fig.cap="Correlation of the difference in WIS with the  laggingness of the indicator at the target date, stratified by up, down, or flat period. Compare to Figure 5 in the manuscript."}
 # Deprecated
 df2 %>%
   filter(period != "jm") %>%
@@ -710,10 +718,10 @@ df2 %>%
   theme(legend.position = "bottom", legend.title = element_blank())
 ```
 
+\clearpage
 
-
-```{r diff-in-lead-lag, include=FALSE}
-# Figure 7 in the manuscript
+```{r diff-in-lead-lag, fig.cap = "Correlation of the difference between leadingness and laggingness with the difference in WIS. The relationship is essentially the same as described in the manuscript and shown in Figure 5."}
+# Deprecated
 df2 %>%
   filter(period != "jm") %>%
   group_by(forecaster, udf) %>%
@@ -729,6 +737,38 @@ df2 %>%
   xlab("") +
   theme(legend.position = "bottom", legend.title = element_blank())
 ```
+
+
+
+\clearpage
+
+
+
+
+
+<!-- Figures in the manuscript in their own scripts -->
+
+
+```{r revisions-dv-jhu, eval=FALSE}
+# Figure 1 in the manuscript
+source("../code/revisions.R")
+```
+
+
+
+
+
+```{r ny-trajectory, eval=FALSE}
+# Figure 2 in the manuscript
+source("../code/ny-trajectory.R")
+gg
+```
+
+
+
+
+
+
 
 
 
@@ -762,36 +802,6 @@ plotter_hotspots(hotspots_honest)
 
 
 \clearpage
-
-
-
-
-<!-- Figures in the manuscript in their own scripts -->
-
-
-```{r revisions-dv-jhu, eval=FALSE}
-# Figure 1 in the manuscript
-source("../code/revisions.R")
-```
-
-
-
-
-
-```{r ny-trajectory, eval=FALSE}
-# Figure 2 in the manuscript
-source("../code/ny-trajectory.R")
-gg
-```
-
-
-```{r ccf-dv-finalized, eval=FALSE}
-# Figure ?? in the manuscript
-source("../code/ccf-dv-finalized.R")
-gg
-```
-
-
 
 
 

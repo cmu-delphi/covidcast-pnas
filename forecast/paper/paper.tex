@@ -273,8 +273,9 @@ dates, by constructing the proper sequence of vintage training data sets.
   \includegraphics[width=\columnwidth]{fig/revisions.pdf}
   % RJT: Ensuring we start with a "declarative title" :) 
   % https://www.internationalscienceediting.com/how-to-write-a-figure-caption/
-  \caption{Revision behavior for two signals in the HRR containing New York  
-    City.  Each colored line corresponds to the data as reported on a particular 
+  \caption{Revision behavior for two signals in the HRR containing Charlotte,
+    North Carolina.  Each colored line corresponds to the data as reported on a
+    particular 
     date (\textit{as of} dates varying from September 28 through October
     19). The left panel shows the DV-CLI signal, which was regularly revised
     throughout the period, though the effects fade as we look further back in   
@@ -711,9 +712,10 @@ function can absorb a lot of the variability in its input).
 \subsection{Implicit Regularization Hypothesis}
 
 One might ask if the benefits we observe in forecasting and hotspot
-prediction have anything to do with the actual indicator themselves. A plausible 
+prediction have anything to do with the actual indicator themselves. A plausible  
 alternative explanation is that the indicators are simply providing \textit{implicit
-  regularization} on top of  the basic AR model when we include them as lagged
+  regularization} on top of the basic AR model, in the same way any noise
+variable might, when we include them as lagged
 features in \eqref{eq:forecast_ar_x} and \eqref{eq:hotspot_ar_x}.
 
 To test this hypothesis, we reran all of the prediction experiments but with
@@ -882,8 +884,8 @@ predictive modeling for epidemics and pandemics.
   the Foundation, and Optum; Centers for Disease Control and Prevention (CDC)
   grant U01IP001121; the Canadian Statistical Sciences Institute; National
   Sciences and Engineering Research Council of Canada (NSERC) grant
-  RGPIN-2021-02618; and National Science Foundation Graduate Research Fellowship 
-  Program (NSF GRFP) award DGE1745016.}  
+  RGPIN-2021-02618; and National Science Foundation Graduate Research
+  Fellowship Program (NSF GRFP) award DGE1745016.}
 
 \showacknow{} % Display the acknowledgments section
 
