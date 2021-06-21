@@ -21,16 +21,88 @@
 \author[c,2]{Jingjing Tang}
 
 % Middle authors
-\author[d]{Middle Authors to be Added}
+\author[i]{Sumit Agrawal}
+\author[l]{Wael Al Saeed}
+\author[g]{Taylor Arnold}
+\author[j]{Amartya Basu}
+\author[d]{Jacob Bien}
+\author[r]{{\'A}ngel A. Cabrera}
+\author[b]{Andrew Chin}
+\author[b]{Eu Jing Chua}
+\author[b]{Brian Clark}
+\author[i]{Sarah Colquhoun}
+\author[b]{Nat DeFries}
+\author[i]{David C. Farrow}
+\author[r]{Jodi Forlizzi}
+\author[i]{Jed Grabman}
+\author[b]{Samuel Gratzl}
+\author[a]{Alden Green}
+\author[r]{Robin Han}
+\author[i]{Kate Harwood}
+\author[a,b]{Addison J. Hu}
+\author[i]{Raphael Hyde}
+\author[d]{Sangwon Hyun}
+\author[l]{Ananya Joshi}
+\author[h]{Jimi Kim}
+\author[r]{Andrew Kuznetsov}
+\author[b]{Wichada La Motte-Kerr}
+\author[e,f]{Balasubramanian Narasimhan}
+\author[r]{Yeon Jin Lee}
+\author[p]{Kenneth Lee}
+\author[b]{Zachary C. Lipton}
+\author[r]{Michael X. Liu}
+\author[k]{Lester Mackey}
+\author[b]{Kathryn Mazaitis}
+\author[o]{Daniel J. McDonald}
+\author[i]{Phillip McGuinness}
+\author[i]{Michael P. O'Brien}
+\author[a,b]{Natalia L. Oliveira}
+\author[a,b]{Pratik Patil}
+\author[r]{Adam Perer}
+\author[b]{Collin A. Politsch}
+\author[l]{Dawn Rucker}
+\author[i]{Chris Scott}
+\author[s]{Nigam Shah}
+\author[n]{Vishnu Shankar}
+\author[p]{James Sharpnack}
+\author[b]{Dmitry Shemetov}
+\author[q]{Noah Simon}
+\author[i]{Benjamin Y. Smith}
+\author[b]{Vishakha Srivastava}
+\author[e,f]{Robert Tibshirani}
+\author[e]{Elena Tuzhilina}
+\author[b]{Ana Karina Van Nortwick}
+\author[a]{Val{\'e}rie Ventura}
+\author[a]{Larry Wasserman}
+\author[i]{Benjamin Weaver}
+\author[m]{Jeremy C. Weiss}
+\author[i]{Spencer Whitman}
+\author[r]{Kristin Williams}
 
 % Senior authors
 \author[b]{Roni Rosenfeld}
-\author[a,b]{Ryan J.\ Tibshirani}
+\author[a,b]{Ryan J. Tibshirani}
 
 \affil[a]{Department of Statistics \& Data Science, Carnegie Mellon University}
 \affil[b]{Machine Learning Department, Carnegie Mellon University}
 \affil[c]{Computational Biology Department, Carnegie Mellon University}
-\affil[d]{Remaining affiliations to be added}
+\affil[d]{Department of Data Sciences and Operations, University of Southern California}
+\affil[e]{Department of Statistics, Stanford University}
+\affil[f]{Department of Biomedical Data Science, Stanford University}
+\affil[g]{Linguistics Program, University of Richmond}
+\affil[h]{School of Natural Sciences and Mathematics, University of Texas at Dallas}
+\affil[i]{Google.org}
+\affil[j]{Information Networking Institute, Carnegie Mellon University}
+\affil[k]{Microsoft Research New England}
+\affil[l]{Computer Science Department, Carnegie Mellon University}
+\affil[m]{Heinz College of Information Systems and Public Policy, Carnegie
+  Mellon University}
+\affil[n]{Program in Immunology, Stanford University School of Medicine}
+\affil[o]{Department of Statistics, University of British Columbia}
+\affil[p]{Department of Statistics, University of California, Davis}
+\affil[q]{Department of Biostatistics, University of Washington}
+\affil[r]{Human-Computer Interaction Institute, Carnegie Mellon University}
+\affil[s]{Department of Medicine, Stanford University}
 
 % Please give the surname of the lead author for the running footer
 \leadauthor{Reinhart}
@@ -373,16 +445,6 @@ the pandemic \cite{Adjodah:2021, Pierri:2021, Jewell:2021, Chakrabarti:2020,
   Doerr:2021}. The API currently serves hundreds of thousands of requests to
 thousands of users every day.
 
-\begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/time_trends_national.pdf}
-  \caption{National trends, from April 2020 to April 2021, of four signals in 
-    the COVIDcast API. The auxiliary signals, based on medical claims data and 
-    massive surveys, track changes in officially reported cases quite
-    well. (They have all been placed on the same scale as reported cases per 
-    100,000 people.)}
-  \label{fig:time_trends_national}
-\end{figure}
-
 In what follows, we present examples of the usefulness of some of the novel
 signals available in the API. These examples demonstrate that such indicators
 are meaningfully related to COVID activity, that they provide alternate views on
@@ -415,14 +477,6 @@ confirmed cases:
   results among Quidel COVID antigen tests.  
 \end{itemize}
 
-\begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/geo_wise_corr.pdf}
-  \caption{Geo-wise correlations with case rates, from April 15, 2020 to April 
-    15, 2021, calculated over all counties for which all signals were available
-    and which had at least 500 cumulative cases by the end of this period.}
-  \label{fig:geo_wise_correlation} 
-\end{figure}
-
 Figure~\ref{fig:time_trends_national} compares the first three of these signals
 to COVID cases in the United States (from JHU CSSE, smoothed with a 7-day
 trailing average) over a year of the pandemic (April 15, 2020 to April 15,
@@ -431,6 +485,16 @@ this same relationship persists across multiple resolutions of the data, down to
 smaller geographic regions such as states and counties, as shown in the
 supplement.  This will also be illustrated in a more detailed correlation 
 analysis in the next subsection.   
+
+\begin{figure}[t]
+  \includegraphics[width=\columnwidth]{fig/time_trends_national.pdf}
+  \caption{National trends, from April 2020 to April 2021, of four signals in 
+    the COVIDcast API. The auxiliary signals, based on medical claims data and 
+    massive surveys, track changes in officially reported cases quite
+    well. (They have all been placed on the same scale as reported cases per 
+    100,000 people.)}
+  \label{fig:time_trends_national}
+\end{figure}
 
 Besides tracking contemporaneous COVID activity, these and other indicators can
 be used to improve forecasts of future COVID case trends, as investigated in a
@@ -461,14 +525,6 @@ people):
   location.
 \end{enumerate}
 
-\begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/time_wise_correlation.pdf}
-  \caption{Time-wise correlations with case rates, from April 15, 2020 to April
-    15, 2021, calculated over all counties for which all signals were available
-    and which had at least 500 cumulative cases by the end of this period.}
-  \label{fig:time_wise_correlation}
-\end{figure} 
-
 Figure~\ref{fig:geo_wise_correlation} shows the geo-wise correlations achieved
 by the five signals and COVID case rates (from JHU CSSE, smoothed using a 7-day
 trailing average), from April 15, 2020 to April 15, 2021. This calculation is
@@ -491,6 +547,14 @@ correlations, in bulk, are achieved by the CHNG-COVID signal; the
 CTIS-CLI-in-community signal is a close second, and the CHNG-CLI signal is
 third. There are two noteworthy points:
 
+\begin{figure}[t]
+  \includegraphics[width=\columnwidth]{fig/geo_wise_corr.pdf}
+  \caption{Geo-wise correlations with case rates, from April 15, 2020 to April 
+    15, 2021, calculated over all counties for which all signals were available
+    and which had at least 500 cumulative cases by the end of this period.}
+  \label{fig:geo_wise_correlation} 
+\end{figure}
+
 \begin{itemize}
 \item This is different from what is observed in
   Figure~\ref{fig:geo_wise_correlation}, where the CTIS-CLI-in-community signal
@@ -509,17 +573,6 @@ third. There are two noteworthy points:
 \end{itemize}
 
 \subsection{Helping Robustness}
-
-\begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/bexar_compare.pdf}
-  \caption{Reported cases per day in Bexar County, Texas during the summer of
-    2020. On July 16, 4,810 backlogged cases were reported, though they actually
-    occurred over the preceding two weeks (this shows up as a prolonged spike in
-    the left panel due to the 7-day trailing averaging applied to the case
-    counts). Daily CTIS estimates of CLI-in-community showed more stable 
-    underlying trends.}
-  \label{fig:bexar_compare}
-\end{figure}
 
 Public health reporting of COVID tests, cases, deaths, and hospitalizations is
 subject to a number of possible delays and problems. For example, COVID testing
@@ -544,7 +597,15 @@ disproportionately during holiday periods, as people are likely less willing to
 go to the doctor for more routine issues. Fortunately, in principle, the holiday
 effects in claims signals should be correctable: they are mainly due to
 \textit{overall} changes in medical seeking behavior during holiday, periods,
-and we can estimate such effects using historical claims data.
+and we can estimate such effects using historical claims data
+
+\begin{figure}[t]
+  \includegraphics[width=\columnwidth]{fig/time_wise_correlation.pdf}
+  \caption{Time-wise correlations with case rates, from April 15, 2020 to April
+    15, 2021, calculated over all counties for which all signals were available
+    and which had at least 500 cumulative cases by the end of this period.}
+  \label{fig:time_wise_correlation}
+\end{figure} 
 
 As a further example, Figure~\ref{fig:bexar_compare} displays data from Bexar
 County, Texas (which contains San Antonio) during July 2020. On July 16, 2020,
@@ -563,15 +624,18 @@ backlogs. Similar reporting problems have occurred in many jurisdictions across
 the United States, making it valuable to cross-check against external sources
 not part of the same reporting systems.
 
-\subsection{Revisions Matter}
-
 \begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/dv_as_of.pdf}
-  \caption{Estimated percentage of doctor's visits due to COVID-like illness
-    displayed across multiple issue dates, with later issue dates adding
-    additional data and revising past data from prior issue dates.}
-  \label{fig:dv_as_of}
+  \includegraphics[width=\columnwidth]{fig/bexar_compare.pdf}
+  \caption{Reported cases per day in Bexar County, Texas during the summer of
+    2020. On July 16, 4,810 backlogged cases were reported, though they actually
+    occurred over the preceding two weeks (this shows up as a prolonged spike in
+    the left panel due to the 7-day trailing averaging applied to the case
+    counts). Daily CTIS estimates of CLI-in-community showed more stable 
+    underlying trends.}
+  \label{fig:bexar_compare}
 \end{figure}
+
+\subsection{Revisions Matter}
 
 The revision tracking feature in the API assists in model-building and
 evaluation. Figure~\ref{fig:dv_as_of} illustrates how one COVIDcast medical
@@ -581,6 +645,14 @@ ends of the lines correspond to estimates for the last day that data are
 available for each issue date, which are generally the most tentative estimates,
 and appear to be significantly biased upward in Arizona in June 2020, and
 significantly biased downward in New York throughout June and July 2020.
+
+\begin{figure}[t]
+  \includegraphics[width=\columnwidth]{fig/dv_as_of.pdf}
+  \caption{Estimated percentage of doctor's visits due to COVID-like illness
+    displayed across multiple issue dates, with later issue dates adding
+    additional data and revising past data from prior issue dates.}
+  \label{fig:dv_as_of}
+\end{figure}
 
 Claims-based signals typically undergo heavy backfill as additional claims are
 processed and errors are corrected; the median relative error between initial
