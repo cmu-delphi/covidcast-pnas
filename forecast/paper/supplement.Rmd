@@ -834,9 +834,6 @@ for (nm in names(traj_best)) print(trajectory_panel(nm, traj_best, traj_worst))
 ```
 
 
-\clearpage
-
-
 <!-- PNAS says: Add this line AFTER all your figures and tables -->
 \FloatBarrier
 
@@ -844,9 +841,6 @@ for (nm in names(traj_best)) print(trajectory_panel(nm, traj_best, traj_worst))
 
 <!-- More PNAS example material -->
 <!-- Probably remove all this -->
-
-\movie{Type legend for the movie here.}
-
 
 \dataset{dataset_one.txt}{Type or paste legend here.}
 
