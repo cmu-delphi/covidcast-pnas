@@ -212,7 +212,7 @@ in the API, we study the following five:
   with confirmed COVID-19, based on the same claims data.
 \item COVID Trends and Impact Survey COVID-like illness in the community
   (CTIS-CLI-in-community): The estimated percentage of the population who know
-  someone in their local community that is sick, based on Delphi's COVID Trends
+  someone in their local community thatwho is sick, based on Delphi's COVID Trends
   and Impact Survey, in partnership with Facebook.
 \item Doctor Visits COVID-like illness (DV-CLI): The same as CHNG-CLI, but
   computed based on de-identified medical insurance claims from other health
@@ -275,15 +275,14 @@ dates, by constructing the proper sequence of vintage training data sets.
   \includegraphics[width=\columnwidth]{fig/revisions.pdf}
   % RJT: Ensuring we start with a "declarative title" :) 
   % https://www.internationalscienceediting.com/how-to-write-a-figure-caption/
-  \caption{Revision behavior for two signals in the HRR containing Charlotte,
+  \caption{Revision behavior for two indicators in the HRR containing Charlotte, 
     North Carolina.  Each colored line corresponds to the data as reported on a
-    particular 
-    date (\textit{as of} dates varying from September 28 through October
-    19). The left panel shows the DV-CLI signal, which was regularly revised
-    throughout the period, though the effects fade as we look further back in   
-    time. In contrast, the right panel shows case rates reported by JHU CSSE
-    (smoothed with a 7-day trailing average), which remain ``as reported'' on
-    September 28, with a spike towards the end of this period, until a major
+    particular date (\textit{as of} dates varying from September 28 through
+    October 19). The left panel shows the DV-CLI signal, which was regularly
+    revised throughout the period, though the effects fade as we look further
+    back in time. In contrast, the right panel shows case rates reported by JHU
+    CSSE (smoothed with a 7-day trailing average), which remain ``as reported''
+    on September 28, with a spike towards the end of this period, until a major 
     correction is made on October 19, which brings this down and affects all
     prior data as well.}  
   \label{fig:vintage}
@@ -717,8 +716,8 @@ One might ask if the benefits we observe in forecasting and hotspot
 prediction have anything to do with the actual indicator themselves. A plausible  
 alternative explanation is that the indicators are simply providing \textit{implicit
   regularization} on top of the basic AR model, in the same way any noise
-variable might, when we include them as lagged
-features in \eqref{eq:forecast_ar_x} and \eqref{eq:hotspot_ar_x}.
+variable might, when we include them as lagged features in
+\eqref{eq:forecast_ar_x} and \eqref{eq:hotspot_ar_x}. 
 
 To test this hypothesis, we reran all of the prediction experiments but with
 $X_{\ell,t}$ in the each indicator models replaced with suitable random noise
@@ -883,11 +882,11 @@ predictive modeling for epidemics and pandemics.
   Johansson, Evan Ray, Nicholas Reich, and Roni Rosenfeld for several
   enlightening conversations about forecast scoring and evaluation.  
   This material is based on work supported by gifts from Facebook, Google.org,
-  the Foundation, and Optum; Centers for Disease Control and Prevention (CDC)
-  grant U01IP001121; the Canadian Statistical Sciences Institute; National
+  the McCune Foundation, and Optum; Centers for Disease Control and Prevention
+  (CDC) grant U01IP001121; the Canadian Statistical Sciences Institute; National 
   Sciences and Engineering Research Council of Canada (NSERC) grant
   RGPIN-2021-02618; and National Science Foundation Graduate Research
-  Fellowship Program (NSF GRFP) award DGE1745016.}
+  Fellowship Program (NSF GRFP) award DGE1745016.} 
 
 \showacknow{} % Display the acknowledgments section
 
