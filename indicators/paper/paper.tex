@@ -250,9 +250,9 @@ activity.
 
 \paragraph{Mobility Data} SafeGraph, a company that collects geospatial data
 from smartphone apps, calculates COVID-related mobility signals
-\cite{SafeGraphSocial, SafeGraphPatterns} and makes it available to researchers 
-under a data use agreement; we aggregate (some of) these signals to the county
-level and make them publicly available.     
+\cite{SafeGraphSocial, SafeGraphPatterns} and makes them available to
+researchers under a data use agreement; we aggregate (some of) these signals to
+the county level and make them publicly available.     
 
 \medskip
 We also scrape data accessible from other public sources, such as cases and
@@ -472,7 +472,7 @@ confirmed cases:
   Facebook users.
 \item COVID Trends and Impact Survey CLI in the community
   (CTIS-CLI-in-community): The estimated percentage of the population who know 
-  someone in their local community that is sick, based on the same surveys.
+  someone in their local community who is sick, based on the same surveys.
 \item Quidel test positivity rate (Quidel-TPR): The percentage of positive
   results among Quidel COVID antigen tests.  
 \end{itemize}
@@ -597,7 +597,7 @@ disproportionately during holiday periods, as people are likely less willing to
 go to the doctor for more routine issues. Fortunately, in principle, the holiday
 effects in claims signals should be correctable: they are mainly due to
 \textit{overall} changes in medical seeking behavior during holiday, periods,
-and we can estimate such effects using historical claims data
+and we can estimate such effects using historical claims data.
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/time_wise_correlation.pdf}
@@ -609,20 +609,20 @@ and we can estimate such effects using historical claims data
 
 As a further example, Figure~\ref{fig:bexar_compare} displays data from Bexar
 County, Texas (which contains San Antonio) during July 2020. On July 16, 2020,
-4,810 backlogged cases were reported after reporting problems prevented them
-from being reported over the past two weeks \cite{Palacios:2021}, resulting in a
-clearly visible spike in the left-hand panel of Figure~\ref{fig:bexar_compare}
-(case data from JHU CSSE, smoothed using a 7-day trailing average).  Meanwhile,
-Delphi's COVID Trends and Impact Survey averaged around 350 responses per day in
-Bexar County over the same time period, and was able to estimate the fraction of
-the population who know someone in their community with COVID-Like Illness
-(CLI). As we can see in the right-hand panel of Figure~\ref{fig:bexar_compare},
-this signal was not affected by Bexar County's reporting problems and, as shown
-in the last subsection, it is (in general) highly correlated with case rates,
-providing an alternate stream of data about COVID activity unaffected by
-backlogs. Similar reporting problems have occurred in many jurisdictions across
-the United States, making it valuable to cross-check against external sources
-not part of the same reporting systems.
+San Antonio reported 4,810 backlogged cases after reporting problems prevented
+them from being reported over the past two weeks \cite{Palacios:2021}, resulting
+in a clearly visible spike in the left-hand panel of the figure (case data from
+JHU CSSE, smoothed using a 7-day trailing average). Meanwhile, Delphi's COVID
+Trends and Impact Survey averaged around 350 responses per day in Bexar County
+over the same time period, and was able to estimate the fraction of the
+population who know someone in their local community with COVID-Like Illness
+(CLI). As we can see in the right-hand panel of the figure, this signal was not
+affected by Bexar County's reporting problems and, as shown in the last
+subsection, it is (in general) highly correlated with case rates, providing an
+alternate stream of data about COVID activity unaffected by backlogs. Similar
+reporting problems have occurred in many jurisdictions across the United States,
+making it valuable to cross-check against external sources not part of the same
+reporting systems.
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/bexar_compare.pdf}
@@ -728,7 +728,7 @@ features and capabilities.) These signals have already supported pandemic
 research and  policy-making.
 
 Third, the underlying database tracks all revisions made to the data, allowing
-us to query the API to learn ``what was known when'', which is critical for
+us to query the API to learn ``what was known when,'' which is critical for
 understanding the behavior (and potential pitfalls) of real-time surveillance
 signals. Such revision data is rarely available in standardized format from
 other sources.
@@ -760,17 +760,22 @@ features of the COVIDcast API will help facilitate this and other related work,
 which will be vital to advancing pandemic modeling and preparedness.
 
 \acknow{We thank Carrie Reed, Matt Biggerstaff, Michael Johansson, Rachel
-  Slayton, Velma Lopez, Jo Walker and others on the CDC COVID-19 Modeling Team;
-  Hal Varian, Brett Slatkin, and others on Google's Surveys team and
-  Google.org's CMU-Delphi Fellowship team; Curtiss Cobb and others on Facebook's   
-  Demography and Survey Science, Data for Good and Health teams; Alex Smola and
-  others at Amazon Web Services; Tim Suther and others at Change Healthcare;
-  Paul Nielsen and others at Optum; and John Tamerius and others at Quidel.
+  Slayton, Velma Lopez, Jo Walker and others on the CDC COVID-19 Modeling Team; 
+  Hal Varian, Brett Slatkin, and others on Google's Surveys team;
+  Erin Hattersley, Rasmi Elasmar, and others at Google.org; 
+  Evgeniy Gabrilovich and others on Google's Health team; 
+  Curtiss Cobb and others on Facebook's  Demography and Survey Science, Data for
+  Good and Health teams; 
+  Alex Smola and others at Amazon Web Services;
+  Tim Suther and others at Change Healthcare;
+  Paul Nielsen and others at Optum; 
+  John Tamerius and others at Quidel; and
+  Ross Epstein and others at SafeGraph.
   This material is based on work supported by gifts from Facebook, Google.org,
   the McCune Foundation, and Optum; Centers for Disease Control and Prevention
   (CDC) grant U01IP001121; National Science Foundation Graduate Research
   Fellowship Program (NSF GRFP) award DGE1745016; and the Center for Machine
-  Learning and Health (CMLH) at Carnegie Mellon University.}         
+  Learning and Health (CMLH) at Carnegie Mellon.}         
 
 \showacknow{} % Display the acknowledgments section
 
