@@ -191,6 +191,159 @@ g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 3)
 g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 4)
 ```
 
+\clearpage
+
+```{r hospitalization_time_trends_national, fig.cap="National trends, from April 2020 to April 2021, of HHS confirmed COVID-19 hospital admissions, plus three other signals in the COVIDcast API. Here, the HHS data has been limited to values from 2020-08-01 onward due to changes in reporting behavior, and processed into a 7-day trailing average rate per 100,000 resident population using Census Bureau estimates for 2019. HSP-HOSP is the percentage of new hospital admissions with COVID-associated diagnoses, based on claims data from health system partners, smoothed in time and adjusted for systematic day-of-week effects. Auxiliary signals have been scaled to have the same maximum value as the HHS data."}
+start_day = "2020-04-15"
+end_day = "2021-04-15"
+as_of_day = "2021-06-01"
+
+HOSP_SOURCES <-
+  c("hhs", "hospital-admissions", "jhu-csse", "chng")
+HOSP_SIGNALS <-
+  c("confirmed_admissions_covid_1d",
+    "smoothed_adj_covid19_from_claims",
+    "confirmed_7dav_incidence_prop",
+    "smoothed_adj_outpatient_covid")
+hosp_names = c(
+  "Hospitalizations", "HSP-HOSP",
+  "Cases", "CHNG-COVID"
+)
+hosp_signal_has_national = c(
+  TRUE, TRUE,
+  TRUE, TRUE
+)
+hhs_start_date = as.Date("2020-08-01")
+
+hosp_colors = c("black", scales::hue_pal()(length(HOSP_SIGNALS)-1))
+
+hosp_raw_signal_data <- covidcast_signals(
+  HOSP_SOURCES[hosp_signal_has_national],
+  HOSP_SIGNALS[hosp_signal_has_national],
+  start_day, end_day,
+  as_of=as_of_day,
+  geo_type="nation"
+)
+
+## For HHS data, remove pre-cutoff-date period, and take a 7-day rolling average rate:
+postprocess_hhs_hosp_df <- function(hhs_hosp_df, geo_type, population_df) {
+  stopifnot(nrow(distinct(hhs_hosp_df, data_source, signal)) == 1)
+  hhs_hosp_df %>%
+    filter(time_value >= hhs_start_date) %>%
+    group_by(geo_value) %>%
+    arrange(time_value) %>%
+    mutate(value = c(rep(NA, 6), sum(value[1:7]) + c(0, cumsum(tail(value,-7) - head(value, -7))))/7) %>% # (could also use zoo::rollmeanr)
+    slice(-(1:6)) %>%
+    left_join(population_df) %>%
+    mutate(value = value/population*100000, population=NULL) %>%
+    ungroup() %>%
+    {as.covidcast_signal(., signal=unique(.$signal), geo_type=geo_type, time_type="day")}
+}
+hosp_signal_data <- hosp_raw_signal_data
+hosp_signal_data[[1]] <- postprocess_hhs_hosp_df(
+  hosp_raw_signal_data[[1]], "nation",
+  ## use national entry appearing in state_census
+  state_census %>% transmute(geo_value=tolower(ABBR), population=POPESTIMATE2019)
+)
+
+hosp_main_signal_max <- max(hosp_signal_data[[1]]$value, na.rm=TRUE)
+
+hosp_rescaled <- aggregate_signals(hosp_signal_data, format = "long") %>%
+  group_by(signal) %>%
+  mutate(value = value / max(value, na.rm=TRUE) * hosp_main_signal_max) %>%
+  ungroup()
+
+hosp_rescaled$signal <- factor(hosp_rescaled$signal, levels=HOSP_SIGNALS, labels=hosp_names)
+
+ggplot(hosp_rescaled, aes(x = time_value, y = value, color = signal)) +
+  geom_line() +
+  scale_color_manual(breaks = hosp_names, values = hosp_colors) +
+  labs(x = "Date", y = "Signal value (scaled)") +
+  scale_x_date(date_breaks = "3 months", date_labels = "%b %Y",
+               date_minor_breaks = "1 month") +
+  theme_bw() +
+  theme(legend.position = "bottom", legend.title = element_blank())
+```
+
+```{r hosp-correlation-data}
+df_hosp_signals = vector("list", length(HOSP_SIGNALS))
+for (i in seq_along(HOSP_SIGNALS)) {
+  df_hosp_signals[[i]] =
+    covidcast_signal(HOSP_SOURCES[i], HOSP_SIGNALS[i],
+                     start_day, end_day, as_of=as_of_day,
+                     geo_type="state")
+}
+state_populations = state_census %>%
+  transmute(geo_value=tolower(ABBR), population=POPESTIMATE2019)
+df_hosp_signals[[1]] <- postprocess_hhs_hosp_df(df_hosp_signals[[1]], "state", state_populations)
+
+## Fetch HHS confirmed hospital admissions and smooth with 7-day
+## trailing average rate:
+df_raw_hospitalizations =
+  covidcast_signal("hhs", "confirmed_admissions_covid_1d",
+                   start_day, end_day, as_of=as_of_day,
+                   geo_type="state")
+df_hospitalizations = postprocess_hhs_hosp_df(df_raw_hospitalizations, "state", state_populations)
+
+## Consider only state-like jurisdictions for which all signals of interest have at least 50 rows:
+geo_values = unique(df_hospitalizations$geo_value)
+for (i in seq_along(HOSP_SIGNALS)) {
+  geo_values = intersect(geo_values, df_hosp_signals[[i]] %>% count(geo_value) %>% filter(n > 50) %>% pull(geo_value))
+}
+
+cat('Number of unique jurisdictions included:\n')
+length(geo_values)
+```
+
+Correlations sliced by time (geo-wise correlation):
+```{r hosp-correlations-by-time, fig.cap="Geo-wise correlations with hospitalization rates derived from HHS data, from April 15, 2020 to April 15, 2021, calculated for all times with sufficient available data within this period, over all state-like jurisdictions for which each signal was reported on at least 50 days during this period."}
+n_hosp_signals = length(HOSP_SIGNALS)
+df_list_hosp_geowise_cor = vector("list", n_hosp_signals)
+for (i in 1:n_hosp_signals) {
+  df_list_hosp_geowise_cor[[i]] = covidcast_cor(
+    df_hosp_signals[[i]] %>% filter(geo_value %in% geo_values),
+    df_hospitalizations %>% filter(geo_value %in% geo_values),
+    by = "time_value", method = "spearman"
+  )
+  df_list_hosp_geowise_cor[[i]]$signal = hosp_names[[i]]
+}
+df_long_hosp_geowise_cor = do.call(rbind, df_list_hosp_geowise_cor[-1])
+df_long_hosp_geowise_cor$signal = factor(df_long_hosp_geowise_cor$signal, hosp_names[-1])
+
+ggplot(df_long_hosp_geowise_cor, aes(x = time_value, y = value)) +
+  geom_line(aes(color = signal)) +
+  scale_color_manual(breaks = hosp_names, values = hosp_colors) +
+  expand_limits(y=0) +
+  labs(x = "Date", y = "Correlation") +
+  scale_x_date(date_breaks = "3 months", date_labels = "%b %Y",
+               date_minor_breaks = "1 month") +
+  theme_bw() +
+  theme(legend.position = "bottom", legend.title = element_blank())
+```
+
+Correlations sliced by state (time-series correlation)
+```{r hosp-correlations-by-state, fig.cap="Time-wise correlations with hospitalization rates derived from HHS data, from April 15, 2020 to April 15, 2021, calculated over all state-like jurisdictions for which each signal was reported on at least 50 days during this period."}
+df_list_hosp_timewise_cor = vector("list", length(HOSP_SIGNALS))
+for (i in seq_along(HOSP_SIGNALS)) {
+  df_list_hosp_timewise_cor[[i]] = covidcast_cor(
+    df_hosp_signals[[i]] %>% filter(geo_value %in% geo_values),
+    df_hospitalizations %>% filter(geo_value %in% geo_values),
+    by = "geo_value", method = "spearman"
+  )
+  df_list_hosp_timewise_cor[[i]]$signal = hosp_names[[i]]
+}
+df_long_hosp_timewise_cor = do.call(rbind, df_list_hosp_timewise_cor[-1])
+df_long_hosp_timewise_cor$signal = factor(df_long_hosp_timewise_cor$signal, hosp_names[-1])
+
+ggplot(df_long_hosp_timewise_cor, aes(value)) +
+  geom_density(aes(color = signal, fill = signal), alpha = 0.4) +
+  labs(x = "Correlation", y = "Density") +
+  expand_limits(x=c(-1,1)) +
+  scale_color_manual(breaks = hosp_names, values = hosp_colors) +
+  scale_fill_manual(breaks = hosp_names, values = hosp_colors) +
+  theme_bw() +
+  theme(legend.position = "bottom", legend.title = element_blank())
+```
 
 <!-- PNAS says: Add this line AFTER all your figures and tables -->
 \FloatBarrier
