@@ -254,6 +254,8 @@ ggplot(hosp_rescaled, aes(x = time_value, y = value, color = signal)) +
   theme(legend.position = "bottom", legend.title = element_blank())
 ```
 
+\clearpage
+
 ```{r hosp-correlation-data}
 df_hosp_signals = vector("list", length(HOSP_SIGNALS))
 for (i in seq_along(HOSP_SIGNALS)) {
@@ -280,7 +282,7 @@ for (i in seq_along(HOSP_SIGNALS)) {
   hosp_geo_values = intersect(hosp_geo_values, df_hosp_signals[[i]] %>% count(geo_value) %>% filter(n > 50) %>% pull(geo_value))
 }
 
-cat('Number of unique jurisdictions included:\n')
+cat('Number of unique jurisdictions included in correlation analysis below:\n')
 length(hosp_geo_values)
 ```
 
@@ -296,11 +298,10 @@ for (i in seq_along(HOSP_SIGNALS)) {
                                       by=c("geo_value","time_value"))
 }
 
-cat('Number of common instances among all signals of interest:\n')
+cat('Number of common instances among all signals of interest in correlation analysis below:\n')
 nrow(hosp_common_instances)
 ```
 
-Correlations sliced by time (geo-wise correlation):
 ```{r hosp-correlations-by-time, fig.cap="Geo-wise correlations with hospitalization rates derived from HHS data, from April 15, 2020 to April 15, 2021, calculated for all times with sufficient available data within this period, over all state-like jurisdictions for which each signal was reported on at least 50 days during this period, limited to state-day combinations for which both signals are available."}
 n_hosp_signals = length(HOSP_SIGNALS)
 df_list_hosp_geowise_cor = vector("list", n_hosp_signals)
@@ -326,7 +327,6 @@ ggplot(df_long_hosp_geowise_cor, aes(x = time_value, y = value)) +
   theme(legend.position = "bottom", legend.title = element_blank())
 ```
 
-Correlations sliced by state (time-series correlation)
 ```{r hosp-correlations-by-state, fig.cap="Time-wise correlations with hospitalization rates derived from HHS data, from April 15, 2020 to April 15, 2021, calculated over all state-like jurisdictions for which each signal was reported on at least 50 days during this period, limited to state-day combinations for which both signals are available."}
 df_list_hosp_timewise_cor = vector("list", length(HOSP_SIGNALS))
 for (i in seq_along(HOSP_SIGNALS)) {
