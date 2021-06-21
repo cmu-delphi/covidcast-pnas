@@ -8,7 +8,7 @@ performing retrospective evaluations of forecasters.   Figures
 \ref{fig:fcast-finalized} and \ref{fig:hot-finalized} show 
 what Figures 3 and 4 in the main paper would have looked like if we
 had simply trained all models using the finalized data rather than
-using vintage data.  This comparison can be seen most
+using vintage data.  This comparison can be seen more
 straightforwardly in Figures \ref{fig:fcast-honest-v-finalized} and
 \ref{fig:hot-honest-v-finalized}, which show the ratio in performance between
 the vintage and finalized 
@@ -16,33 +16,37 @@ versions.  When methods are
 given the finalized version of the data rather than the version available at the
 time that the forecast would have been made, all methods 
 appear (misleadingly) to have better performance than they would
-actually have had if run prospectively.  For example, for forecasting case rates
+have had if run prospectively.  For example, for forecasting case rates
 7-days ahead, the WIS of all methods is at least 8\% larger than what would have been
-recorded using the finalized values of the data.  This effect
+achieved using finalized data.  This effect
 diminishes as the forecasting horizon increases, reflecting the fact
-that these forecasters rely less heavily on recent data than very
-short-term forecasters.  Crucially, some methods are
-"helped" more than others by the less scrupulous retrospective
+that longer-horizon forecasters rely less heavily on recent data than very
+short-horizon forecasters.  Crucially, some methods are
+``helped'' more than others by the less scrupulous retrospective
 evaluation, underscoring the difficulty of avoiding misleading
 conclusions when performing retrospective evaluations of forecasters.
 
-The \chngcli~indicator (along with the other claims-based signals) is the most
+\chngcli~(and, to a lesser extent, the other claims-based
+signals) is the most  
 affected by this distinction, reflecting the latency in claims-based
-reporting.  This supports the importance of efforts to provide "nowcasts" for claims signals
-(which corresponds to a 0-ahead "forecast" of what the claims
+reporting.  This underscores the importance of efforts to provide ``nowcasts'' for
+claims signals 
+(which corresponds to a 0-ahead forecast of what the claims
 signal's value will be once all data has been collected). Looking at
 the \chngcli~and \dv~curves in Figure \ref{fig:fcast-finalized}, we
-can see that they perform very similarly when trained on the finalized data.  This is reassuring
-because they are in principle measuring the same thing (namely, the percentage of
-  outpatient visits that are primarily about COVID-related symptoms).
-  The substantial difference in their curves in Figure 3 of the
-  main paper must therefore reflect their having very different
-  backfill profiles.  
+can see that they perform very similarly when trained on the finalized data.
+This is reassuring 
+because they are, in principle, measuring the same thing (namely, the percentage of
+outpatient visits that are primarily about COVID-related symptoms).
+The substantial difference in their curves in Figure 3 of the
+main paper must therefore reflect their having very different
+backfill profiles.  
   
-While \dv~is one of the least affected methods by using finalized
-rather than vintage values, it is one of the most affected methods for the hotspot problem.
-This is a reminder that the forecasting and hotspot problems are
-distinct problems.  For example, the hotspot problem does not measure
+While using finalized rather than vintage data affects \dv~the least for forecasting,
+it is one of the most affected methods for the
+hotspot problem. 
+This is a reminder that the forecasting and hotspot problems are fundamentally
+distinct.  For example, the hotspot problem does not measure
 the ability to distinguish between flat and downward trends.
 
 Even the \ar~model is affected by this distinction, reflecting the
@@ -59,8 +63,9 @@ wholly attributed to revisions of case rates.
 \section{Aggregating with geometric mean}
 
 In this section, we consider using the geometric mean instead of the
-arithmetic mean when aggregating the weighted interval score (WIS) across location-time pairs.
-There are three reasons why the geometric mean may be desirable.
+arithmetic mean when aggregating the weighted interval score (WIS) across
+location-time pairs. 
+There are three reasons why using the geometric mean may be desirable.
 \begin{enumerate}
 \item  WIS is right-skewed, being bounded below by zero and having
   occasional very large values.   Figure \ref{fig:wis-densities} illustrates that the
@@ -71,14 +76,15 @@ There are three reasons why the geometric mean may be desirable.
 \item In the main paper, we report the ratio of the mean WIS of a
   forecaster to the mean WIS of the baseline forecaster. Another
   choice could be to take the mean of the ratio of WIS values for the
-  two methods. (This latter choice would penalize a method less for
-  doing poorly where the baseline forecaster also does poorly.)
-Using instead the geometric mean makes the order of aggregation and
-scaling immaterial since the ratio of geometric means is the same as
-the geometric mean of ratios.
+  two methods. This latter choice would penalize a method less for
+  doing poorly where the baseline forecaster also does poorly.
+  Using instead the geometric mean makes the order of aggregation and
+  scaling immaterial since the ratio of geometric means is the same as
+  the geometric mean of ratios.
 \item If one imagines that a forecaster's WIS is composed of
   multiplicative space-time effects $S_{\ell,t}$ shared across all forecasters,
-  i.e. $\WIS(F_{\ell,t,f},Y_{\ell,t})=S_{\ell,t}E_{f}$, then
+  i.e. $\WIS(F_{\ell,t,f},Y_{\ell,t})=S_{\ell,t}E_{f,t}$ with $E_{F,t}$ a
+  forecaster-specific error, then
   taking the ratio of two forecasters' geometric mean WIS values will
   effectively cancel these space-time effects.
 \end{enumerate}
@@ -86,7 +92,7 @@ the geometric mean of ratios.
 Figure \ref{fig:fcast-adjusted} uses the geometric
 mean for aggregation.  Comparing this with Figure 3 of the main paper,
 we see that the main conclusions are largely unchanged; however,
-\chngcli~now does appear better than \ar.  This behavior would be
+\chngcli~now appears better than \ar.  This behavior would be
 expected if \chngcli's poor performance is attributable to a
 relatively small number of large errors (as opposed to a large number
 of moderate errors).  Indeed, Figure 5 of the main paper further
@@ -98,32 +104,32 @@ for \chngcli.
 As explained in Section 2.B. of the main paper, a (somewhat cynical)
 hypothesis for why we see benefits in forecasting and hotspot
 prediction is that the indicators are not actually providing useful
-information but they are instead simply acting as a sort of ``implicit
+information but they are instead acting as a sort of ``implicit
 regularization,''  leading to shrinkage on the autoregressive
-coefficients, leading to less volatile predictions.  To investigate
+coefficients and therefore to less volatile predictions.  To investigate
 this hypothesis, we consider fitting  ``noise features'' that in truth
-should have zero coefficients.  Recall (from the main paper) that at each forecast date, we
+should have zero coefficients.  Recall (from the main paper) that at each
+forecast date, we 
 train a model on 6,426 location-time pairs.  Indicator models are
 based on six features, corresponding to the three autoregressive terms
 and the three lagged indicator values.  To form noise indicator features,
-we resample from other rows (while keeping the autoregressive
+we replace their values with those from a randomly chosen time-space pair
+(while keeping the autoregressive 
 features fixed).  In particular, at each location $\ell$ and
 time $t$, for the forecasting task we replace the triplet $(X_{\ell,t}, X_{\ell,t-7},
-X_{\ell,t-14})$ in Eq. (3) of the main paper with the triplet $(X_{\ell^*,t^*}, X_{\ell^*,t^*-7},
+X_{\ell,t-14})$ in Eq. (3) of the main paper with the triplet $(X_{\ell^*,t^*},
+X_{\ell^*,t^*-7}, 
 X_{\ell^*,t^*-14})$, where $(\ell^*,t^*)$ is a location-time pair
 sampled with replacement from the 6,426 location-time pairs.  
-Likewise in the hotspot prediction task, we replace the triplet $(X_{\ell,t}^\Delta, X_{\ell,t-7}^\Delta,
-X_{\ell,t-14}^\Delta)$ in Eq. (5) of the main paper with $(X_{\ell^*,t^*}^\Delta, X_{\ell^*,t^*-7}^\Delta,
+Likewise in the hotspot prediction task, we replace the triplet
+$(X_{\ell,t}^\Delta, X_{\ell,t-7}^\Delta, 
+X_{\ell,t-14}^\Delta)$ in Eq. (5) of the main paper with
+$(X_{\ell^*,t^*}^\Delta, X_{\ell^*,t^*-7}^\Delta, 
 X_{\ell^*,t^*-14}^\Delta)$.
 Figures
 \ref{fig:fcast-booted}--\ref{fig:hot-booted} show the results.  No
 method exhibits a noticeable performance gain over the \ar~method,
 leading us to dismiss the implicit regularization hypothesis.
-
-
-% # Correlations with lagged actuals
-
-% Alden's histograms are in Figure~\ref{fig:cor-wis-ratio} and Figure~\ref{fig:cor-wis-ratio-m1}.
 
 
 
@@ -146,7 +152,7 @@ indicator models.
 
 One hypothesis for diminished relative performance during upswings is that 
 the AR model tends to overpredict downswings and underpredict upswings. Adding
-indicators seems to help avoid this behavior on the downswing but not as much 
+indicators appears to help avoid this behavior on the downswing but not as much 
 on upswings. Figure \ref{fig:upswing-corr-table} shows the correlation between
 between $\WIS(AR) - \WIS(F)$ and the difference of their median forecasts.
 During 
@@ -169,7 +175,7 @@ Currently, both figures are in the manuscript. Probably just need text here.
 In this section, we investigate the sensitivity of the results to the
 period over which we train and evaluate the models.  In the main
 paper, we end all evaluation on December 31, 2020.  Figures
-\ref{fig:fcast-alldates} -- \ref{fig:hot-alldates} show how the
+\ref{fig:fcast-alldates}--\ref{fig:hot-alldates} show how the
 results would differ if we extended this analysis through March
   31, 2021. Comparing Figure \ref{fig:fcast-alldates} to Figure 3 of
 the main paper, one sees that as ahead increases most methods now improve
@@ -181,16 +187,7 @@ These changes are likely due to the differing nature of the pandemic
 in 2021, with flat and downward trends much more common than upward
 trajectories.  Indeed, the nature of the hotspot prediction problem is
 quite different in this period.  With a 21-day training window, it is
-common for there to be very few hotspots in training.
-
-\section{Deprecated}
-
-There are a few blocks at the bottom (figures with Google symptoms only and the
-old trajectory plots) that we can remove once we decide.
-
-
-
-
+common for there to be many fewer hotspots in training.
 
 
 
