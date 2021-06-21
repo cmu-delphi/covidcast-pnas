@@ -218,7 +218,15 @@ largely similar to the pattern in leadingness described in the manuscript: the
 relationship is strongest in down periods and weakest in up periods with the
 strength diminishing as we move from down to flat to up for all indicators. 
 
-
+In calculating the CCF and the associated leadingness and laggingness scores, we
+have used the finalized data, and we look at the behavior when $t$ is the
+target date of the forecast. That is we are using the same data to
+evaluate predictive accuracy as to determine
+leadingness and laggingness. It should be noted that the leadingness of the
+indicator at the time the model is trained may also be important. Thus, we could
+calculate separate leadningness and laggingness scores for the trained model and
+for the evaluation data and examine their combination in some way. We do not
+pursue this combination further and leave this question for future work.
 
 
 
