@@ -286,23 +286,39 @@ df_raw_hospitalizations =
 df_hospitalizations = postprocess_hhs_hosp_df(df_raw_hospitalizations, "state", state_populations)
 
 ## Consider only state-like jurisdictions for which all signals of interest have at least 50 rows:
-geo_values = unique(df_hospitalizations$geo_value)
+hosp_geo_values = unique(df_hospitalizations$geo_value)
 for (i in seq_along(HOSP_SIGNALS)) {
-  geo_values = intersect(geo_values, df_hosp_signals[[i]] %>% count(geo_value) %>% filter(n > 50) %>% pull(geo_value))
+  hosp_geo_values = intersect(hosp_geo_values, df_hosp_signals[[i]] %>% count(geo_value) %>% filter(n > 50) %>% pull(geo_value))
 }
 
 cat('Number of unique jurisdictions included:\n')
-length(geo_values)
+length(hosp_geo_values)
+```
+
+```{r hosp-correlation-instances}
+## Find common set of (geo_value, time_value) instances across all signals:
+hosp_common_instances =
+  select(df_hospitalizations, geo_value, time_value) %>%
+  filter(geo_value %in% hosp_geo_values)
+
+for (i in seq_along(HOSP_SIGNALS)) {
+  hosp_common_instances <- inner_join(hosp_common_instances,
+                                      select(df_hosp_signals[[i]], geo_value, time_value),
+                                      by=c("geo_value","time_value"))
+}
+
+cat('Number of common instances among all signals of interest:\n')
+nrow(hosp_common_instances)
 ```
 
 Correlations sliced by time (geo-wise correlation):
-```{r hosp-correlations-by-time, fig.cap="Geo-wise correlations with hospitalization rates derived from HHS data, from April 15, 2020 to April 15, 2021, calculated for all times with sufficient available data within this period, over all state-like jurisdictions for which each signal was reported on at least 50 days during this period."}
+```{r hosp-correlations-by-time, fig.cap="Geo-wise correlations with hospitalization rates derived from HHS data, from April 15, 2020 to April 15, 2021, calculated for all times with sufficient available data within this period, over all state-like jurisdictions for which each signal was reported on at least 50 days during this period, limited to state-day combinations for which all signals of interest are available."}
 n_hosp_signals = length(HOSP_SIGNALS)
 df_list_hosp_geowise_cor = vector("list", n_hosp_signals)
 for (i in 1:n_hosp_signals) {
   df_list_hosp_geowise_cor[[i]] = covidcast_cor(
-    df_hosp_signals[[i]] %>% filter(geo_value %in% geo_values),
-    df_hospitalizations %>% filter(geo_value %in% geo_values),
+    df_hosp_signals[[i]] %>% inner_join(hosp_common_instances, by=c("geo_value","time_value")),
+    df_hospitalizations %>% inner_join(hosp_common_instances, by=c("geo_value","time_value")),
     by = "time_value", method = "spearman"
   )
   df_list_hosp_geowise_cor[[i]]$signal = hosp_names[[i]]
@@ -322,12 +338,12 @@ ggplot(df_long_hosp_geowise_cor, aes(x = time_value, y = value)) +
 ```
 
 Correlations sliced by state (time-series correlation)
-```{r hosp-correlations-by-state, fig.cap="Time-wise correlations with hospitalization rates derived from HHS data, from April 15, 2020 to April 15, 2021, calculated over all state-like jurisdictions for which each signal was reported on at least 50 days during this period."}
+```{r hosp-correlations-by-state, fig.cap="Time-wise correlations with hospitalization rates derived from HHS data, from April 15, 2020 to April 15, 2021, calculated over all state-like jurisdictions for which each signal was reported on at least 50 days during this period, limited to state-day combinations for which all signals of interest are available."}
 df_list_hosp_timewise_cor = vector("list", length(HOSP_SIGNALS))
 for (i in seq_along(HOSP_SIGNALS)) {
   df_list_hosp_timewise_cor[[i]] = covidcast_cor(
-    df_hosp_signals[[i]] %>% filter(geo_value %in% geo_values),
-    df_hospitalizations %>% filter(geo_value %in% geo_values),
+    df_hosp_signals[[i]] %>% inner_join(hosp_common_instances, by=c("geo_value","time_value")),
+    df_hospitalizations %>% inner_join(hosp_common_instances, by=c("geo_value","time_value")),
     by = "geo_value", method = "spearman"
   )
   df_list_hosp_timewise_cor[[i]]$signal = hosp_names[[i]]
