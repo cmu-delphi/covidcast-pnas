@@ -250,7 +250,7 @@ activity.
 
 \paragraph{Mobility Data} SafeGraph, a company that collects geospatial data
 from smartphone apps, calculates COVID-related mobility signals
-\cite{SafeGraphSocial, SafeGraphPatterns} and makes it available to researchers 
+\cite{SafeGraphSocial, SafeGraphPatterns} and makes them available to researchers
 under a data use agreement; we aggregate (some of) these signals to the county
 level and make them publicly available.     
 
@@ -443,7 +443,7 @@ numerous analyses studying the impacts of COVID-19 on the public, the
 effectiveness of policy interventions, and factors that influenced the spread of
 the pandemic \cite{Adjodah:2021, Pierri:2021, Jewell:2021, Chakrabarti:2020,
   Doerr:2021}. The API currently serves hundreds of thousands of requests to
-thousands of users every day.
+hundreds of users every day.
 
 In what follows, we present examples of the usefulness of some of the novel
 signals available in the API. These examples demonstrate that such indicators
@@ -472,7 +472,7 @@ confirmed cases:
   Facebook users.
 \item COVID Trends and Impact Survey CLI in the community
   (CTIS-CLI-in-community): The estimated percentage of the population who know 
-  someone in their local community that is sick, based on the same surveys.
+  someone in their local community who is sick, based on the same surveys.
 \item Quidel test positivity rate (Quidel-TPR): The percentage of positive
   results among Quidel COVID antigen tests.  
 \end{itemize}
@@ -597,7 +597,7 @@ disproportionately during holiday periods, as people are likely less willing to
 go to the doctor for more routine issues. Fortunately, in principle, the holiday
 effects in claims signals should be correctable: they are mainly due to
 \textit{overall} changes in medical seeking behavior during holiday, periods,
-and we can estimate such effects using historical claims data
+and we can estimate such effects using historical claims data.
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/time_wise_correlation.pdf}
@@ -609,20 +609,20 @@ and we can estimate such effects using historical claims data
 
 As a further example, Figure~\ref{fig:bexar_compare} displays data from Bexar
 County, Texas (which contains San Antonio) during July 2020. On July 16, 2020,
-4,810 backlogged cases were reported after reporting problems prevented them
-from being reported over the past two weeks \cite{Palacios:2021}, resulting in a
-clearly visible spike in the left-hand panel of Figure~\ref{fig:bexar_compare}
-(case data from JHU CSSE, smoothed using a 7-day trailing average).  Meanwhile,
-Delphi's COVID Trends and Impact Survey averaged around 350 responses per day in
-Bexar County over the same time period, and was able to estimate the fraction of
-the population who know someone in their community with COVID-Like Illness
-(CLI). As we can see in the right-hand panel of Figure~\ref{fig:bexar_compare},
-this signal was not affected by Bexar County's reporting problems and, as shown
-in the last subsection, it is (in general) highly correlated with case rates,
-providing an alternate stream of data about COVID activity unaffected by
-backlogs. Similar reporting problems have occurred in many jurisdictions across
-the United States, making it valuable to cross-check against external sources
-not part of the same reporting systems.
+San Antonio reported 4,810 backlogged cases after reporting problems prevented
+them from being reported over the past two weeks \cite{Palacios:2021}, resulting
+in a clearly visible spike in the left-hand panel of
+Figure~\ref{fig:bexar_compare} (case data from JHU CSSE, smoothed using a 7-day
+trailing average). Meanwhile, Delphi's COVID Trends and Impact Survey averaged
+around 350 responses per day in Bexar County over the same time period, and was
+able to estimate the fraction of the population who know someone in their
+community with COVID-Like Illness (CLI). As we can see in the right-hand panel
+of Figure~\ref{fig:bexar_compare}, this signal was not affected by Bexar
+County's reporting problems and, as shown in the last subsection, it is (in
+general) highly correlated with case rates, providing an alternate stream of
+data about COVID activity unaffected by backlogs. Similar reporting problems
+have occurred in many jurisdictions across the United States, making it valuable
+to cross-check against external sources not part of the same reporting systems.
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/bexar_compare.pdf}
@@ -728,7 +728,7 @@ features and capabilities.) These signals have already supported pandemic
 research and  policy-making.
 
 Third, the underlying database tracks all revisions made to the data, allowing
-us to query the API to learn ``what was known when'', which is critical for
+us to query the API to learn ``what was known when,'' which is critical for
 understanding the behavior (and potential pitfalls) of real-time surveillance
 signals. Such revision data is rarely available in standardized format from
 other sources.
