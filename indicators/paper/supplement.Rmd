@@ -13,7 +13,6 @@ params:
 <!-- PNAS materials -->
 
 <!-- Comment out or remove this line before generating final copy for submission; this will also remove the warning re: "Consecutive odd pages found". -->
-\instructionspage
 
 
 
@@ -21,16 +20,6 @@ params:
 \maketitle
 
 <!-- Adds the main heading for the SI text. Comment out this line if you do not have any supporting information text. -->
-
-\SItext
-
-All our text goes here. Reference figures with the R chuck label as Figure~\ref{fig:fcast-finalized}.
-
-All figures go on their own page after all of the text...
-
-Edit `pnas-suppl-template.tex` for the correct Author list and Title.
-
-
 
 
 ```{r setup, include=FALSE}
