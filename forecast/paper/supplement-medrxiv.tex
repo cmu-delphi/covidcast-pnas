@@ -1,0 +1,218 @@
+
+
+
+\input{supplement-text.tex}
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/fcast-finalized-1} 
+
+}
+
+\caption{Forecasting performance using finalized data. Compare to Figure 3 in the manuscript.}\label{fig:fcast-finalized}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/hot-finalized-1} 
+
+}
+
+\caption{Hotspot prediction performance using finalized data. Compare to Figure 4 in the manuscript.}\label{fig:hot-finalized}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/fcast-honest-v-finalized-1} 
+
+}
+
+\caption{Relative forecast WIS with vintage compared to finalized data. Using finalized data leads to overly optimistic performance.}\label{fig:fcast-honest-v-finalized}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/hot-honest-v-finalized-1} 
+
+}
+
+\caption{Relative AUC with vintage compared to finalized data. Using finalized data leads to overly optimistic hotspot performance.}\label{fig:hot-honest-v-finalized}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/wis-densities-1} 
+
+}
+
+\caption{Weighted interval score appears to more closely resemble a log-Gaussian distribution.}\label{fig:wis-densities}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/fcast-adjusted-1} 
+
+}
+
+\caption{Relative forecast performance using vintage data and summarizing with the more robust geometric mean.}\label{fig:fcast-adjusted}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/fcast-booted-1} 
+
+}
+
+\caption{Forecast performance when indicators are replaced with samples from their empirical distribution. Performance is largely similar to the AR model.}\label{fig:fcast-booted}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/fcast-booted-adjusted-1} 
+
+}
+
+\caption{Forecast performance as measured with the geometric mean when indicators are replaced with samples from their empirical distribution. Performance is largely similar to the AR model.}\label{fig:fcast-booted-adjusted}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/hot-booted-1} 
+
+}
+
+\caption{Hotspot prediction performance when indicators are replaced with samples from their empirical distribution. Performance is largely similar to the AR model.}\label{fig:hot-booted}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/upswing-summary-1} 
+
+}
+
+\caption{Average difference between the WIS of the AR model and the WIS of the other forecasters. The indicator-assisted forecasters do best during down and flat periods.}\label{fig:upswing-summary}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/hotspots-upswing-downswing-1} 
+
+}
+
+\caption{Classification and loglikelihood separated into periods of upswing, downswing, and flat cases. Like the analysis of the forecasting task in the main paper (see Figure 7), performance is better during down and flat periods.}\label{fig:hotspots-upswing-downswing}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/cor-wis-ratio-1} 
+
+}
+
+\caption{Histograms of the Spearman correlation between the ratio of AR to AR WIS with the percent change in smoothed case rates relative to 7 days earlier.}\label{fig:cor-wis-ratio}
+\end{figure}
+
+\clearpage
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/upswing-corr-table-1} 
+
+}
+
+\caption{Correlation of the difference in WIS with the difference in median predictions for the AR model relative to the indicator-assisted forecaster. In down periods, improvements in forecast risk are highlycorrelated with lower median predictions. The opposite is true in up periods. This suggests, as one might expect that improved performance of the indicator-assisted model is attributable to being closer to the truth then the AR model. This conclusion is stronger in down periods then in up periods.}\label{fig:upswing-corr-table}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/ccf-dv-finalized-1} 
+
+}
+
+\caption{Illustration of the cross-correlation function between DV-CLI and cases. The left panel shows the standardized signals over the period from August 1 to September 28 (as of May 15, 2021). The right panel shows $\CCF_{\ell}(a)$ for different values of $a$ as vertical blue bars. The orange dashed lines indicate the 95\% significance threshold. By our leadingness/laggingness metric, DV-CLI is leading (but notlagging) cases over this period.}\label{fig:ccf-dv-finalized}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/lagging-only-1} 
+
+}
+
+\caption{Correlation of the difference in WIS with the  laggingness of the indicator at the target date, stratified by up, down, or flat period. Compare to Figure 5 in the manuscript.}\label{fig:lagging-only}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/diff-in-lead-lag-1} 
+
+}
+
+\caption{Correlation of the difference between leadingness and laggingness with the difference in WIS. The relationship is essentially the same as described in the manuscript and shown in Figure 5.}\label{fig:diff-in-lead-lag}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/fcast-alldates-1} 
+
+}
+
+\caption{Forecast performance over all periods. Performance largely improves for all forecasters with the inclusion of data in 2021.}\label{fig:fcast-alldates}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/fcast-alldates-adjusted-1} 
+
+}
+
+\caption{Forcast performance over all periods aggregaged with the geometric mean. Again, the inclusion of data in 2021 leads to improved performance.}\label{fig:fcast-alldates-adjusted}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/hot-alldates-1} 
+
+}
+
+\caption{Area under the curve for hotspot predictions including data in 2021. Performance degrades relative to the period in 2020. However, there are far fewer hotspots during this period as case rates declined in much of the country.}\label{fig:hot-alldates}
+\end{figure}
+
+
+
+%\bibliography{../../common/covidcast.bib,pnas-materials/pnas-sample.bib}
+
