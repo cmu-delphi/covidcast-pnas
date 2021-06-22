@@ -3,7 +3,7 @@
 \section{Examining the relative advantage of using finalized rather than vintage data}
 
 The goal of this section is to quantify the effect of
-not properly accounting for the question of "what was known when" in
+not properly accounting for the question of ``what was known when'' in
 performing retrospective evaluations of forecasters.   Figures
 \ref{fig:fcast-finalized} and \ref{fig:hot-finalized} show 
 what Figures 3 and 4 in the main paper would have looked like if we
@@ -170,63 +170,73 @@ in the correct direction, for example, narrower confidence intervals.
 
 In Section 2.D of the main text, we discuss the extent to which the indicators
 are leading or lagging case rates during different periods. To define the amount
-of leadingness or laggingness, we use the cross correlation function (CCF)
-between the two time series. The CCF is of an indicator $X_{\ell,t}$ and case
-rates $Y_{\ell,t}$ is defined as
-\[
-\CCF_{\ell,t}(a) = \frac{1}{n_a} \sum_{i=1}^{n_a} \left( ( X_{\ell,t,i+a} -
-  \overline{X}_{\ell,t}) / s^{X}_{\ell,t}\right) \left( ( Y_{\ell,t,i} -
-  \overline{Y}_{\ell,t}) / s^{Y}_{\ell,t}\right), 
-\]
-where $n_a$ is the number of available time points when $X_{\ell,t}$ has been
-shifted in time by $a$ days, and $\overline{X}_{\ell,t}$, $s^X_{\ell,t}$
-are the sample mean and
-standard deviation of $X_{\ell,t}$ (respectively $Y_{\ell,t}$). The result is a
-sequence of Pearson correlations for each selected $a$, where we align
-$X_{\ell,t}$ with the values of $Y_{\ell,t}$ that occurred $a$ days earlier.
-Thus, for $a>0$, $\CCF_{\ell,t}(a)>0$ indicates that
-$Y_{\ell,t}$ is moving together with the values of $X_{\ell,t}$ that occur $a$
-days in the future. In this case we say that $X_{\ell,t}$ is lagging
-$Y_{\ell,t}$. For $a<0$, $\CCF_{\ell,t}(a)>0$ means that $Y_{\ell,t}$ is
-positively correlated with $X_{\ell,t}$ shifted earlier, so we say that
-$X_{\ell,t}$ leads $Y_{\ell,t}$.
+of leadingness or laggingness at location $\ell$, we use the cross correlation
+function (CCF) 
+between the two time series. The $\CCF_\ell(a)$ of an indicator $X_{\ell}$ and case
+rates $Y_{\ell}$ is defined as
+% \[
+% \CCF_{\ell,t}(a) = \frac{1}{n_a} \sum_{i=1}^{n_a} \left( ( X_{\ell,t,i+a} -
+%   \overline{X}_{\ell,t}) / s^{X}_{\ell,t}\right) \left( ( Y_{\ell,t,i} -
+%   \overline{Y}_{\ell,t}) / s^{Y}_{\ell,t}\right), 
+% \]
+% where $n_a$ is the number of available time points when $X_{\ell,t}$ has been
+% shifted in time by $a$ days, and $\overline{X}_{\ell,t}$, $s^X_{\ell,t}$
+% are the sample mean and
+% standard deviation of $X_{\ell,t}$ (respectively $Y_{\ell,t}$). The result is a
+their Pearson correlation where $X_\ell$ has been
+% sequence of Pearson correlations for each selected $a$, where we
+aligned
+with the values of $Y_{\ell}$ that occurred $a$ days earlier.
+Thus, for any $a>0$, $\CCF_{\ell}(a)>0$ indicates that
+$Y_{\ell,t}$ is moving together with $X_{\ell,t+a}$.
+% days in the future.
+In this case we say that $X_{\ell}$ is lagging
+$Y_{\ell}$. For $a<0$, $\CCF_{\ell}(a)>0$ means that $Y_{\ell,t}$ is
+positively correlated with $X_{\ell,t-a}$, so we say that
+$X_{\ell}$ leads $Y_{\ell}$.
 
 Figure \ref{fig:ccf-dv-finalized} shows the standardized signals for the HRR
 containing Charlotte, North Carolina, from August 1, 2020 until the end of
-September. These are the same signals shown in Figure 1 in the manuscript. To
-define ``leadingness'' we compute $\CCF_{\ell,t}(a)$ for each $a\in
-\{-15,\ldots,15\}$ using the 56 days leading up to time $t$ (this is the same
+September. These are the same signals shown in Figure 1 in the manuscript but
+using finalized data. To
+define ``leadingness'' we compute $\CCF_{\ell}(a)$ (as implemented with the R
+function {\tt ccf()}) for each $a\in
+\{-15,\ldots,15\}$ using the 56 days leading up to the target date. This is the same
 amount of data used to train the forecasters: 21 days of training data, 21 days
-to get the response at $a=21$, and 14 days for the longest lagged value). The
-orange dashed horizontal line represents the 97.5\% significance threshold for
+to get the response at $a=21$, and 14 days for the longest lagged value. The
+orange dashed horizontal line represents the 95\% significance threshold for
 correlations based on 56 observations. Any correlations larger in magnitude than
 this value are considered statistically significant under the null hypothesis of
 no relationship. We define leadingness to be the sum of the significant
 correlations that are leading (those above the dashed line with $a<0$) while
-laggingness is the same but for $a>0$. In this case, there are no significant
-correlations, so both scores will be 0: on September 28, \dv~is neither
-leading nor lagging cases.
+laggingness is the same but for $a>0$. In the figure, there are three
+significant correlations on the ``leading'' side (at $a = -5, -4, -3$), so
+leadingness will be the sum of those values while laggingness is 0:
+%correlations, so both scores will be 0:
+on September 28 in Charlotte, \dv~is leading cases
+leading but not lagging.
 
 Figure \ref{fig:lagging-only} shows the correlation between laggingness and the
 difference in indicator WIS and AR WIS. Unlike leadingness (Figure 5 in the
-manuscript) there is no obvious relationship. This is heartening as laggingness
+manuscript) there is no obvious relationship that holds consistently
+across indicators. This is heartening as laggingness
 should not aid forecasting performance. On the other hand, if an indicator is
 more lagging than it is leading, this may suggest diminished performance.
 Figure~\ref{fig:diff-in-lead-lag} shows the correlation of the difference in
 leadingness and laggingness with the difference in WIS. The pattern here is
 largely similar to the pattern in leadingness described in the manuscript: the
 relationship is strongest in down periods and weakest in up periods with the
-strength diminishing as we move from down to flat to up for all indicators. 
+strength diminishing as we move from down to flat to up for all indicators.
 
 In calculating the CCF and the associated leadingness and laggingness scores, we
-have used the finalized data, and we look at the behavior when $t$ is the
+have used the finalized data, and we look at the behavior at the 
 target date of the forecast. That is we are using the same data to
 evaluate predictive accuracy as to determine
 leadingness and laggingness. It should be noted that the leadingness of the
 indicator at the time the model is trained may also be important. Thus, we could
-calculate separate leadningness and laggingness scores for the trained model and
+calculate separate leadingness and laggingness scores for the trained model and
 for the evaluation data and examine their combination in some way. We do not
-pursue this combination further and leave this question for future work.
+pursue this combination further and leave this investigation for future work.
 
 
 

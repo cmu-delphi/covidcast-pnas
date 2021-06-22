@@ -579,7 +579,7 @@ lead_lag <- function(x, y, lag.max = NULL, na.len = 14) {
     return(c(leading = NA, lagging = NA))
   }
   out <- ccf(x, y, lag.max = lag.max, plot = FALSE, na.action = na.omit)
-  clim <- qnorm((1 + .95) / 2) / sqrt(out$n.used)
+  clim <- qnorm((1 + .9) / 2) / sqrt(out$n.used)
   lag_vec <- drop(out$lag)
   cc <- drop(out$acf)
   cc <- cc * (cc > clim)
@@ -691,7 +691,7 @@ df2 %>%
   theme(legend.position = "bottom", legend.title = element_blank())
 ```
 
-```{r ccf-dv-finalized, eval=TRUE, fig.cap="Illustration of the cross-correlation function between DV-CLI and cases. The left panel shows the standardized signals over the period from August 1 to September 28 (as of September 28, 2020). The right panel shows $\\CCF(a)$ for different values of $a$ as vertical blue bars. The orange dashed lines indicate the 95\\% significance threshold. By our leadingness metric, DV-CLI is neither leading nor lagging cases over this period."}
+```{r ccf-dv-finalized, eval=TRUE, fig.cap="Illustration of the cross-correlation function between DV-CLI and cases. The left panel shows the standardized signals over the period from August 1 to September 28 (as of May 15, 2021). The right panel shows $\\CCF_{\\ell}(a)$ for different values of $a$ as vertical blue bars. The orange dashed lines indicate the 95\\% significance threshold. By our leadingness/laggingness metric, DV-CLI is leading (but notlagging) cases over this period."}
 source("../code/ccf-dv-finalized.R")
 gg
 ```
