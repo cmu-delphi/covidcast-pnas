@@ -3,7 +3,7 @@ sigs <- covidcast_signals(
   signal = c("confirmed_7dav_incidence_prop", "smoothed_adj_cli"),
   start_day = "2020-08-01",
   end_day = "2020-09-28",
-  as_of = "2020-09-28", #2020-12-21",
+  as_of = "2021-05-15", #2020-12-21",
   geo_type = "hrr",
   geo_values = "311") %>% # NYC
   aggregate_signals(format = "wide")
@@ -31,7 +31,7 @@ g1 <- std_sigs %>%
 cc <- ccf(sigs$`doctor-visits`, sigs$cases, plot = FALSE)
 g2 <- ggplot(tibble(lag = drop(cc$lag), ccf = drop(cc$acf)), aes(lag)) +
   geom_segment(aes(xend = lag, yend = ccf), y = 0, color = "cornflowerblue") +
-  geom_hline(yintercept = qnorm((1 + .95) / 2) / sqrt(cc$n.used),
+  geom_hline(yintercept = qnorm((1 + .9) / 2) / sqrt(cc$n.used),
              color = "darkorange", linetype = "dashed") +
   geom_hline(yintercept = 0) +
   geom_vline(xintercept = 0) +

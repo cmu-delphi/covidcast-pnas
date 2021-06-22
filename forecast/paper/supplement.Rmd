@@ -579,7 +579,7 @@ lead_lag <- function(x, y, lag.max = NULL, na.len = 14) {
     return(c(leading = NA, lagging = NA))
   }
   out <- ccf(x, y, lag.max = lag.max, plot = FALSE, na.action = na.omit)
-  clim <- qnorm((1 + .95) / 2) / sqrt(out$n.used)
+  clim <- qnorm((1 + .9) / 2) / sqrt(out$n.used)
   lag_vec <- drop(out$lag)
   cc <- drop(out$acf)
   cc <- cc * (cc > clim)

@@ -171,34 +171,38 @@ in the correct direction, for example, narrower confidence intervals.
 In Section 2.D of the main text, we discuss the extent to which the indicators
 are leading or lagging case rates during different periods. To define the amount
 of leadingness or laggingness, we use the cross correlation function (CCF)
-between the two time series. The CCF is of an indicator $X_{\ell,t}$ and case
-rates $Y_{\ell,t}$ is defined as
-\[
-\CCF_{\ell,t}(a) = \frac{1}{n_a} \sum_{i=1}^{n_a} \left( ( X_{\ell,t,i+a} -
-  \overline{X}_{\ell,t}) / s^{X}_{\ell,t}\right) \left( ( Y_{\ell,t,i} -
-  \overline{Y}_{\ell,t}) / s^{Y}_{\ell,t}\right), 
-\]
-where $n_a$ is the number of available time points when $X_{\ell,t}$ has been
-shifted in time by $a$ days, and $\overline{X}_{\ell,t}$, $s^X_{\ell,t}$
-are the sample mean and
-standard deviation of $X_{\ell,t}$ (respectively $Y_{\ell,t}$). The result is a
-sequence of Pearson correlations for each selected $a$, where we align
-$X_{\ell,t}$ with the values of $Y_{\ell,t}$ that occurred $a$ days earlier.
-Thus, for $a>0$, $\CCF_{\ell,t}(a)>0$ indicates that
-$Y_{\ell,t}$ is moving together with the values of $X_{\ell,t}$ that occur $a$
-days in the future. In this case we say that $X_{\ell,t}$ is lagging
-$Y_{\ell,t}$. For $a<0$, $\CCF_{\ell,t}(a)>0$ means that $Y_{\ell,t}$ is
-positively correlated with $X_{\ell,t}$ shifted earlier, so we say that
-$X_{\ell,t}$ leads $Y_{\ell,t}$.
+between the two time series. The $\CCF_\ell(a)$ of an indicator $X_{\ell}$ and case
+rates $Y_{\ell}$ is defined as
+% \[
+% \CCF_{\ell,t}(a) = \frac{1}{n_a} \sum_{i=1}^{n_a} \left( ( X_{\ell,t,i+a} -
+%   \overline{X}_{\ell,t}) / s^{X}_{\ell,t}\right) \left( ( Y_{\ell,t,i} -
+%   \overline{Y}_{\ell,t}) / s^{Y}_{\ell,t}\right), 
+% \]
+% where $n_a$ is the number of available time points when $X_{\ell,t}$ has been
+% shifted in time by $a$ days, and $\overline{X}_{\ell,t}$, $s^X_{\ell,t}$
+% are the sample mean and
+% standard deviation of $X_{\ell,t}$ (respectively $Y_{\ell,t}$). The result is a
+their Pearson correlation where $X_\ell$ has been
+% sequence of Pearson correlations for each selected $a$, where we
+aligned
+with the values of $Y_{\ell}$ that occurred $a$ days earlier.
+Thus, for any $a>0$, $\CCF_{\ell}(a)>0$ indicates that
+$Y_{\ell,t}$ is moving together with the values of $X_{\ell,t+a}$.
+% days in the future.
+In this case we say that $X_{\ell}$ is lagging
+$Y_{\ell}$. For $a<0$, $\CCF_{\ell}(a)>0$ means that $Y_{\ell,t}$ is
+positively correlated with $X_{\ell,t-a}$, so we say that
+$X_{\ell}$ leads $Y_{\ell}$.
 
 Figure \ref{fig:ccf-dv-finalized} shows the standardized signals for the HRR
 containing Charlotte, North Carolina, from August 1, 2020 until the end of
-September. These are the same signals shown in Figure 1 in the manuscript. To
-define ``leadingness'' we compute $\CCF_{\ell,t}(a)$ for each $a\in
-\{-15,\ldots,15\}$ using the 56 days leading up to time $t$ (this is the same
+September. These are the same signals shown in Figure 1 in the manuscript but
+using finalized data. To
+define ``leadingness'' we compute $\CCF_{\ell}(a)$ for each $a\in
+\{-15,\ldots,15\}$ using the 56 days leading up to the target date (this is the same
 amount of data used to train the forecasters: 21 days of training data, 21 days
 to get the response at $a=21$, and 14 days for the longest lagged value). The
-orange dashed horizontal line represents the 97.5\% significance threshold for
+orange dashed horizontal line represents the 95\% significance threshold for
 correlations based on 56 observations. Any correlations larger in magnitude than
 this value are considered statistically significant under the null hypothesis of
 no relationship. We define leadingness to be the sum of the significant
