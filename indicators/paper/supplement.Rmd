@@ -270,9 +270,6 @@ hosp_geo_values = unique(df_hospitalizations$geo_value)
 for (i in seq_along(HOSP_SIGNALS)) {
   hosp_geo_values = intersect(hosp_geo_values, df_hosp_signals[[i]] %>% count(geo_value) %>% filter(n > 50) %>% pull(geo_value))
 }
-
-cat('Number of unique jurisdictions included in correlation analysis below:\n')
-length(hosp_geo_values)
 ```
 
 ```{r hosp-correlation-instances}
@@ -286,9 +283,6 @@ for (i in seq_along(HOSP_SIGNALS)) {
                                       select(df_hosp_signals[[i]], geo_value, time_value),
                                       by=c("geo_value","time_value"))
 }
-
-cat('Number of common instances among all signals of interest in correlation analysis below:\n')
-nrow(hosp_common_instances)
 ```
 
 ```{r hosp-correlations-by-time, fig.cap="Geo-wise correlations with hospitalization rates derived from HHS data, from April 15, 2020 to April 15, 2021, calculated for all times with sufficient available data within this period, over all state-like jurisdictions for which each signal was reported on at least 50 days during this period, limited to state-day combinations for which both signals are available."}
