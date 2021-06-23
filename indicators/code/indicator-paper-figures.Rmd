@@ -1,0 +1,285 @@
+---
+title: COVIDcast Indicators figures and tables
+author: Alex Reinhart, et al.
+date: June 23, 2021
+---
+
+This code accompanies the paper "An Open Repository of Real-Time COVID-19
+Indicators" by Reinhart et al. It requires the [covidcast
+package](https://cran.r-project.org/package=covidcast) for R, plus the packages
+listed below.
+
+```{r setup, message=FALSE}
+library(covidcast)
+library(gridExtra)
+library(ggplot2)
+library(scales)
+library(dplyr)
+library(purrr)
+```
+
+This file can be knit to HTML using
+`rmarkdown::render("indicator-paper-figures.Rmd")` from within R, using the
+[rmarkdown package](https://cran.r-project.org/package=rmarkdown). By default it
+also saves publication-ready PDF versions of figures to the `../paper/fig/`
+directory.
+
+## Figure 1
+
+National trends, from April 2020 to April 2021, of four signals in the COVIDcast
+API.
+
+```{r figure-1, message=FALSE, cache=TRUE}
+SOURCES <- c("jhu-csse", "chng", "chng", "fb-survey")
+SIGNALS <- c("confirmed_7dav_incidence_prop",
+             "smoothed_adj_outpatient_cli",
+             "smoothed_adj_outpatient_covid",
+             "smoothed_wcli")
+cs <- covidcast_signals(
+  SOURCES,
+  SIGNALS,
+  "2020-04-15", "2021-04-15",
+  geo_type = "nation"
+)
+
+case_max <- max(cs[[1]]$value)
+
+rescaled <- aggregate_signals(cs, format = "long") %>%
+  group_by(signal) %>%
+  mutate(value = value / max(value, na.rm = TRUE) * case_max) %>%
+  ungroup()
+
+colors <- c("black", scales::hue_pal()(5))
+names <- c("Cases", "CHNG-CLI", "CHNG-COVID", "CTIS-CLI",
+          "CTIS-CLI-in-community", "Quidel-TPR")
+rescaled$signal <- factor(rescaled$signal, labels = names[1:4])
+
+ggplot(rescaled, aes(x = time_value, y = value, color = signal)) +
+  geom_line() +
+  scale_color_manual(breaks = names[1:4], values = colors[1:4]) +
+  labs(x = "Date", y = "Signal value (scaled)") +
+  scale_x_date(date_breaks = "3 months", date_labels = "%b %Y",
+               date_minor_breaks = "1 month") +
+  theme_bw() +
+  theme(legend.position = "bottom", legend.title = element_blank())
+
+ggsave("../paper/fig/time_trends_national.pdf", width = 5, height = 3)
+```
+
+# Figure 2
+
+Geo-wise correlations with case rates, from April 15, 2020 to April 15, 2021,
+calculated over all counties for which all signals were available and which had
+at least 500 cumulative cases by the end of this period.
+
+First, we fetch the required data from the API. This may take a while, since it
+fetches the entire county-level history of several signals with large coverage.
+
+```{r figure-2-fetch, message=FALSE, warning=FALSE, cache=TRUE}
+sources <- c("chng", "chng", "fb-survey", "fb-survey", "quidel")
+signals <- c("smoothed_adj_outpatient_cli",
+             "smoothed_adj_outpatient_covid",
+             "smoothed_cli",
+             "smoothed_whh_cmnty_cli",
+             "covid_ag_smoothed_pct_positive")
+
+start_day <- "2020-04-15"
+end_day <- "2021-04-15"
+as_of_day <- "2021-06-01"
+
+df_signals <- vector("list", length(signals))
+for (i in seq_along(signals)) {
+  df_signals[[i]] <- covidcast_signal(sources[i], signals[i], start_day,
+                                      end_day, as_of = as_of_day)
+}
+
+# Fetch JHU-CSSE confirmed case incidence proportion (smoothed with 7-day
+# trailing average)
+df_cases <- covidcast_signal("jhu-csse", "confirmed_7dav_incidence_prop",
+                             start_day, end_day, as_of = as_of_day)
+n <- length(signals)
+```
+
+Next, we find counties with at least 500 cumulative cases.
+
+```{r figure-2-counties, message=FALSE, cache=TRUE}
+case_num <- 500
+geo_values <- covidcast_signal("jhu-csse", "confirmed_cumulative_num",
+                               max(df_cases$time_value),
+                               max(df_cases$time_value),
+                               as_of = as_of_day) %>%
+  filter(value >= case_num) %>%
+  pull(geo_value)
+
+for (i in seq_along(signals)) {
+  geo_values <- intersect(geo_values, df_signals[[i]]$geo_value)
+}
+
+colors <- c("black", scales::hue_pal()(5))
+names <- c("Cases", "CHNG-CLI", "CHNG-COVID", "CTIS-CLI",
+           "CTIS-CLI-in-community", "Quidel-TPR")
+```
+
+There are `r length(geo_values)` counties that have at least 500 cumulative
+cases and have measurements for all the signals desired.
+
+```{r figure-2, cache=TRUE}
+df_cor <- vector("list", n)
+for (i in 1:n) {
+  df_cor[[i]] <- covidcast_cor(df_signals[[i]] %>%
+                                 filter(geo_value %in% geo_values),
+                               df_cases %>%
+                                 filter(geo_value %in% geo_values),
+                               by = "time_value", method = "spearman")
+  df_cor[[i]]$signal <- names[i]
+}
+
+df <- do.call(rbind, df_cor)
+df$signal <- factor(df$signal, labels = names[2:6])
+
+ggplot(df, aes(x = time_value, y = value)) +
+  geom_line(aes(color = signal)) +
+  scale_color_manual(breaks = names[2:6], values = colors[2:6]) +
+  ylim(0, NA) +
+  labs(x = "Date", y = "Correlation") +
+  scale_x_date(date_breaks = "3 months", date_labels = "%b %Y",
+               date_minor_breaks = "1 month") +
+  theme_bw() +
+  guides(col = guide_legend(nrow = 2)) +
+  theme(legend.position = "bottom", legend.title = element_blank())
+
+ggsave("../paper/fig/geo_wise_corr.pdf", width = 5, height = 3.5)
+```
+
+## Figure 3
+
+Time-wise correlations with case rates, from April 15, 2020 to April 15, 2021.
+
+```{r figure-3, warning=FALSE, cache=TRUE}
+df_cor <- vector("list", length(signals))
+
+for (i in seq_along(signals)) {
+  df_cor[[i]] <- covidcast_cor(df_signals[[i]] %>%
+                                 filter(geo_value %in% geo_values),
+                               df_cases %>%
+                                 filter(geo_value %in% geo_values),
+                               by = "geo_value", method = "spearman")
+  df_cor[[i]]$signal <- names[i]
+}
+
+df <- do.call(rbind, df_cor)
+df$signal <- factor(df$signal, labels = names[2:6])
+
+ggplot(df, aes(value)) +
+  geom_density(aes(color = signal, fill = signal), alpha = 0.4) +
+  labs(x = "Correlation", y = "Density") +
+  scale_color_manual(breaks = names[2:6], values = colors[2:6]) +
+  scale_fill_manual(breaks = names[2:6], values = colors[2:6]) +
+  theme_bw() +
+  guides(col = guide_legend(nrow = 2)) +
+  theme(legend.position = "bottom", legend.title = element_blank())
+
+ggsave("../paper/fig/time_wise_correlation.pdf", width = 5, height = 3.5)
+```
+
+## Figure 4
+
+```{r figure-4, message=FALSE, cache=TRUE}
+sa_fips <- "48029"
+sa_start <- "2020-06-15"
+sa_end <- "2020-08-15"
+sa_anomaly_date <- as.Date("2020-07-16")
+
+sa_cases <- covidcast_signal("jhu-csse", "confirmed_7dav_incidence_num",
+                             sa_start, sa_end, geo_values = sa_fips)
+
+sa_cli <- covidcast_signal("fb-survey", "smoothed_whh_cmnty_cli",
+                            sa_start, sa_end, geo_values = sa_fips)
+
+g1 <- ggplot(sa_cases, aes(x = time_value, y = value)) +
+  geom_vline(xintercept = sa_anomaly_date, color = "gray", linetype = "dashed",
+             size = 0.75, alpha = 0.75) +
+  geom_line() +
+  labs(x = "", y = "Cases", title = "Cases") +
+  theme_bw()
+
+g2 <- ggplot(sa_cli, aes(x = time_value, y = value)) +
+  geom_vline(xintercept = sa_anomaly_date, color = "gray", linetype = "dashed",
+             size = 0.75, alpha = 0.75) +
+  geom_line() +
+  labs(x = "", y = "% CLI-in-community", title = "CTIS-CLI-in-community") +
+  scale_y_continuous(labels = label_percent(scale = 1, accuracy = 1),
+                     limits = c(NA, 75)) +
+  theme_bw()
+
+grid.arrange(g1, g2, ncol = 2)
+
+g <- arrangeGrob(g1, g2, ncol = 2)
+
+ggsave("../paper/fig/bexar_compare.pdf", g, width = 6, height = 4)
+```
+
+## Figure 5
+
+Estimated percentage of doctor's visits due to COVID-like illness displayed
+across multiple issue dates, with later issue dates adding additional data and
+revising past data from prior issue dates.
+
+```{r figure-5, message=FALSE, warning=FALSE, cache=TRUE}
+as_ofs <- seq(as.Date("2020-06-08"), as.Date("2020-08-01"), by = "week")
+states <- c("az", "ca", "ny", "tx")
+dv_as_of <- map_dfr(as_ofs, function(as_of) {
+  covidcast_signal(data_source = "doctor-visits", signal = "smoothed_adj_cli",
+                   start_day = "2020-06-01", end_day = as_of - 1L,
+                   geo_type = "state", geo_values = states, as_of = as_of) %>%
+    mutate(as_of = as_of)
+})
+
+## Now plot the each "as of" time series curve, faceted by state
+dv_as_of %>%
+  mutate(geo_label = factor(
+    geo_value, levels = states,
+    labels = abbr_to_name(states, ignore.case = TRUE))) %>%
+  mutate(as_of = factor(format(as.Date(as_of), "%b %d"))) %>%
+  ggplot(aes(x = time_value, y = value, color = as_of)) +
+  geom_line() +
+  facet_wrap(vars(geo_label), nrow = 2) +
+  labs(color = "As of:", x = "Date", y = "% doctor's visits due to CLI") +
+  expand_limits(y = 0) +
+  scale_y_continuous(labels = label_percent(scale = 1, accuracy = 1),
+                     breaks = seq(0, 12, by = 4)) +
+  theme_bw() +
+  theme(legend.pos = "bottom", legend.direction = "horizontal")
+
+ggsave("../paper/fig/dv_as_of.pdf", width = 5, height = 4)
+```
+
+## Figure 6
+
+Percentage point increase in SafeGraph estimates of the percentage of people
+staying completely at home, based on aggregated mobile device data, between
+March 1, 2020 and April 15, 2020.
+
+```{r figure-6, message=FALSE, cache=TRUE}
+begin_date <- "2020-03-01"
+end_date <- "2020-04-15"
+
+begin_data <- covidcast_signal("safegraph", "completely_home_prop_7dav",
+                               begin_date, begin_date, geo_type = "state")
+end_data <- covidcast_signal("safegraph", "completely_home_prop_7dav",
+                             end_date, end_date, geo_type = "state")
+
+diffs <- begin_data %>%
+  inner_join(end_data, by = "geo_value", suffix = c(".begin", ".end")) %>%
+  mutate(value = 100 * (value.end - value.begin)) %>%
+  select(data_source = data_source.end, signal = signal.end, geo_value, value, issue = issue.end) %>%
+  mutate(time_value = end_date) %>%
+  as.data.frame %>%
+  as.covidcast_signal(signal = "safegraph-change",
+                      geo_type = "state")
+
+plot(diffs, plot_type = "choro", range = c(10, 30),
+     title = "", choro_params = list(legend_n = 5))
+
+ggsave("../paper/fig/mobility-drop.pdf", width = 5, height = 4)
+```
