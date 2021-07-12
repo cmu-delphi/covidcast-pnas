@@ -1,10 +1,21 @@
-\documentclass[9pt,twocolumn,twoside,lineno]{pnas-new}
+\documentclass[11pt]{article}
 % Use the lineno option to display guide line numbers if required.
 
-\templatetype{pnasresearcharticle} % Choose template
+% \templatetype{pnasresearcharticle} % Choose template
 % {pnasresearcharticle} = Template for a two-column research article
 % {pnasmathematics} %= Template for a one-column mathematics article
 % {pnasinvited} %= Template for a PNAS invited submission
+
+\usepackage{authblk}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage[numbers,square,sort&compress]{natbib}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{array}
+\usepackage{lscape}
 
 \input{../../common/prelim.tex}
 
@@ -109,55 +120,60 @@
 \affil[t]{Heinz College of Information Systems and Public Policy, Carnegie
   Mellon University}
 
-% Please give the surname of the lead author for the running footer
-\leadauthor{Reinhart}
-
 % Please add a significance statement to explain the relevance of your work
-\significancestatement{To study the COVID-19 pandemic, its effects on society,
-  and measures for reducing its spread, researchers need detailed data on the
-  course of the pandemic. Standard public health data streams suffer
-  inconsistent reporting and frequent, unexpected revisions. They also miss
-  other aspects of a population's behavior that are worthy of consideration. We
-  present an open database of COVID signals in the United States, measured at
-  the county level and updated daily. This includes traditionally reported COVID
-  cases and deaths, and many others: measures of mobility, social distancing,
-  internet search trends, self-reported symptoms, and patterns of COVID-related
-  activity in de-identified medical insurance claims. The database provides all
-  signals in a common, easy-to-use format, empowering both public health
-  research and operational decision-making.
-}
+% \significancestatement{To study the COVID-19 pandemic, its effects on society,
+%   and measures for reducing its spread, researchers need detailed data on the
+%   course of the pandemic. Standard public health data streams suffer
+%   inconsistent reporting and frequent, unexpected revisions. They also miss
+%   other aspects of a population's behavior that are worthy of consideration. We
+%   present an open database of COVID signals in the United States, measured at
+%   the county level and updated daily. This includes traditionally reported COVID
+%   cases and deaths, and many others: measures of mobility, social distancing,
+%   internet search trends, self-reported symptoms, and patterns of COVID-related
+%   activity in de-identified medical insurance claims. The database provides all
+%   signals in a common, easy-to-use format, empowering both public health
+%   research and operational decision-making.
+% }
 
 % Please include corresponding author, author contribution and author declaration information
 % Googlers: SA, SC, DCF, JG, KH, RH, PM, MPO, CS, BYS, BW, SW
-\authorcontributions{Author contributions: A.R., L.B., M.J., A.R., J.T., A.C,
-  E.J.C., N.D., A.J.H., S.H., M.J., J.K., W.L.M.K, Z.C.L., L.M., N.L.O.,
-  J.C.W, R.R., and R.J.T. obtained and managed data;
-  A.R., J.B., J.F., Z.C.L., L.M., D.J.M., A.P., S.R., D.R., N.S., R.T.,
-  V.V., L.W., J.C.W, R.R., and R.J.T. designed software and
-  research;
-  A.R., L.B., M.J., A.R., J.T., W.A.S., T.A., A.B., J.B., L.B., A.A.C., A.C.,
-  E.J.C., B.C., N.D., S.G., A.G., G.H., R.H., A.J.H.,
-  S.H., M.J., A.J., J.K., A.K., M.X.L., L.M., K.M., D.J.M., B.N.,
-  N.L.O., P.P., C.A.P., S.R., V.S, J.S, D.S., N.S., V.S., S.T.,
-  J.T., R.T., J.C.W, and R.J.T. developed software;
-  W.A.S., A.C., B.C., S.G., G.H., K.M., D.J.M., B.N., J.S.,
-  D.S., and A.K.V.N. managed technical infrastructure and systems;
-  A.R., L.B., M.J., A.R., J.T, J.B., A.C., E.J.C., N.D.,  A.G.,
-  A.J.H., R.H., S.H., A.J., J.K., K.L., Y.J.L, Z.C.L., L.M., D.J.M., B.N.,
-  N.L.O., P.P., C.A.P., S.R., N.S., V.S., J.S., D.S., N.S., S.T., J.T., R.T.,
-  V.V., L.W., J.C.W., R.R., and R.J.T. performed research;
-  R.R. and R.J.T. acquired funding;
-  and A.R., L.B., M.J., A.R., J.T., and R.J.T. wrote the paper.
-}
-\authordeclaration{No competing interests to declare.}
-\correspondingauthor{\textsuperscript{1}To whom correspondence should be
-  addressed. E-mail: areinhar@stat.cmu.edu}
-\equalauthors{\textsuperscript{2}L.B., M.J., A.R., and J.T. contributed equally
-  to this work.}
+% \authorcontributions{Author contributions: A.R., L.B., M.J., A.R., J.T., A.C,
+%   E.J.C., N.D., A.J.H., S.H., M.J., J.K., W.L.M.K, Z.C.L., L.M., N.L.O.,
+%   J.C.W, R.R., and R.J.T. obtained and managed data;
+%   A.R., J.B., J.F., Z.C.L., L.M., D.J.M., A.P., S.R., D.R., N.S., R.T.,
+%   V.V., L.W., J.C.W, R.R., and R.J.T. designed software and
+%   research;
+%   A.R., L.B., M.J., A.R., J.T., W.A.S., T.A., A.B., J.B., L.B., A.A.C., A.C.,
+%   E.J.C., B.C., N.D., S.G., A.G., G.H., R.H., A.J.H.,
+%   S.H., M.J., A.J., J.K., A.K., M.X.L., L.M., K.M., D.J.M., B.N.,
+%   N.L.O., P.P., C.A.P., S.R., V.S, J.S, D.S., N.S., V.S., S.T.,
+%   J.T., R.T., J.C.W, and R.J.T. developed software;
+%   W.A.S., A.C., B.C., S.G., G.H., K.M., D.J.M., B.N., J.S.,
+%   D.S., and A.K.V.N. managed technical infrastructure and systems;
+%   A.R., L.B., M.J., A.R., J.T, J.B., A.C., E.J.C., N.D.,  A.G.,
+%   A.J.H., R.H., S.H., A.J., J.K., K.L., Y.J.L, Z.C.L., L.M., D.J.M., B.N.,
+%   N.L.O., P.P., C.A.P., S.R., N.S., V.S., J.S., D.S., N.S., S.T., J.T., R.T.,
+%   V.V., L.W., J.C.W., R.R., and R.J.T. performed research;
+%   R.R. and R.J.T. acquired funding;
+%   and A.R., L.B., M.J., A.R., J.T., and R.J.T. wrote the paper.
+% }
+% \authordeclaration{No competing interests to declare.}
+% \correspondingauthor{\textsuperscript{1}To whom correspondence should be
+%   addressed. E-mail: areinhar@stat.cmu.edu}
+% \equalauthors{\textsuperscript{2}L.B., M.J., A.R., and J.T. contributed equally
+%   to this work.}
+\footnotetext[1]{To whom correspondence should be addressed. E-mail:
+  areinhar@stat.cmu.edu}
+\footnotetext[2]{L.B., M.J., A.R., and J.T. contributed equally to this work.}
 
 % At least three keywords are required at submission. Please provide three to five keywords, separated by the pipe symbol.
-\keywords{COVID-19 $|$ open data $|$ digital surveillance $|$ medical insurance
-  claims $|$ internet surveys}
+% \keywords{COVID-19 $|$ open data $|$ digital surveillance $|$ medical insurance
+%   claims $|$ internet surveys}
+
+\begin{document}
+\maketitle
+
+\clearpage
 
 \begin{abstract}
   The COVID-19 pandemic presented enormous data challenges in the United States.
@@ -181,25 +197,16 @@
   decision-making.
 \end{abstract}
 
-\dates{This manuscript was compiled on \today}
-\doi{\url{www.pnas.org/cgi/doi/10.1073/pnas.XXXXXXXXXX}}
-
-\begin{document}
-
-\maketitle
-\thispagestyle{firststyle}
-\ifthenelse{\boolean{shortarticle}}{\ifthenelse{\boolean{singlecolumn}}{\abscontentformatted}{\abscontent}}{}
-
-\dropcap{P}ublic health decision makers, healthcare providers, epidemiological
+Public health decision makers, healthcare providers, epidemiological
 researchers, employers, institutions, and the general public benefit from
 promptly and readily accessible data regarding COVID-19 activity levels,
-countermeasures, and pandemic impact.  Real-time indicators of COVID-19
-activity levels, such as statistics on cases, deaths, test positivity, and
+countermeasures, and pandemic impact. Real-time indicators of COVID-19 activity
+levels, such as statistics on cases, deaths, test positivity, and
 hospitalizations, enable reports and interactive dashboard applications for
 situational awareness \cite{Dong:2020, NYTimes, USAFacts}, and are essential for
-most analyses of the pandemic.  These data are available for locations across
-the United States from a number of official sources and independent aggregators
-in varied and inconsistent formats.  Different data types and sources vary in
+most analyses of the pandemic. These data are available for locations across the
+United States from a number of official sources and independent aggregators in
+varied and inconsistent formats. Different data types and sources vary in
 timeliness, based on when measured events occur in the progression of the
 disease, testing capabilities, the reporting pipeline, and their publication
 schedules.
@@ -293,13 +300,14 @@ A summary of the data sources and signals in the API is in
 Table~\ref{tab:sources_signals}, and detailed documentation is available at
 \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}.
 
+\begin{landscape}
 \begin{table*}[t]
 \centering
 \caption{Data sources available in Delphi's COVIDcast API \cite{CovidcastAPI},
   as of date of publication. The first group of data sources are produced by
   Delphi from data not otherwise available publicly (or only available in
   limited form); the second group is mirrored from public sources.}
-\begin{tabular}{>{\raggedright}p{1.2in} p{4.0in} l >{\raggedright\arraybackslash}p{0.5in}}
+\begin{tabular}{>{\raggedright}p{1.2in} p{5.0in} l >{\raggedright\arraybackslash}p{0.5in}}
   \toprule
   \textbf{Data source} & \textbf{Signals available} & \textbf{First date} &
 \textbf{Resolution} \\\midrule
@@ -342,12 +350,13 @@ COVID, flu, or pneumonia, compiled by the National Center for Health Statistics
 \cite{NCHS}. & 2020-01-26 & State \\
   \bottomrule
 \end{tabular}
-\addtabletext{$^*$Available at $>60$\% of counties; $^{**}$available at
+{\raggedright $^*$Available at $>60$\% of counties; $^{**}$available at
   20--60\% of counties; $^{***}$available at $<20$\% of counties.  For some
   signals, location availability varies over time, e.g., due to variable
   reporting volume.}
 \label{tab:sources_signals}
 \end{table*}
+\end{landscape}
 
 \subsection{Signal Processing}
 
@@ -518,7 +527,8 @@ supplement.  This will also be illustrated in a more detailed correlation
 analysis in the next subsection.
 
 \begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/time_trends_national.pdf}
+  \centering
+  \includegraphics[width=0.6\columnwidth]{fig/time_trends_national.pdf}
   \caption{National trends, from April 2020 to April 2021, of four signals in
     the COVIDcast API. The auxiliary signals, based on medical claims data and
     massive surveys, track changes in officially reported cases quite
@@ -579,7 +589,8 @@ CTIS-CLI-in-community signal is a close second, and the CHNG-CLI signal is
 third. There are two noteworthy points:
 
 \begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/geo_wise_corr.pdf}
+  \centering
+  \includegraphics[width=0.6\columnwidth]{fig/geo_wise_corr.pdf}
   \caption{Geo-wise correlations with case rates, from April 15, 2020 to April
     15, 2021, calculated over all counties for which all signals were available
     and which had at least 500 cumulative cases by the end of this period.}
@@ -631,7 +642,8 @@ effects in claims signals should be correctable: they are mainly due to
 and we can estimate such effects using historical claims data.
 
 \begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/time_wise_correlation.pdf}
+  \centering
+  \includegraphics[width=0.6\columnwidth]{fig/time_wise_correlation.pdf}
   \caption{Time-wise correlations with case rates, from April 15, 2020 to April
     15, 2021, calculated over all counties for which all signals were available
     and which had at least 500 cumulative cases by the end of this period.}
@@ -656,7 +668,8 @@ making it valuable to cross-check against external sources not part of the same
 reporting systems.
 
 \begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/bexar_compare.pdf}
+  \centering
+  \includegraphics[width=0.6\columnwidth]{fig/bexar_compare.pdf}
   \caption{Reported cases per day in Bexar County, Texas during the summer of
     2020. On July 16, 4,810 backlogged cases were reported, though they actually
     occurred over the preceding two weeks (this shows up as a prolonged spike in
@@ -678,7 +691,8 @@ and appear to be significantly biased upward in Arizona in June 2020, and
 significantly biased downward in New York throughout June and July 2020.
 
 \begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/dv_as_of.pdf}
+  \centering
+  \includegraphics[width=0.6\columnwidth]{fig/dv_as_of.pdf}
   \caption{Estimated percentage of doctor's visits due to COVID-like illness
     displayed across multiple issue dates, with later issue dates adding
     additional data and revising past data from prior issue dates.}
@@ -717,7 +731,7 @@ outreach efforts.
 
 \begin{figure}
   \centering
-  \includegraphics[width=\columnwidth]{fig/mobility-drop.pdf}
+  \includegraphics[width=0.6\columnwidth]{fig/mobility-drop.pdf}
   \caption{Percentage point increase in SafeGraph estimates of the percentage of
   people staying completely at home, based on aggregated mobile device data,
   between March 1, 2020 and April 15, 2020.}
@@ -789,27 +803,34 @@ these sources in forecasting and nowcasting systems. The breadth and unique
 features of the COVIDcast API will help facilitate this and other related work,
 which will be vital to advancing pandemic modeling and preparedness.
 
-\acknow{We thank Carrie Reed, Matt Biggerstaff, Michael Johansson, Rachel
-  Slayton, Velma Lopez, Jo Walker and others on the CDC COVID-19 Modeling Team;
-  Hal Varian, Brett Slatkin, and others on Google's Surveys team;
-  Erin Hattersley, Rasmi Elasmar, and others at Google.org;
-  Evgeniy Gabrilovich and others on Google's Health team;
-  Curtiss Cobb and others on Facebook's  Demography and Survey Science, Data for
-  Good and Health teams;
-  Alex Smola and others at Amazon Web Services;
-  Tim Suther and others at Change Healthcare;
-  Paul Nielsen and others at Optum;
-  John Tamerius and others at Quidel; and
-  Ross Epstein and others at SafeGraph.
-  This material is based on work supported by gifts from Facebook, Google.org,
-  the McCune Foundation, and Optum; Centers for Disease Control and Prevention
-  (CDC) grant U01IP001121; National Science Foundation Graduate Research
-  Fellowship Program (NSF GRFP) award DGE1745016; and the Center for Machine
-  Learning and Health (CMLH) at Carnegie Mellon.}
+\subsection*{Acknowledgments}
 
-\showacknow{} % Display the acknowledgments section
+We thank Carrie Reed, Matt Biggerstaff, Michael Johansson, Rachel Slayton, Velma
+Lopez, Jo Walker and others on the CDC COVID-19 Modeling Team; Hal Varian, Brett
+Slatkin, and others on Google's Surveys team; Erin Hattersley, Rasmi Elasmar,
+and others at Google.org; Evgeniy Gabrilovich and others on Google's Health
+team; Curtiss Cobb and others on Facebook's Demography and Survey Science, Data
+for Good and Health teams; Alex Smola and others at Amazon Web Services; Tim
+Suther and others at Change Healthcare; Paul Nielsen and others at Optum; John
+Tamerius and others at Quidel; and Ross Epstein and others at SafeGraph. This
+material is based on work supported by gifts from Facebook, Google.org, the
+McCune Foundation, and Optum; Centers for Disease Control and Prevention (CDC)
+grant U01IP001121; National Science Foundation Graduate Research Fellowship
+Program (NSF GRFP) award DGE1745016; and the Center for Machine Learning and
+Health (CMLH) at Carnegie Mellon.
 
 % Bibliography
+\bibliographystyle{unsrtnat}
 \bibliography{../../common/covidcast.bib}
+
+\clearpage
+
+\appendix
+
+\section*{Supplemental figures}
+
+\clearpage
+
+\input{supplement-medrxiv.tex}
 
 \end{document}
