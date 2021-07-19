@@ -1,18 +1,16 @@
 
 ## Evaluate hotspots
-library(dplyr)
-library(purrr)
-library(tibble)
-source("hotspot_detection.R")
-source("misc.R")
-source("utils.R")
+source(here::here("code", "pkgs_and_common.R"))
+source(here::here("code", "hotspots", "hotspot_detection.R"))
+source(here::here("code", "hotspots", "misc.R"))
+source(here::here("code", "hotspots", "utils.R"))
 detect_hotspots = detect_upswings_basic
 
 # Compute ``ground truth'' hotspots, i.e. whether or not a hotspot
 # actually occurred. This needs to be done independently, because the
 # ground truth hotspots are not available as a covidcast signal.
-forecast_dates <- seq(as.Date("2020-06-16"), as.Date("2021-03-31"), by = "day")
-ahead <- 7:21
+forecast_dates <- hotspot_forecast_dates
+
 AR_models = c(
   'AR3',
   'AR3FB3',
@@ -50,7 +48,6 @@ hotspots_df <- detect_hotspots(response_df) %>%
 #       AND get back both preds and actuals columns.
 # So I do the following instead.
 #
-train_types = c('honest', 'dishonest', 'honest_bootstrapped')
 
 for (tt in train_types) {
   # Read baseline

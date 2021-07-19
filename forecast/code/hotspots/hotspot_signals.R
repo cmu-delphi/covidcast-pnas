@@ -27,71 +27,37 @@
 # devtools::install_local(c("../covidcast/R-packages/modeltools"))
 
 ## Source
-library(assertthat)
-library(covidcast)
-library(dplyr)
-library(evalcast)
-library(glmnet)
-library(purrr)
-library(tibble)
-library(modeltools)
-source("auc.R")
-source("alden_evalcast.R") # Used to get predictions from already downloaded data
-source("cv_logisticlasso.R")
-source("hotspot_detection.R")
-source("logisticlasso.R")
-source("logisticlasso_hotspot.R")
-source("misc.R")
-source("utils.R")
-
-# What type of analysis are we doing
-train_types <- c("honest", "dishonest", "honest_bootstrapped")
+source(here::here("code", "pkgs_and_common.R"))
+source(here::here("code", "hotspots", "logisticlasso_hotspot.R"))
+source(here::here("code", "hotspots", "logisticlasso.R"))
+source(here::here("code", "hotspots", "misc.R"))
+source(here::here("code", "hotspots", "utils.R"))
+source(here::here("code", "hotspots", "hotspot_detection.R"))
 
 # What are we forecasting?
-response_source <- "jhu-csse"
-response_signal <- "confirmed_7dav_incidence_num"
-incidence_period <- "day"
-geo_type <- "hrr"
-forecast_dates <- seq(as.Date("2020-06-16"), as.Date("2021-03-31"), by = "day")
+forecast_dates <- hotspot_forecast_dates
 
 # How do we detect a hotspot?
 hotspot_lag = 7            # Number of days in the past to compare to.
 upswing_threshold = .25     # Threshold for null hypothesis.
 min_threshold = 30
 detect_hotspots = detect_upswings_basic
+
+
 # Arguments for our forecaster to take.
 forecaster_args <- list(
-  ahead = 7:21,
-  n = 21, # training set size
-  lags = c(0, 7, 14), # in days for features
+  ahead = ahead,
+  n = ntrain, # training set size
+  lags = lags, # in days for features
   hotspot_detector = detect_hotspots,
   feature_type = "pct_difference",
   lambda = 0 # no penalty
 )
 
+# different names for hotspots
+signals_df$name <- c("AR3", "AR3FB3", "AR3DV3", "AR3CHCLI3", "AR3CHCOV3",
+                     "AR3GG3_imputed", "AR3GG3")
 
-# What signals to use
-signals_df_1 = tribble(
-  ~data_source,         ~signal,
-  response_data_source, response_signal,
-  'fb-survey',          'smoothed_hh_cmnty_cli',
-  'doctor-visits',      'smoothed_adj_cli',
-  'chng',               'smoothed_adj_outpatient_cli',
-  'chng',               'smoothed_adj_outpatient_covid',
-  'google-symptoms',    'sum_anosmia_ageusia_smoothed_search',
-  'google-symptoms',    'sum_anosmia_ageusia_smoothed_search',
-)
-signals_df_2 = tribble(
-  ~geo_values,  ~name,              ~zero_impute,
-  '*',          'AR3',              NULL,
-  '*',          'AR3FB3',           NULL,
-  '*',          'AR3DV3',           NULL,
-  '*',          'AR3CHCLI3',        NULL,
-  '*',          'AR3CHCOV3',        NULL,
-  '*',          'AR3GG3_imputed',   'anosmia',
-  '*',          'AR3GG3',           NULL,
-)
-signals_df = bind_cols(signals_df_1, signals_df_2)
 
 debug_dir <- here::here("data", "debug_results", "hotspots")
 if (!dir.exists(debug_dir)) dir.create(debug_dir)
@@ -120,7 +86,7 @@ for (tt in train_type) {
     forecast_args$model_dir = here::here(debug_dir, sprintf("%s_as_of", tt), signals_df$name[idx])
     if (!dir.exists(forecast_args$model_dir)) dir.create(forecaster_args$model_dir)
     # Get predictions for forecaster ii
-    preds <- alden_get_predictions(
+    preds <- offline_get_predictions(
       forecaster = lgstlasso_hotspot_forecaster,
       name_of_forecaster = signals_df$name[idx],
       signals = signals_ar,
@@ -128,10 +94,11 @@ for (tt in train_type) {
       incidence_period = incidence_period,
       offline_signal_dir = offline_signal_dir,
       forecaster_args = forecaster_args
-    ) %>% mutate(signal = "hotspot")
+    ) %>%
+      mutate(signal = "hotspot")
 
-    saveRDS(preds, here::here(preds_dir,
-                        sprintf('%s_%s.RDS', signals_df$name[idx], tt)))
+    saveRDS(preds,
+            here::here(preds_dir, sprintf('%s_%s.RDS', signals_df$name[idx], tt)))
   }
 }
 

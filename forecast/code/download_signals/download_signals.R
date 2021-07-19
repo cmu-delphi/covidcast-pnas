@@ -68,6 +68,7 @@ start_day_download <- function(forecast_date) {
 
 signals_df = honest_as_of_signals
 offline_signal_dir = here("data", "offline_signals", "honest_as_of")
+if (!dir.exists(offline_signal_dir)) dir.create(offline_signal_dir)
 for (idx in 1:nrow(honest_as_of_signals)) {
   forecast_dates <- seq(as.Date(signals_df$start_forecast_date[idx]),
                         as.Date(end_forecast_date), by = "day")
@@ -95,6 +96,7 @@ for (idx in 1:nrow(honest_as_of_signals)) {
 
 signals_df = dishonest_as_of_signals
 offline_signal_dir = here("data", "offline_signals", "dishonest_as_of")
+if (!dir.exists(offline_signal_dir)) dir.create(offline_signal_dir)
 for (idx in 1:nrow(dishonest_as_of_signals)) {
     forecast_dates <- seq(as.Date(signals_df$start_forecast_date[idx]),
                           as.Date(end_forecast_date), by = "day")

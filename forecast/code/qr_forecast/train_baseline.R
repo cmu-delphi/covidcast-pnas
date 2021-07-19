@@ -1,23 +1,8 @@
-library(furrr)
-future::plan(multisession)
-
-library(progressr)
-
-library(dplyr)
-library(tibble)
-library(covidcast)
-library(evalcast)
+source(here::here("code", "pkgs_and_common.R"))
+lags = qr_lags
+forecast_dates <- qr_forecast_dates
 
 
-geo_type <- "hrr"
-ntrain = 21
-lags = c(0, 7, 14)
-forecast_dates <- seq(as.Date('2020-06-09'),
-                      as.Date('2021-03-31'),
-                      by = "day")
-ahead = 7:21
-response_data_source = 'jhu-csse'
-response_signal = 'confirmed_7dav_incidence_prop'
 
 # To user with future_map, we must evaluate these globals ahead of time
 make_start_day_baseline = function(ntrain) {

@@ -6,35 +6,56 @@
 ## Required `R` packages
 
 ```r
+# CRAN packages
 install.packages("devtools")
 install.packages("parallel")
 install.packages(c("scales", "cowplot", "lubridate", "tidyverse")
 install.packages(c("here", "future", "furrr", "progressr"))
 install.packages("covidcast")
+install.packages("glmnet")
 
-remotes::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/evalcast")
+# Packages on Github
+remotes::install_github("ryantibs/quantgen", subdir="R-package/quantgen")
+remotes::install_github("cmu-delphi/covidcast@evalcast-0.3", subdir = "R-packages/evalcast")
 ```
+
+Note: The `{quantgen}` package is faster if you use the Gurobi solver. See the package [README](https://github.com/ryantibs/quantgen) for installation instructions (not required).
+
+## `pkgs_and_common.R`
+
+Loads common libraries and sets parameters. This file is sourced by the core scripts below.
 
 ## `download_signals/`
 
 For the purposes of (re)running our analysis, we download all the signals beforehand
 and run the models from those rather than grabbing the data from the API.
 
-1. `download_signals.R` -- grabs all necessary as of data and puts it into  `data/offline_signals/`
+1. `download_signals.R` -- grabs all necessary vintage data and puts it into  `data/offline_signals/`
 
 ## `qr_forecast/`
 
-Reruns all "forecasts" using quantile regression 
+The following three files must be run in order to reruns all "forecasts" using quantile regression.
 
-1. `quantgen.R` -- quantile regression forecaster (uses `{ryantibs/quantgen}`) for use with `{evalcast}`
-1. `train_baseline.R` -- runs the baseline AR(3) model and saves results
+1. `train_baseline.R` -- runs the baseline (strawman) model and saves results
 1. `train_signals.R` -- runs all models with signals and saves results
 1. `evaluate_predictions.R` -- scores the forecasts against actuals and saves the results
+
+`quantgen.R` contains the quantile regression forecaster (uses `{ryantibs/quantgen}`) for use with `{evalcast}`. This file is sourced by the above scripts.
+
+## `hotspots/`
+
+The below two files must be run in order to rerun all "hotspot" analysis.
+
+1. `hotspot_signals.R` -- runs all models with signals and saves results
+1. `evaluate_hotspots.R` -- scores the forecasts against actuals and saves results
+
+`hotspot_detection.R`, `logisticlasso_hotspot.R`, `logisticlasso.R`, `misc.R` and `utils.R`
+are all lower-level functions called by those above
 
 
 ## `figures/`
 
-Any source scripts referenced by `/paper/supplement.Rmd`. Uses processed data.
+Any source scripts referenced by `/paper/supplement.Rmd`. Uses processed data. These need not be used individually.
 
 1. `ccf-dv-finalized.R` -- Supplemental figure
 1. `eval_funs.R` -- Simple utility functions and plotting colors
