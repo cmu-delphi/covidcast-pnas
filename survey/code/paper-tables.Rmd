@@ -1,0 +1,833 @@
+---
+title: Survey paper tables and figures
+author: Alex Reinhart, Alyssa Bilinski, and coauthors
+date: July 12, 2021
+---
+
+This file contains the code used to generate Tables 2 and 3 and Figures 1, 3, 4,
+and 5 of "COVID Trends and Impact Survey in the United States, 2020-2021:
+Continuous real-time measurement of COVID-19 symptoms, risks, protective
+behaviors, testing and vaccination" by Salomon et al. Figure 2 is generated
+separately in `survey-paper-exhibits.ipynb`.
+
+To knit this file: `rmarkdown::render("paper-tables.Rmd")`. This file requires
+the packages listed below, plus unified versions of the complete survey
+microdata; microdata is only available under [data use
+agreement](https://cmu-delphi.github.io/delphi-epidata/symptom-survey/data-access.html).
+
+```{r setup, message=FALSE}
+library(data.table)
+library(dplyr)
+library(tidyr)
+library(epitools)
+library(tidycensus)
+
+library(ggplot2)
+library(gridExtra)
+library(scales)
+library(geofacet)
+
+library(knitr)
+library(lubridate)
+library(covidcast)
+
+source("survey-utils.R")
+```
+
+## Setup
+
+These categories are in order based on their coding in Q64, so indices
+correspond to coding:
+
+```{r more-setup}
+occupations <- c(
+  "Community and social service",
+  "Education, training, and library",
+  "Arts, design, entertainment, sports, and media",
+  "Healthcare practitioners and technicians",
+  "Healthcare support",
+  "Protective service",
+  "Food preparation and serving related",
+  "Building and grounds cleaning and maintenance",
+  "Personal care and service",
+  "Sales and related",
+  "Office and administrative support",
+  "Construction and extraction",
+  "Installation, maintenance, and repair",
+  "Production",
+  "Transportation and material moving",
+  "Other"
+)
+```
+
+We load the replication data files. Each object takes quite a lot of RAM, so
+removing them and garbage-collecting is essential for this to run in the
+available RAM on our server.
+
+```{r load-data}
+d1 <- fread("unified-1-year-part-1.csv.gz")
+d2 <- fread("unified-1-year-part-2.csv.gz")
+
+data <- rbind(d1, d2, fill = TRUE)
+
+rm(d1, d2)
+gc()
+```
+
+## Metadata
+
+This is based on data in the following time range:
+
+```{r date-range}
+range(data$StartDatetime)
+```
+
+Each wave has received this many responses:
+
+```{r wave-count}
+data %>%
+  select(wave) %>%
+  group_by(wave) %>%
+  summarize(n = n()) %>%
+  arrange(wave) %>%
+  kable(col.names = c("Wave", "N"))
+```
+
+In total, that is:
+
+```{r sample-size}
+nrow(data)
+```
+
+Design effects:
+
+```{r deff}
+deff <- data %>%
+  select(StartDatetime, weight) %>%
+  mutate(StartDatetime = as.Date(StartDatetime),
+         week = floor_date(StartDatetime, unit = "week"),
+         epiweek = epiweek(StartDatetime),
+         epiyear = epiyear(StartDatetime)) %>%
+  group_by(week, epiyear, epiweek) %>%
+  summarize(deff = mean(weight**2) / (mean(weight)**2),
+            n = n(),
+            .groups = "keep") %>%
+  arrange(week) %>%
+  select(week, epiyear, epiweek, deff, n)
+
+write_csv(deff, "deff.csv")
+
+ggplot(deff, aes(x = week, y = deff)) +
+  geom_line() +
+  labs(x = "", y = "Design effect") +
+  scale_x_date(date_breaks = "2 months", date_labels = "%b %Y",
+               date_minor_breaks = "1 month") +
+  scale_y_continuous(limits = c(0, NA)) +
+  theme_bw()
+```
+
+## Respondent demographics
+
+We'll produce unweighted and weighted proportions for each demographic variable.
+
+```{r demo-setup}
+proportionate <- function(data, var) {
+  var <- ensym(var)
+
+  data %>%
+    filter(!is.na(!!var)) %>%
+    group_by(!!var) %>%
+    summarize(n = n(), sum_weight = sum(weight)) %>%
+    mutate(unweighted_prop = n / sum(n) * 100,
+           weighted_prop = sum_weight / sum(sum_weight) * 100) %>%
+    select(!!var, n, unweighted_prop, weighted_prop)
+}
+```
+
+### Gender
+
+```{r demo-gender}
+data %>%
+  select(D1, weight) %>%
+  mutate(gender = case_when(
+    D1 == "1" ~ "Male",
+    D1 == "2" ~ "Female",
+    D1 == "3" | D1 == "4" ~ "Non-binary/self-describe",
+    D1 == "5" | is.na(D1) ~ NA_character_
+  )) %>%
+  proportionate(gender) %>%
+  kable(col.names = c("Gender", "Number", "Unweighted %", "Weighted %"),
+        digits = 1, format.args = list(big.mark = ","))
+```
+
+### Age
+
+```{r demo-age}
+gc()
+
+data %>%
+  select(D2, weight) %>%
+  mutate(age = case_when(
+    D2 == "1" ~ "18-24",
+    D2 == "2" ~ "25-34",
+    D2 == "3" ~ "35-44",
+    D2 == "4" ~ "45-54",
+    D2 == "5" ~ "55-64",
+    D2 == "6" ~ "65-74",
+    D2 == "7" ~ "75 plus",
+    is.na(D2) ~ NA_character_
+  )) %>%
+  proportionate(age) %>%
+  kable(col.names = c("Age", "Number", "Unweighted %", "Weighted %"),
+        digits = 1, format.args = list(big.mark = ","))
+```
+
+### Region
+
+```{r demo-region}
+data %>%
+  select(fips, weight) %>%
+  mutate(
+    fips = ifelse(is.na(fips), NA_character_, sprintf("%05d", fips)),
+    state_abbr = toupper(name_to_abbr(state_fips_to_name(fips)))) %>%
+  inner_join(select(state_census, REGION, ABBR),
+             by = c("state_abbr" =  "ABBR")) %>%
+  mutate(REGION = case_when(
+    REGION == 1 ~ "Northeast",
+    REGION == 2 ~ "Midwest",
+    REGION == 3 ~ "South",
+    REGION == 4 ~ "West"
+  )) %>%
+  proportionate(REGION) %>%
+  kable(col.names = c("Region", "Number", "Unweighted %", "Weighted %"),
+        digits = 1, format.args = list(big.mark = ","))
+```
+
+### Household size
+
+```{r demo-hh-size}
+gc()
+
+data %>%
+  select(A2b, A5_1, A5_2, A5_3, wave, weight) %>%
+  mutate(
+    A2b = as.integer(A2b),
+    A5_1 = as.integer(A5_1),
+    A5_2 = as.integer(A5_2),
+    A5_3 = as.integer(A5_3),
+    hh_size = case_when(
+      wave < 4 ~ A2b,
+      wave >= 4 ~ ifelse(is.na(A5_1) + is.na(A5_2) + is.na(A5_3) < 3,
+                         ifelse(is.na(A5_1), 0L, A5_1) +
+                           ifelse(is.na(A5_2), 0L, A5_2) +
+                           ifelse(is.na(A5_3), 0L, A5_3),
+                         NA_integer_)
+    ),
+    hh_size_bucket = case_when(
+      hh_size == 1 ~ "1",
+      hh_size == 2 ~ "2",
+      hh_size >= 3 & hh_size <= 5 ~ "3-5",
+      hh_size >= 6 & hh_size <= 10 ~ "6-10",
+      hh_size > 10 ~ ">10"
+      )) %>%
+  proportionate(hh_size_bucket) %>%
+  kable(col.names = c("Household size", "Number", "Unweighted %", "Weighted %"),
+        digits = 1, format.args = list(big.mark = ","))
+```
+
+### Date of completion
+
+```{r demo-completion-date}
+gc()
+
+data %>%
+  select(StartDatetime, weight) %>%
+  mutate(date = as.Date(StartDatetime),
+         quarter = paste0(year(date), "Q", quarter(date))) %>%
+  proportionate(quarter) %>%
+  kable(col.names = c("Quarter", "Number", "Unweighted %", "Weighted %"),
+        digits = 1, format.args = list(big.mark = ","))
+```
+
+### Education
+
+ACS educational attainment data is for adults age 25 and older.
+
+```{r demo-education}
+data %>%
+  filter(D2 >= 2) %>%
+  select(D8, weight) %>%
+  mutate(education = case_when(
+    D8 == 1 ~ "Less than high school",
+    D8 == 2 ~ "High school or equivalent",
+    D8 == 3 ~ "Some college, no degree",
+    D8 == 4 ~ "Associate's degree",
+    D8 == 5 ~ "Bachelor's degree",
+    D8 %in% 6:8 ~ "Graduate or professional degree"
+  )) %>%
+  proportionate(education) %>%
+  kable(col.names = c("Education", "Number", "Unweighted %", "Weighted %"),
+        digits = 1, format.args = list(big.mark = ","))
+```
+
+This does not match the ACS data (our respondents are more educated), so it may
+be valuable to look at this breakdown monthly. If the bias is consistent over
+time, at least we know it is not messing up time trends.
+
+```{r demo-education-time}
+data %>%
+  filter(D2 >= 2) %>%
+  select(D8, StartDatetime, weight) %>%
+  mutate(date = as.Date(StartDatetime),
+         month = paste0(year(date), "M", month(date)),
+         education = case_when(
+           D8 == 1 ~ "Less than high school",
+           D8 == 2 ~ "High school or equivalent",
+           D8 == 3 ~ "Some college, no degree",
+           D8 == 4 ~ "Associate's degree",
+           D8 == 5 ~ "Bachelor's degree",
+           D8 %in% 6:8 ~ "Graduate or professional degree"
+         )) %>%
+  group_by(education, month) %>%
+  summarize(sum_weight = sum(weight), .groups = "drop") %>%
+  group_by(month) %>%
+  mutate(prop = 100 * sum_weight / sum(sum_weight)) %>%
+  ungroup() %>%
+  select(month, education, prop) %>%
+  pivot_wider(names_from = month, values_from = prop)
+```
+
+### Comorbidities
+
+The paper only reports on "at least 1 comorbidity".
+
+```{r comorbidities}
+data %>%
+  filter(!is.na(C1)) %>%
+  select(C1, weight) %>%
+  mutate(at_least_one = case_when(
+    C1 == "9" ~ "None",
+    TRUE ~ "At least one comorbidity"
+  )) %>%
+  proportionate(at_least_one) %>%
+  kable(col.names = c("Comorbidities", "Number", "Unweighted %", "Weighted %"),
+        digits = 1, format.args = list(big.mark = ","))
+```
+
+### Tested given symptoms
+
+## Occupation
+
+Table columns:
+
+- % tested positive: The % of respondents in each occupation category who have
+  ever tested positive. P(ever tested positive | occupation group). Note no
+  conditioning on testing, so respondents who were never tested count as not
+  having tested positive.
+- % working with symptoms: In each occupation category, % of respondents who (a)
+  have worked outside their home in the past few days but (b) have unusual
+  symptoms. That is, P(symptoms & worked outside home | occupation group)
+- % working outside/not tested: In each occupation category, % of respondents
+  who (a) have worked outside their home in the past 4 weeks but (b) have never
+  been tested. (There are some pretty stark disparities in this table). That is,
+  P(never tested & worked outside home | occupation group).
+
+Calculated on all responses in January 2020 with the relevant items completed.
+
+**Note:** From here on, all analyses will be for Wave 4 onward (since Wave 4 has
+the needed variables).
+
+```{r occupation}
+data <- data %>%
+  filter(wave >= 4)
+
+data$C13_logic <- split_options(data$C13)
+
+data %>%
+  filter(!is.na(Q64),
+         StartDatetime >= "2021-01-01 00:00:00",
+         StartDatetime < "2021-02-01 00:00:00") %>%
+  mutate(
+    ever_pos = case_when(
+      B10a == "1" ~ TRUE,
+      B11 == "1" ~ TRUE,
+      B11 == "2" ~ FALSE,
+      B8 == "2" ~ FALSE,
+      TRUE ~ NA
+    ),
+    work_sym = case_when(
+      is.na(C13) ~ NA, # No info on activities outside home
+      is.na(B2) ~ NA, # No info on symptoms, unusual or not
+      B2 == "15" ~ FALSE, # No symptoms, unusual or not
+      is.na(B2c) ~ FALSE, # No unusual symptoms listed
+      !is_selected(C13_logic, "1") ~ FALSE, # Did not work outside home
+      is_selected(C13_logic, "1") ~ TRUE, # Worked outside home
+      TRUE ~ NA
+    ),
+    work_not_tested = case_when(
+      D10 == "2" ~ FALSE,
+      B8 == "1" ~ FALSE,
+      D10 == "1" & B8 == "2" ~ TRUE,
+      TRUE ~ NA
+    ),
+    occupation = occupations[Q64]) %>%
+  select(occupation, ever_pos, work_sym, work_not_tested, weight) %>%
+  group_by(occupation) %>%
+  summarize(work_pos_rate = 100 * weighted.mean(ever_pos, weight, na.rm = TRUE),
+            work_sym_rate = 100 * weighted.mean(work_sym, weight, na.rm = TRUE),
+            work_not_tested_rate = 100 * weighted.mean(work_not_tested, weight, na.rm = TRUE),
+            n = n(),
+            .groups = "drop_last") %>%
+  kable(col.names = c("Occupation group", "% tested positive",
+                      "% working with symptoms", "% working outside/not tested",
+                      "N"),
+        digits = 1, format.args = list(big.mark = ","))
+```
+
+## Symptoms
+
+```{r symptom-rates}
+data$positive_14d <- case_when(
+  data$B10a == 1 ~ "Tested positive",
+  TRUE ~ "All others"
+)
+
+symptoms <- list(
+  "1" = "Fever",
+  "2" = "Cough",
+  "3" = "Shortness of breath",
+  "4" = "Difficulty breathing",
+  "5" = "Tiredness or exhaustion",
+  "6" = "Nasal congestion",
+  "7" = "Runny nose",
+  "8" = "Muscle or joint aches",
+  "9" = "Sore throat",
+  "10" = "Chest pain",
+  "11" = "Nausea or vomiting",
+  "12" = "Diarrhea",
+  "13" = "Loss of smell/taste",
+  "16" = "Eye pain",
+  "17" = "Chills",
+  "18" = "Headaches",
+  "19" = "Changes in sleep",
+  "14" = "Other"
+)
+
+## P(unusual symptoms | tested positive in past 14 days, age group)
+symptom_data <- data %>%
+  select(positive_14d, B2, B2c, weight)
+
+symptom_data$B2c_logic <- split_options(symptom_data$B2c)
+
+for (ii in names(symptoms)) {
+  sym_name <- paste0("sym_", symptoms[[ii]])
+
+  symptom_data[[sym_name]] <- case_when(
+    symptom_data$B2 == "15" ~ FALSE, # no symptoms, unusual or not
+    is.na(symptom_data$B2) ~ NA, # left symptoms blank
+    is.na(symptom_data$B2c) ~ FALSE, # symptom given in B2, no unusual symptoms
+    TRUE ~ is_selected(symptom_data$B2c_logic, ii)
+  )
+}
+
+symptom_rates_overall <- symptom_data %>%
+  summarize(across(starts_with("sym_"), ~ weighted.mean(.x, weight, na.rm = TRUE))) %>%
+  pivot_longer(cols = starts_with("sym_"), names_to = "symptom",
+               names_prefix = "sym_", values_to = "rate")
+
+symptom_rates <- symptom_data %>%
+  group_by(positive_14d) %>%
+  summarize(across(starts_with("sym_"), ~ weighted.mean(.x, weight, na.rm = TRUE))) %>%
+  pivot_longer(cols = starts_with("sym_"), names_to = "symptom",
+               names_prefix = "sym_", values_to = "rate")
+```
+
+Here are overall symptoms among all respondents:
+
+```{r symptoms-overall-table}
+symptom_rates_overall %>%
+  mutate(rate = 100 * rate) %>%
+  arrange(desc(rate)) %>%
+  kable(col.names = c("Symptom", "% with symptom"),
+        digits = 1)
+```
+
+Here we have unusual symptoms, split by whether the respondent reported testing
+positive in the past 14 days. Calculate risk ratios and their CIs.
+
+```{r symptoms-compare}
+# Reorder factor levels to order by symptoms among those who tested positive
+ordered_symptoms <- symptom_rates %>%
+  filter(positive_14d == "Tested positive") %>%
+  arrange(desc(rate)) %>%
+  pull(symptom)
+symptom_rates$symptom <- factor(
+  symptom_rates$symptom,
+  levels = ordered_symptoms)
+
+# Get relative risks using epitools. We need raw counts, not weighted estimates,
+# unfortunately.
+symptom_counts <- symptom_data %>%
+  group_by(positive_14d) %>%
+  summarize(across(starts_with("sym_"), ~ sum(.x, na.rm = TRUE))) %>%
+  pivot_longer(cols = starts_with("sym_"), names_to = "symptom",
+               names_prefix = "sym_", values_to = "rate")
+
+n_positive <- sum(symptom_data$positive_14d == "Tested positive", na.rm = TRUE)
+n_negative <- sum(symptom_data$positive_14d == "All others", na.rm = TRUE)
+
+symptom_rrs <- symptom_counts %>%
+  pivot_wider(id_cols = symptom, names_from = positive_14d, values_from = rate)
+
+symptom_rrs$rr <- NA
+symptom_rrs$rr_lower <- NA
+symptom_rrs$rr_upper <- NA
+for (ii in seq_len(nrow(symptom_rrs))) {
+  res <- riskratio(c(
+    n_negative - symptom_rrs[[ii, "All others"]], # without symptom, negative
+    symptom_rrs[[ii, "All others"]], # with symptom, negative
+    n_positive - symptom_rrs[[ii, "Tested positive"]], # without symptom, positive
+    symptom_rrs[[ii, "Tested positive"]]))$measure
+
+  symptom_rrs$rr[ii] <- res["Exposed2", "estimate"]
+  symptom_rrs$rr_lower[ii] <- res["Exposed2", "lower"]
+  symptom_rrs$rr_upper[ii] <- res["Exposed2", "upper"]
+}
+```
+
+Now plot:
+
+```{r symptoms-compare-plot}
+rr_scale_factor <- 70
+
+ggplot(symptom_rates, aes(x = symptom, y = rate, fill = positive_14d)) +
+  geom_col(position = position_dodge()) +
+  geom_pointrange(
+    aes(x = symptom, y = rr / rr_scale_factor,
+        ymin = rr_lower / rr_scale_factor,
+        ymax = rr_upper / rr_scale_factor),
+    data = symptom_rrs,
+    inherit.aes = FALSE) +
+  scale_y_continuous(labels = label_percent(accuracy = 1),
+                     sec.axis = sec_axis(~ . * rr_scale_factor,
+                                         name = "Relative risk")) +
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
+  labs(x = "", y = "Frequency among respondents",
+       fill = "Group") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+ggsave("figures/symptoms-comparison.pdf")
+```
+
+In table form, so we can quote it:
+
+```{r symptoms-table}
+symptom_rates %>%
+  mutate(rate = 100 * rate) %>%
+  pivot_wider(names_from = "positive_14d", values_from = "rate") %>%
+  select(symptom, positive = `Tested positive`, others = `All others`) %>%
+  arrange(desc(positive)) %>%
+  kable(col.names = c("Symptom", "Tested positive", "All others"),
+        digits = 1)
+```
+
+And the table of relative risks and their CIs:
+
+```{r rr-table}
+symptom_rrs %>%
+  select(symptom, rr, rr_lower, rr_upper) %>%
+  arrange(desc(rr)) %>%
+  kable(col.names = c("Symptom", "RR", "lower", "upper"),
+        digits = 2)
+```
+
+## Cumulative test positivity
+
+Based on code from Minttu Rönn.
+
+We use 7-day average cumulative incidence (per 100,000 population) to match the
+7-day averaging used in the survey estimates. The survey data will have one
+estimate per week, rather than per day, and so when we join the two data frames
+we'll get one JHU case rate per week.
+
+```{r case-rate-compare}
+# State adult populations, from Census data
+state_pops <- read.csv("state-age-pops.csv")
+# State-level age distributions of cases, from CDC data
+case_age_dist <- read.csv("case-age-distribution.csv")
+
+start_day <- floor_date(as.Date(min(data$StartDatetime)), unit = "week")
+state_case_rate <- covidcast_signal("jhu-csse", "confirmed_7dav_cumulative_num",
+                                    start_day = start_day,
+                                    end_day = as.Date(max(data$StartDatetime)),
+                                    geo_type = "state") %>%
+  mutate(geo_value = toupper(geo_value),
+         year = year(time_value),
+         month = month(time_value)) %>%
+  select(state = geo_value, cumulative_cases = value, time_value, year, month) %>%
+  inner_join(state_pops, by = "state") %>%
+  inner_join(case_age_dist, by = c("year", "month")) %>%
+  mutate(case_rate_adult = cumulative_cases * frac_adult_cases / adult_pop * 100)
+
+state_case_compare <- data %>%
+  filter(!is.na(fips)) %>%
+  mutate(
+    ever_pos = case_when(
+      B10a == "1" ~ TRUE,
+      B11 == "1" ~ TRUE,
+      B11 == "2" ~ FALSE,
+      B8 == "2" ~ FALSE,
+      TRUE ~ NA
+    ),
+    week = floor_date(as.Date(StartDatetime), unit = "week"),
+    fips = sprintf("%05d", fips),
+    state_abbr = name_to_abbr(state_fips_to_name(fips))
+  ) %>%
+  group_by(week, state_abbr) %>%
+  summarize(ever_pos = 100 * weighted.mean(ever_pos, weight, na.rm = TRUE),
+            .groups = "drop") %>%
+  left_join(state_case_rate,
+            by = c("state_abbr" = "state", "week" = "time_value"))
+
+g <- ggplot(state_case_compare) +
+  facet_geo(~ state_abbr, grid = "us_state_with_DC_PR_grid1", label = "code") +
+  geom_line(aes(x = week, y = case_rate_adult, color = "Surveillance"),
+            linetype = 1, size = 0.5) +
+  geom_line(aes(x = week, y = ever_pos, color = "CTIS"),
+            linetype = 1, size = 0.5) +
+  scale_color_manual(values = c("lightblue", "gray50")) +
+  scale_y_continuous(breaks = c(0, 10),
+                     minor_breaks = c(5, 15),
+                     labels = label_percent(scale = 1,
+                                            accuracy = 1)) +
+  scale_x_date(date_breaks = "4 months", date_labels = "%b",
+               date_minor_breaks = "1 month") +
+  labs(x = "", y = "", color = "") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+ggsave("figures/cumulative-case-compare.pdf", g, width = 10, height = 7)
+
+g
+```
+
+We should also calculate correlations between state reports and survey estimates
+during the last week of data:
+
+```{r}
+max(state_case_compare$week)
+
+final_week <- state_case_compare %>%
+  filter(week == max(week))
+
+# States with the lowest proportion of ever-diagnosed in survey data
+final_week %>%
+  arrange(ever_pos) %>%
+  select(state_abbr, ever_pos, case_rate_adult) %>%
+  head()
+
+# States with the highest proportion
+final_week %>%
+  arrange(desc(ever_pos)) %>%
+  select(state_abbr, ever_pos, case_rate_adult) %>%
+  head()
+
+# Pearson correlation between surveillance and CTIS
+cor(final_week$case_rate_adult, final_week$ever_pos)
+
+# Spearman (rank) correlation between surveillance and CTIS
+cor(final_week$case_rate_adult, final_week$ever_pos,
+    method = "spearman")
+```
+
+## Contacts, masks, and public transport
+
+Based on code from Alyssa Bilinski.
+
+```{r external-data}
+make_df <- function(f, var = SVI_cat) {
+  var <- ensym(var)
+
+  f %>%
+    select(!!var, week, C13_options, C14, contacts_tot, weight) %>%
+    filter(!is.na(!!var)) %>%
+    group_by(!!var, week) %>%
+    summarize(
+      pub_trans = 100 * weighted.mean(is_selected(C13_options, "6"),
+                                      weight, na.rm = TRUE),
+      masks_not_always = 100 * weighted.mean(
+        case_when(
+          C14 == 1 ~ FALSE,
+          C14 %in% 2:5 ~ TRUE,
+          C14 == 6 ~ NA), # exclude those not in public in past 5/7 days
+        weight, na.rm = TRUE),
+      contacts_avg_mod = weighted.mean(contacts_tot, weight, na.rm = TRUE)) %>%
+    pivot_longer(c(contacts_avg_mod, pub_trans, masks_not_always),
+                 names_to = "var", values_to = "value") %>%
+    mutate(var_cat = case_when(
+      var == "contacts_avg_mod" ~ "Average contacts (past 24h)",
+      var == "pub_trans" ~ "Rode public transit (past 24h, %)",
+      var == "masks_not_always" ~ "Not always masked in public (%)"))
+}
+
+pops <- read.csv("data/population.csv")
+
+# SVI
+svi <- read.csv("data/SVI2018_US_COUNTY.csv") %>%
+  mutate(SVI_cat = case_when(RPL_THEMES >= 0.75 ~ "1st quartile",
+                             RPL_THEMES >= 0.5 & RPL_THEMES < 0.75 ~ "2nd quartile",
+                             RPL_THEMES >= 0.25 & RPL_THEMES < 0.5 ~ "3rd quartile",
+                             RPL_THEMES < 0.25 ~ "4th quartile")) %>%
+  select(FIPS, SVI_cat)
+```
+
+Produce the variables and data:
+
+```{r contacts-data}
+contacts_data <- data %>%
+  # Exclude ludicrous numbers of contacts, since they screw up the means
+  filter(chk_work_contacts & chk_shopping_contacts & chk_social_contacts & chk_other_contacts) %>%
+  mutate(
+    C13 = ifelse(!is.na(C13), C13, C13b), # Replaced in Wave 10; treat as identical
+    C14 = ifelse(!is.na(C14), C14, C14a), # Replaced in Wave 8; treat as identical
+    C13_options = split_options(C13),
+    state = state_fips_to_name(ifelse(is.na(fips), NA_character_, sprintf("%05d", fips))),
+    week = floor_date(as.Date(StartDatetime), unit = "week"),
+    any_work = ifelse(is.na(C10_1_1), 0, C10_1_1),
+    any_shopping = ifelse(is.na(C10_2_1), 0, C10_2_1),
+    any_social = ifelse(is.na(C10_3_1), 0, C10_3_1),
+    any_other = ifelse(is.na(C10_4_1), 0, C10_4_1),
+    chk = !is.na(C10_1_1) | !is.na(C10_2_1) | !is.na(C10_3_1) | !is.na(C10_4_1),
+    work_mod2 = ifelse(chk, any_work, NA),
+    social_mod2 = ifelse(chk, any_social, NA),
+    shopping_mod2 = ifelse(chk, any_shopping, NA),
+    other_mod2 = ifelse(chk, any_other, NA),
+    contacts_tot = (as.numeric(work_mod2) + as.numeric(shopping_mod2) +
+                      as.numeric(social_mod2) + as.numeric(other_mod2)),
+    age_cat = case_when(D2 <= 2 ~ "18-34",
+                        D2 %in% 3:5 ~ "35-64",
+                        D2 > 5 ~ "65+")
+  ) %>%
+  left_join(svi, by = c("fips" = "FIPS")) %>%
+  left_join(pops, by = c("state" = "StateName"))
+```
+
+Produce the plots:
+
+```{r contacts-plots}
+g1 <- make_df(contacts_data, var = SVI_cat)
+g2 <- make_df(contacts_data, var = age_cat)
+g3 <- make_df(contacts_data, var = region)
+
+# TODO See if we can merge these into one big facet_grid so the widths match
+# (not sure how to deal with legends?)
+a <- ggplot(g1, aes(x = week, y = value, col = SVI_cat, group = SVI_cat)) +
+  geom_line() +
+  facet_wrap(. ~ var_cat, scales = "free", ncol = 4) +
+  scale_color_discrete(name = "SVI") +
+  scale_x_date(date_breaks = "3 months", date_labels = "%b %Y",
+               date_minor_breaks = "1 month") +
+  labs(x = "", y = "") +
+  ylim(0,  NA) +
+  theme_bw()
+
+b <- ggplot(g2, aes(x = week, y = value, col = age_cat, group = age_cat)) +
+  geom_line() +
+  facet_wrap(. ~ var_cat, scales = "free", ncol = 4) +
+  scale_color_discrete(name = "Age") +
+  scale_x_date(date_breaks = "3 months", date_labels = "%b %Y",
+               date_minor_breaks = "1 month") +
+  labs(x = "", y = "") +
+  ylim(0, NA) +
+  theme_bw()
+
+c <- ggplot(g3, aes(x = week, y = value, col = region, group = region)) +
+  geom_line() +
+  facet_wrap(.~var_cat, scales = "free", ncol = 4) +
+  scale_color_discrete(name = "Region")  +
+  scale_x_date(date_breaks = "3 months", date_labels = "%b %Y",
+               date_minor_breaks = "1 month") +
+  labs(x = "", y = "") +
+  ylim(0, NA) +
+  theme_bw()
+
+g <- arrangeGrob(a, b, c, nrow = 3)
+
+ggsave("figures/contacts-masks-transport.pdf", g, width = 8, height = 5)
+```
+
+## Vaccine acceptance and hesitancy
+
+Based on code from Marissa Reitsma.
+
+```{r vaccine-hesitancy-map}
+# Get data into the form Marissa's code expects
+df <- data %>%
+  select(StartDatetime, fips, V1, V3, weight) %>%
+  mutate(date = as.Date(StartDatetime)) %>%
+  filter(!is.na(fips),
+         date >= as.Date("2021-03-01"),
+         date <= as.Date("2021-04-05")) %>%
+  mutate(
+    hesitant = case_when(
+      V1 == 1 ~ FALSE,
+      V3 %in% 1:2 ~ FALSE,
+      V3 %in% 3:4 ~ TRUE),
+    fips = sprintf("%05d", fips))
+
+# Get all FIPSen
+fips <- as.data.table(tidycensus::fips_codes)
+fips <- fips[, fips:=paste0(state_code, county_code)]
+
+# Collapse into summaries. This uses megacounty logic to get summaries by state
+# if sample size per county is inadequate
+df <- merge(df, fips, by = "fips", all.y = TRUE)
+
+# Compute percent vaccinated or accepting
+df <- df[, sample_size := .N, by = c("fips")]
+df <- df[, geo_id := ifelse(sample_size >= 50, fips, state_code)]
+
+df <- df[, pct_hesitant := weighted.mean(hesitant, weight, na.rm = TRUE), by = c("geo_id")]
+df <- df[, pct_hesitant := mean(pct_hesitant, na.rm = TRUE), by = c("geo_id")]
+
+# Collapse the dataset
+df <- unique(df[, .(pct_hesitant, geo_id, fips, sample_size)])
+
+# Code the colors
+df <- df[pct_hesitant < 0.1, plot_var := "<10%"]
+df <- df[pct_hesitant >= 0.1 & pct_hesitant < 0.14, plot_var := "10-14%"]
+df <- df[pct_hesitant >= 0.14 & pct_hesitant < 0.18, plot_var := "14-18%"]
+df <- df[pct_hesitant >= 0.18 & pct_hesitant < 0.22, plot_var := "18-22%"]
+df <- df[pct_hesitant >= 0.22 & pct_hesitant < 0.26, plot_var := "22-26%"]
+df <- df[pct_hesitant >= 0.26 & pct_hesitant < 0.3, plot_var := "26-30%"]
+df <- df[pct_hesitant >= 0.3, plot_var := "30+%"]
+
+df <- df[, plot_var := factor(plot_var, levels = c("<10%", "10-14%", "14-18%", "18-22%", "22-26%", "26-30%", "30+%"))]
+
+df <- df[, GEOID := fips]
+
+counties <- get_acs(geography = "county", geometry = TRUE,
+                    shift_geo = TRUE, variables = "B19013_001")
+states <- get_acs(geography = "state", geometry = TRUE,
+                  shift_geo = TRUE, variables = "B19013_001")
+
+plot_data <- merge(counties, df, by = "GEOID", all.x = TRUE)
+
+g <- ggplot(data = plot_data, aes(fill = plot_var)) +
+  geom_sf(data = plot_data[plot_data$geo_id == plot_data$fips, ],
+          size = 0.2, color = "gray") +
+  geom_sf(data = plot_data[plot_data$geo_id != plot_data$fips, ],
+          size = 0.2, color = "NA") +
+  geom_sf(data = states, fill = NA, color = "#444444") +
+  scale_fill_manual(
+    values = c("#0d2c84", "#225ea8", "#1d91c0", "#41b6c4",
+               "#7fcdbb", "#c7e9b4", "#ffffcc", "#dedede"),
+    na.value = "#dedede") +
+  theme_void() +
+  labs(fill = "% hesitant", title = "")
+
+ggsave("figures/hesitancy-county-map.pdf", g, width = 6, height = 4)
+
+g
+```
