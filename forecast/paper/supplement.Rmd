@@ -827,7 +827,7 @@ plotter_hotspots(hotspots_gs %>% filter(period != "jm")) +
 
 
 ```{r traj-data, eval = FALSE}
-source(here("code", "tbd", "trajectory_plot_funs.R"))
+source(here("code", "deprecated", "trajectory_plot_funs.R"))
 preds <- readRDS(here("data", "predictions_honest.RDS"))
 traj_best <- get_trajectory_plots(fcasts_honest, preds, actuals, hrr_tab, 
                                   "only2020", "best")
