@@ -3,7 +3,7 @@
 This folder contains some intermediate data to reproduce the manuscript. 
 Small datasets are included in the github repo (along with the code to create them). 
 
-The rest are available in persistent storage. All will be created
+The rest are available in persistent storage. All large data will be recreated
 by rerunning scripts in the `code/` directory.
 
 HRR data and 
@@ -45,7 +45,7 @@ saveRDS(df[[1]] %>%
 
 Created using `code/download_signals/download_signals.R`.
 
-Available at 
+Available at https://doi.org/10.5683/SP2/PUE88I.
 
 ### QR forecast results
 
@@ -57,8 +57,7 @@ Available at
 The above four files
 are produced by running the scripts in `code/qr_forecast/`
 
-Available at
-
+Available at https://doi.org/10.5683/SP2/PUE88I.
 
 Additional results will also be produced, but are not necessary to reproduce 
 the manuscript.
@@ -72,8 +71,7 @@ the manuscript.
 The above three files
 are produced by running the scripts in `code/qr_forecast/`
 
-Available at
-
+Available at https://doi.org/10.5683/SP2/PUE88I.
 
 Additional results will also be produced, but are not necessary to reproduce 
 the manuscript.
