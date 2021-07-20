@@ -36,14 +36,14 @@ library(lubridate)
 library(evalcast)
 library(here)
 
-source(here("code", "figures", "results_processing_and_plotting"))
+source(here("code", "figures", "results_processing_and_plotting.R"))
 source(here("code", "figures", "eval_funs.R"))
 source(here("code", "figures", "hotspot_funs.R"))
 
 ```
 
 ```{r data-loading}
-actuals <- readRDS(here("data", "actuals.RDS"))
+actuals <- readRDS(here("data", "confirmed_7dav_incidence_prop.RDS"))
 fcasts_honest <- readRDS(here("data", "results_honest.RDS")) %>%
   process_res_cases(actuals) %>%
   filter(forecaster != "gs_inherit") 
@@ -56,7 +56,7 @@ hotspots_honest <- readRDS(here("data", "hotspots_honest.RDS")) %>%
 hotspots_finalized <- readRDS(here("data", "hotspots_dishonest.RDS")) %>%
   process_res_hotspots() %>%
   filter(forecaster != "gs_inherit")
-cases7dav <- readRDS(here("data", "cases7dav.RDS")) %>%
+cases7dav <- readRDS(here("data", "confirmed_7dav_incidence_num.RDS")) %>%
   rename(case_num = value)
 if (params$fd_casefloor >= 0) {
   fcasts_honest <- filter_case_floor(fcasts_honest, cases7dav, params)
@@ -479,7 +479,7 @@ comparison_df <- left_join(
 
 pct_chng_df <- readRDS(here(
   "data", 
-  "jhu-csse_confirmed_7dav_incidence_num_2021-05-18.RDS")) %>%
+  "confirmed_7dav_incidence_num.RDS")) %>%
   pct_change(n = 7) %>%
   select(geo_value, time_value, pct_change) %>%
   filter(time_value %in% unique(comparison_df$forecast_date))
@@ -599,7 +599,7 @@ slide_lead_lag <- function(x, y, min_len = 56, lag.max = NULL, na.len = 14) {
     outlist)
 }
 
-all_sigs <- readRDS(here("data", "all_signals_wide_as_of_2020-05-15.RDS"))
+all_sigs <- readRDS(here("data", "all_signals_wide_as_of_2020-05-18.RDS"))
 
 all_sigs_imputed <- all_sigs %>% 
   group_by(geo_value) %>% 

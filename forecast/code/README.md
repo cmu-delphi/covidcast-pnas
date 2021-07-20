@@ -34,7 +34,7 @@ and run the models from those rather than grabbing the data from the API.
 
 ## `qr_forecast/`
 
-The following three files must be run in order to reruns all "forecasts" using quantile regression.
+The following three files must be run in order to reoroduce all "forecasts" using quantile regression.
 
 1. `train_baseline.R` -- runs the baseline (strawman) model and saves results
 1. `train_signals.R` -- runs all models with signals and saves results
@@ -44,7 +44,7 @@ The following three files must be run in order to reruns all "forecasts" using q
 
 ## `hotspots/`
 
-The below two files must be run in order to rerun all "hotspot" analysis.
+The below two files must be run in order to reproduce all "hotspot" analysis.
 
 1. `hotspot_signals.R` -- runs all models with signals and saves results
 1. `evaluate_hotspots.R` -- scores the forecasts against actuals and saves results

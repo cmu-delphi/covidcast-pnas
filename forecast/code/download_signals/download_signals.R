@@ -11,7 +11,7 @@ ahead = 7:21
 lags = c(0, 7, 14)
 hotspot_lag = 7
 end_forecast_date = '2021-03-31'
-named_function = function(x) lubridate::mdy("2021-05-18") # dishonest as_of
+named_function = function(x) lubridate::ymd("2021-05-18") # finalized as_of
 
 honest_as_of_signals = tribble(
   ~data_source,         ~signal,                              ~start_forecast_date,
@@ -125,4 +125,23 @@ for (idx in 1:nrow(dishonest_as_of_signals)) {
 
 google_sigs <- list.files(offline_signal_dir, "google-symptoms")
 file.copy(google_sigs, here("data", "offline_signals", "honest_as_of"))
+
+
+# Create case / prop actuals ----------------------------------------------
+df <- covidcast_signals(
+  data_source = "jhu-csse",
+  signal = c("confirmed_7dav_incidence_prop", "confirmed_7dav_incidence_num"),
+  start_day = "2020-06-01",
+  end_day = "2021-05-01",
+  as_of = named_function(1)
+)
+
+saveRDS(df[[1]] %>%
+          select(geo_value, time_value, value) %>%
+          rename(target_end_date = time_value, actual = value),
+        here("data", "confirmed_7dav_incidence_prop.RDS"))
+
+saveRDS(df[[1]] %>%
+          select(geo_value, time_value, value),
+        here("data", "confirmed_7dav_incidence_num.RDS"))
 
