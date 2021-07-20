@@ -5,7 +5,7 @@ source(here::here("code", "hotspots", "hotspot_detection.R"))
 source(here::here("code", "hotspots", "misc.R"))
 source(here::here("code", "hotspots", "utils.R"))
 detect_hotspots = detect_upswings_basic
-
+source(here::here("code", "hotspots", "hotspot_params.R"))
 # Compute ``ground truth'' hotspots, i.e. whether or not a hotspot
 # actually occurred. This needs to be done independently, because the
 # ground truth hotspots are not available as a covidcast signal.

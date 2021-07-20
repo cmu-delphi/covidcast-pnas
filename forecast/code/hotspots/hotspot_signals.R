@@ -38,25 +38,13 @@ source(here::here("code", "hotspots", "hotspot_detection.R"))
 forecast_dates <- hotspot_forecast_dates
 
 # How do we detect a hotspot?
-hotspot_lag = 7            # Number of days in the past to compare to.
-upswing_threshold = .25     # Threshold for null hypothesis.
-min_threshold = 30
-detect_hotspots = detect_upswings_basic
+source(here::here("code", "hotspots", "hotspot_params.R"))
 
-
-# Arguments for our forecaster to take.
-forecaster_args <- list(
-  ahead = ahead,
-  n = ntrain, # training set size
-  lags = lags, # in days for features
-  hotspot_detector = detect_hotspots,
-  feature_type = "pct_difference",
-  lambda = 0 # no penalty
-)
 
 # different names for hotspots
 signals_df$name <- c("AR3", "AR3FB3", "AR3DV3", "AR3CHCLI3", "AR3CHCOV3",
                      "AR3GG3_imputed", "AR3GG3")
+signals_df$signal[1] <- response_signal
 
 
 debug_dir <- here::here("data", "debug_results", "hotspots")
