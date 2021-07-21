@@ -34,29 +34,29 @@ library(covidcast)
 library(tidyverse)
 library(lubridate)
 library(evalcast)
+library(here)
 
-source("../code/eval_funs.R")
-source("../code/hotspot_funs.R")
+source(here("code", "figures", "results_processing_and_plotting.R"))
+source(here("code", "figures", "eval_funs.R"))
+source(here("code", "figures", "hotspot_funs.R"))
 
-path_to_data <- "~/Documents/COVID-Delphi/fcast-indicators-paper/temp_data/"
 ```
 
 ```{r data-loading}
-actuals <- readRDS(file.path(path_to_data, "actuals.RDS"))
-fcasts_honest <- readRDS(file.path(path_to_data, "results_honest.RDS")) %>%
+actuals <- readRDS(here("data", "confirmed_7dav_incidence_prop.RDS"))
+fcasts_honest <- readRDS(here("data", "results_honest.RDS")) %>%
   process_res_cases(actuals) %>%
   filter(forecaster != "gs_inherit") 
-fcasts_finalized <- readRDS(file.path(path_to_data, "results_dishonest.RDS")) %>%
+fcasts_finalized <- readRDS(here("data", "results_dishonest.RDS")) %>%
   process_res_cases(actuals) %>%
   filter(forecaster != "gs_inherit")
-hotspots_honest <- readRDS(file.path(path_to_data, "hotspots_honest.RDS")) %>%
+hotspots_honest <- readRDS(here("data", "hotspots_honest.RDS")) %>%
   process_res_hotspots() %>%
   filter(forecaster != "gs_inherit")
-hotspots_finalized <- readRDS(
-  file.path(path_to_data, "hotspots_dishonest.RDS")) %>%
+hotspots_finalized <- readRDS(here("data", "hotspots_dishonest.RDS")) %>%
   process_res_hotspots() %>%
   filter(forecaster != "gs_inherit")
-cases7dav <- readRDS(file.path(path_to_data, "cases7dav.RDS")) %>%
+cases7dav <- readRDS(here("data", "confirmed_7dav_incidence_num.RDS")) %>%
   rename(case_num = value)
 if (params$fd_casefloor >= 0) {
   fcasts_honest <- filter_case_floor(fcasts_honest, cases7dav, params)
@@ -102,7 +102,7 @@ hotspots_finalized <- intersect_averagers(
 ```
 
 ```{r hrr-names}
-hrr_names <- read_csv(file.path(path_to_data, "Hospital_Referral_Regions.csv"), 
+hrr_names <- read_csv(here("data", "Hospital_Referral_Regions.csv"), 
                       col_types = "_ccc__") %>%
   mutate(state = substr(hrrcity, 1, 2),
          hrrname = paste(HRR_lbl, state)) %>%
@@ -237,15 +237,13 @@ plotter(fcasts_honest %>% filter(period != "jm"),
 <!-- Bootstrap stuff -->
 
 ```{r bootstrap-loading}
-fcasts_booted <- readRDS(
-  file.path(path_to_data,"results_honest_bootstrapped.RDS")) %>%
+fcasts_booted <- readRDS(here("data","results_honest_bootstrapped.RDS")) %>%
   process_res_cases(actuals) %>%
   filter(forecaster != "gs_inherit")
 if (params$fd_casefloor >= 0) {
   fcasts_booted <- filter_case_floor(fcasts_booted, cases7dav, params)
 }
-hotspots_booted <- readRDS(
-  file.path(path_to_data, "hotspots_honest_bootstrapped.RDS")) %>%
+hotspots_booted <- readRDS(here("data", "hotspots_honest_bootstrapped.RDS")) %>%
   process_res_hotspots() %>%
   filter(forecaster != "gs_inherit")
 if (params$flag_jumps > 0) {
@@ -303,7 +301,7 @@ plotter_hotspots(hotspots_booted %>% filter(period != "jm")) +
 <!-- Upswings vs. downswings -->
 
 ```{r up-down-processing}
-preds <- readRDS(file.path(path_to_data, "predictions_honest.RDS"))
+preds <- readRDS(here("data", "predictions_honest.RDS"))
 preds <- preds %>% 
   filter(abs(quantile - 0.5) < 1e-6) %>% 
   select(-quantile) %>%
@@ -479,9 +477,9 @@ comparison_df <- left_join(
   group_by(forecaster, forecast_date, geo_value) %>%
   summarize(wis_ratio = mean(wis) / mean(ar3_wis), .groups = "drop") 
 
-pct_chng_df <- readRDS(file.path(
-  path_to_data, 
-  "jhu-csse_confirmed_7dav_incidence_num_2021-05-18.RDS")) %>%
+pct_chng_df <- readRDS(here(
+  "data", 
+  "confirmed_7dav_incidence_num.RDS")) %>%
   pct_change(n = 7) %>%
   select(geo_value, time_value, pct_change) %>%
   filter(time_value %in% unique(comparison_df$forecast_date))
@@ -601,8 +599,7 @@ slide_lead_lag <- function(x, y, min_len = 56, lag.max = NULL, na.len = 14) {
     outlist)
 }
 
-all_sigs <- readRDS(file.path(
-  path_to_data, "all_signals_wide_as_of_2020-05-15.RDS"))
+all_sigs <- readRDS(here("data", "all_signals_wide_as_of_2020-05-18.RDS"))
 
 all_sigs_imputed <- all_sigs %>% 
   group_by(geo_value) %>% 
@@ -692,7 +689,7 @@ df2 %>%
 ```
 
 ```{r ccf-dv-finalized, eval=TRUE, fig.cap="Illustration of the cross-correlation function between DV-CLI and cases. The left panel shows the standardized signals over the period from August 1 to September 28 (as of May 15, 2021). The right panel shows $\\CCF_{\\ell}(a)$ for different values of $a$ as vertical blue bars. The orange dashed lines indicate the 95\\% significance threshold. By our leadingness/laggingness metric, DV-CLI is leading (but notlagging) cases over this period."}
-source("../code/ccf-dv-finalized.R")
+source(here("code", "figures", "ccf-dv-finalized.R"))
 gg
 ```
 
@@ -751,7 +748,7 @@ df2 %>%
 
 ```{r revisions-dv-jhu, eval=FALSE}
 # Figure 1 in the manuscript
-source("../code/revisions.R")
+source(here("code", "figures", "revisions.R"))
 ```
 
 
@@ -760,7 +757,7 @@ source("../code/revisions.R")
 
 ```{r ny-trajectory, eval=FALSE}
 # Figure 2 in the manuscript
-source("../code/ny-trajectory.R")
+source(here("code", "figures", "trajectory.R"))
 gg
 ```
 
@@ -830,8 +827,8 @@ plotter_hotspots(hotspots_gs %>% filter(period != "jm")) +
 
 
 ```{r traj-data, eval = FALSE}
-source("../code/trajectory_plot_funs.R")
-preds <- readRDS(file.path(path_to_data, "predictions_honest.RDS"))
+source(here("code", "deprecated", "trajectory_plot_funs.R"))
+preds <- readRDS(here("data", "predictions_honest.RDS"))
 traj_best <- get_trajectory_plots(fcasts_honest, preds, actuals, hrr_tab, 
                                   "only2020", "best")
 traj_worst <- get_trajectory_plots(fcasts_honest, preds, actuals, hrr_tab,

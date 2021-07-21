@@ -2,8 +2,9 @@ library(covidcast)
 library(evalcast)
 library(tidyverse)
 
-ny_preds <- readRDS("data/ny_predictions.RDS")
-ny_actuals <- readRDS("data/ny_actuals.RDS")
+
+ny_preds <- readRDS(here::here("data", "ny_predictions.RDS"))
+ny_actuals <- readRDS(here::here("data", "ny_actuals.RDS"))
 
 pd <- evalcast:::setup_plot_trajectory(ny_preds, side_truth = ny_actuals)
 pd$truth_df <- pd$truth_df %>% rename(target_end_date = time_value)
@@ -28,4 +29,4 @@ ggplot(pd$truth_df, mapping = aes(x = target_end_date)) +
   ylab("Cases per 100,000 people") + 
   xlab("Date")
 
-ggsave("../paper/fig/trajectory.pdf", width = 6, height = 4)
+ggsave(here::here("paper", "fig", "trajectory.pdf"), width = 6, height = 4)
