@@ -16,7 +16,7 @@ ggplot(tt %>% filter(forecast_date < "2021-01-01"),
        aes(forecast_date, w, color = forecaster)) + 
   geom_line() +
   geom_hline(yintercept = 1) +
-  xlab("Days ahead") +
+  xlab("forecast date") +
   ylab("cummean(sum(wis_forecaster[t]) /\n sum(wis_strawman[t]))") +
   scale_color_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
   theme_bw() +
