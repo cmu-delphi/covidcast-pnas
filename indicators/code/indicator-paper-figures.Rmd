@@ -283,3 +283,47 @@ plot(diffs, plot_type = "choro", range = c(10, 30),
 
 ggsave("../paper/fig/mobility-drop.pdf", width = 5, height = 4)
 ```
+
+County-level vaccination data obtained [from the
+CDC](https://data.cdc.gov/Vaccinations/COVID-19-Vaccinations-in-the-United-States-County/8xkx-amqh).
+Data downloaded on August 2, 2021.
+
+```{r figure-6-redux, message=FALSE, cache=TRUE}
+cdc <- read.csv("COVID-19_Vaccinations_in_the_United_States_County.csv") %>%
+  filter(Date == "07/20/2021")
+
+cdc_sm <- cdc %>%
+  select(FIPS, Series_Complete_18PlusPop_Pct, Administered_Dose1_Recip_18PlusPop_Pct) %>%
+  mutate(best_pop = pmax(Series_Complete_18PlusPop_Pct, Administered_Dose1_Recip_18PlusPop_Pct))
+
+vacc <- covidcast_signal("fb-survey", "smoothed_wcovid_vaccinated_or_accept",
+                         geo_type = "county", start_day = "2021-01-20",
+                         end_day = "2021-01-20")
+
+vacc_on_inauguration <- vacc %>%
+  mutate(location = abbr_to_name(geo_value, ignore.case = TRUE)) %>%
+  filter(time_value == "2021-01-20")
+
+w_cdc <- vacc_on_inauguration %>%
+  left_join(county_census, by = c("geo_value" = "FIPS")) %>%
+  left_join(cdc_sm, by = c("geo_value" = "FIPS")) %>%
+  mutate(REGION = case_when(
+    REGION == 1 ~ "Northeast",
+    REGION == 2 ~ "Midwest",
+    REGION == 3 ~ "South",
+    REGION == 4 ~ "West"))
+
+w_cdc %>%
+  filter(best_pop > 0, sample_size >= 250) %>%
+  ggplot(aes(x = value, y = Series_Complete_18PlusPop_Pct, color = REGION)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_x_continuous(labels = label_percent(scale = 1)) +
+  scale_y_continuous(labels = label_percent(scale = 1)) +
+  theme_bw() +
+  labs(x = "Estimated % willing to be vaccinated, 2021-01-20",
+       y = "% vaccinated on 2021-07-20", color = "Region") +
+  theme(legend.pos = "bottom", legend.direction = "horizontal")
+
+ggsave("../paper/fig/vaccine-intent-compare.pdf", width = 5, height = 4)
+```
