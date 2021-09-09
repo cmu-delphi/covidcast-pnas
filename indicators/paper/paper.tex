@@ -366,11 +366,13 @@ each revision is tagged with its own issue date.
 
 When appropriate, additional post-processing (often nontrivial) is applied to
 the data. For example, data on visits to doctors' offices is subject to strong
-day-of-week effects, and so regression is used to adjust for these
-effects. Other indicators are available in raw versions and versions smoothed
-with a 7-day trailing average. All processing is done using open-source code
-written primarily in Python and R, and available publicly at
-\url{https://github.com/cmu-delphi/covidcast-indicators/}.
+day-of-week effects, and so regression is used to adjust for these effects.
+Other indicators are available in raw versions and versions smoothed with a
+7-day trailing average. All processing is done using open-source code written
+primarily in Python and R, and available publicly at
+\url{https://github.com/cmu-delphi/covidcast-indicators/}. The processing steps
+used for each signal are publicly documented on their respective pages at
+\url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html}.
 
 \subsection{Revision Tracking}
 \label{subsec:revision_tracking}

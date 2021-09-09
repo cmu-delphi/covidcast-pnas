@@ -1,0 +1,198 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{microtype}
+
+\usepackage{newtxmath}
+\usepackage{newtxtext}
+
+\title{Response to reviewers}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Editor}
+
+\begin{quote}
+  The reviewers both saw high value in the database and regarded the paper as
+  important and relevant. Reviewer 2 had several high-level comments about the
+  current framing of the results and offered a number of suggestions for the
+  authors to consider additional or modified analyses that would strengthen the
+  paper. I would like to invite the authors to submit a revised version of the
+  manuscript including a detailed point-by-point response to the reviewer
+  comments, particularly where Reviewer 2 has suggested need for either further
+  analyses or pointed to notable limitations. While the authors should use their
+  discretion regarding whether additional analyses would be within scope for the
+  revision, it will be important to respond to the suggestions in either case
+  and at least to expand on limitations as relevant in the revised manuscript.
+\end{quote}
+
+TODO
+
+\section*{Reviewer 1}
+
+\begin{quote}
+  In section 1.B, you mention non-trivial signal processing and direct the
+  reader to github to learn more. I would like to see more discussion of how
+  each source was processed. If this is not possible due to length constraints,
+  where can the reader find more details? Is there documentation at the Delphi
+  website that explains how the data from each source is processed? In a quick
+  search at the Delphi website, I was not able to find information about how the
+  survey data (for example) were weighted. These details will be important to
+  those using the data.
+\end{quote}
+
+Thanks, this is an important point. We have added a sentence to Section 1.B to
+make clear that detailed documentation, including such details as the survey
+weighting procedures and the day-of-week adjustments used in other data sources,
+is available on the public documentation site.
+
+\section*{Reviewer 2}
+
+\begin{quote}
+  This paper describes a diverse public database of signals related to COVID-19
+  prevalence, including symptom survey data, mobility, at-home tests, and
+  hospitalizations. The database is unique, important, and useful, especially in
+  the current surveillance-limited context of the United States. However, the
+  main analyses presented in the results section did not feel cohesive, and the
+  ``story'' of the paper felt incomplete. While I respect the challenge of
+  dividing work among multiple related papers, I think that a key goal of
+  revisions might be to add further independent analyses of the data described
+  that emphasize its utility beyond comparisons to cases or add additional
+  analyses to build a unique cohesive story for this paper.
+\end{quote}
+
+TODO
+
+\begin{quote}
+  The main value of the data discussed in the paper seems to focus on its
+  potential utility in forecasting, which guides the main comparisons to
+  observed case burden and primary outcome of ``signal value'' in results and in
+  the appendix. However, there are a number of important limitations to the
+  results presented that impede this message.
+\end{quote}
+
+TODO
+
+\begin{quote}
+  Most concrete results on this point seem to be presented in another paper.
+  Correlations in the paper are focused on current case burden (signal vs. cases
+  both at time t), rather than prediction for forecasts.
+\end{quote}
+
+TODO
+
+\begin{quote}
+  Even from a nowcasting perspective, comparisons are all benchmarked against
+  cases which are observable in real-time.
+\end{quote}
+
+TODO
+
+\begin{quote}
+  The strength of observed correlations change (non-monotonically) over time,
+  and the implications of this are not discussed.
+\end{quote}
+
+TODO
+
+\begin{quote}
+  Signal strength is compared only to cases (rather than downstream outcomes
+  like hospitalization or death).
+\end{quote}
+
+TODO
+
+\begin{quote}
+  The case studies of signal utility that are provided seem stylized.
+  Policymakers would *know* in real-time when backlogged cases are reported and
+  can adjust case numbers accordingly or when cases are not being reported due
+  to holiday backlogs.
+\end{quote}
+
+TODO
+
+\begin{quote}
+  As a result, it might be useful to focus quantitative analyses in this paper
+  on other attributes of the data or expand analyses to include, e.g.:
+  \begin{itemize}
+  \item descriptive statistics from each data source, expressed in the units of
+    that data source
+  \item analysis of how signals differ
+  \item analysis of case correlations over time due to discussion of how they
+    have evolved over time -- e.g. due to changes in vaccination, testing, etc.
+  \item for case studies: I think it would be more powerful to either highlight
+    an instance issues were not apparent in the absence of other signals or to
+    provide more in depth analysis about a specific policy conclusion that would
+    result from use of these signals (or specific examples of
+    geographic/temporal variation that the signal data can uniquely inform).
+  \end{itemize}
+\end{quote}
+
+TODO
+
+\begin{quote}
+  A compelling framing for the results section might be to include general
+  descriptive statistics and then pick case studies that illustrate 2-3 uses of
+  the data.
+\end{quote}
+
+TODO
+
+\begin{quote}
+  I think that descriptions in results of ``what the data could be used for''
+  are less compelling than more specific examples would be. For instance, the
+  section on revised estimates over time seems to echo what was in the methods
+  and implications don't really hit home without connection to changes in
+  specific forecasts.
+\end{quote}
+
+TODO
+
+\begin{quote}
+  Some of the verb tenses (e.g. line 33) feel awkward: ``The Delphi Group
+  **works** (worked) with partner organizations and34 public data sets to build
+  a massive database of indicators35 tracking COVID-19 activity and other
+  relevant phenomena36 in the United States, which has been publicly available
+  and37 continuously updated since April 2020.''
+\end{quote}
+
+TODO
+
+\begin{quote}
+  It would be helpful to end the introduction with a description of the
+  contribution of this paper, rather than other papers.
+\end{quote}
+
+TODO
+
+\begin{quote}
+  I think it would be useful to replace ``massive'' with a more precise
+  adjective unless it is standard in the literature.
+\end{quote}
+
+TODO
+
+\begin{quote}
+  Similarly, the verb ``ingest'' also feels odd to refer to data sources.
+\end{quote}
+
+TODO
+
+\begin{quote}
+  I'm not sure that it is common practice to repeatedly refer to a sponsoring
+  research group throughout an academic article.
+\end{quote}
+
+TODO
+
+\begin{quote}
+  Descriptions of statistical analyses (e.g. correlation methods) feel more
+  appropriate for the methods section, not the results section.
+\end{quote}
+TODO
+
+\end{document}
