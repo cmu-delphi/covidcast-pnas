@@ -565,13 +565,22 @@ Figure~\ref{fig:geo_wise_correlation} shows the geo-wise correlations achieved
 by the five signals and COVID case rates (from JHU CSSE, smoothed using a 7-day
 trailing average), from April 15, 2020 to April 15, 2021. This calculation is
 performed over all counties with at least 500 cumulative cases by the end of
-this period, and at which all indicators are available (956 counties in
-total). The large positive correlations suggest that these signals could be
-useful in hotspot detection (identifying counties that have relatively high
-COVID activity, at a given time). Somewhat surprisingly, the survey-based
+this period, and at which all indicators are available (956 counties in total).
+The large positive correlations suggest that these signals could be useful in
+hotspot detection (identifying counties that have relatively high COVID
+activity, at a given time). Somewhat surprisingly, the survey-based
 CLI-in-community signal shows the strongest correlations for much of the time
 period. This clearly demonstrates the value of a large-scale survey such as CTIS
-for tracking symptoms and case trends, especially when other data is unavailable.
+for tracking symptoms and case trends, especially when other data is
+unavailable. The correlations vary over time in complex ways; while some of this
+variation is doubtless due to complex changes in public behavior, reporting and
+testing practices, and so on, some is also related to changes in overall
+COVID-19 case rates. For example, comparing against
+Figure~\ref{fig:time_trends_national}, we observe that correlations drop in
+February 2021 for several of the signals, matching when COVID cases also sharply
+decline. This decline likely caused the heterogeneity in case rates by county to
+decline, making it more difficult for any signal to achieve a high correlation
+by county.
 
 Figure~\ref{fig:time_wise_correlation} summarizes time-wise correlations from
 these five signals over the same time period, and for the same set of counties.

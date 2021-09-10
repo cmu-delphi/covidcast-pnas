@@ -100,7 +100,19 @@ TODO
   and the implications of this are not discussed.
 \end{quote}
 
-TODO
+While it is difficult to fully explain the changes in correlation---they are
+likely due to a variety of changes in reporting practices, health-seeking
+behavior, survey response patterns, and so on---one key point is that the
+strength of the correlation depends on the overall differences between counties.
+That is, if counties have very similar COVID case rates, it is difficult to
+achieve a high Spearman correlation between case rates and signals, because
+getting the rank correct is difficult. If counties have widely varying COVID
+case rates, a signal that provides information about cases will be able to
+achieve a higher Spearman correlation.
+
+We have slightly expanded our discussion of Figure 2 to make this point, though
+we have tried to keep the discussion brief so as not to sidetrack the main
+discussion of the manuscript.
 
 \begin{quote}
   Signal strength is compared only to cases (rather than downstream outcomes
@@ -148,17 +160,25 @@ TODO Should we add anything to 2.C to make this point more obvious?
     result from use of these signals (or specific examples of
     geographic/temporal variation that the signal data can uniquely inform).
   \end{itemize}
-\end{quote}
-
-TODO
-
-\begin{quote}
   A compelling framing for the results section might be to include general
   descriptive statistics and then pick case studies that illustrate 2-3 uses of
   the data.
 \end{quote}
 
-TODO
+We appreciate the interest in additional analyses, and our replacement of Figure
+6 is partly intended to address this concern about choice of case studies. It
+represents an example showing how these data sources can reveal points not
+available in other standard data sources, such as case and death data, and serve
+to aid public health decision-making.
+
+We have chosen not to include additional descriptive statistics or comparisons
+between signals for two reasons. First, given the large number of signals
+available in our API, a table of descriptive statistics would be prohibitively
+large; this is particularly difficult if one accounts for time and geography by
+presenting statistics over time or across space. Second, it's not clear to us
+what a reader would gain from such statistics. Because the data is freely
+available, a reader interested in any specific signal can quickly investigate it
+and explore whatever aspects of it are of interest.
 
 \begin{quote}
   I think that descriptions in results of ``what the data could be used for''
