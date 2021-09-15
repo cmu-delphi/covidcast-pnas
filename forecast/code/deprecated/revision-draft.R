@@ -6,6 +6,12 @@ tt <- fcasts_honest %>%
   arrange(forecast_date) %>%
   mutate(n = n(), w = cummean(w))
 
+tt <- fcasts_honest %>%
+  group_by(forecaster, forecast_date) %>%
+  summarise(w = sum(wis) / sum(strawman_wis)) %>%
+  arrange(forecast_date) %>%
+  mutate(n = n(), w = cumsum(w))
+
 
 fcast_colors <- c(RColorBrewer::brewer.pal(5, "Set1"), "#000000")
 names(fcast_colors) <- c("CHNG-CLI", "CHNG-COVID", "CTIS-CLIIC", "DV-CLI",
