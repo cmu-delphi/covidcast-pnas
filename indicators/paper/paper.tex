@@ -633,16 +633,18 @@ clear dips in the confirmed COVID case curve that occur around the Thanksgiving
 and New Year's holidays. This is artificial, and due to the fact that public
 health departments usually close over holiday periods, which delays case and
 death reporting (for this reason, the artificial dips persist at the state- and
-county-level as well). The CLI signal from the survey, on the other hand,
-displays no such dips. The claims signals actually display holiday effects going
-in the other direction: they exhibit \textit{spikes} around Thanksgiving and New
-Year's. This is because they measure the fraction of all outpatient visits with
-a certain condition, and the denominator here (total outpatient visits) drops
-disproportionately during holiday periods, as people are likely less willing to
-go to the doctor for more routine issues. Fortunately, in principle, the holiday
-effects in claims signals should be correctable: they are mainly due to
-\textit{overall} changes in medical seeking behavior during holiday, periods,
-and we can estimate such effects using historical claims data.
+county-level as well). This delay denies public health officials timely signals
+of current trends for the duration of the holidays. The CLI signal from the
+survey, on the other hand, displays no such dips. The claims signals actually
+display holiday effects going in the other direction: they exhibit
+\textit{spikes} around Thanksgiving and New Year's. This is because they measure
+the fraction of all outpatient visits with a certain condition, and the
+denominator (total outpatient visits) drops disproportionately during holiday
+periods, as people are likely less willing to go to the doctor for more routine
+issues. Fortunately, in principle, the holiday effects in claims signals should
+be correctable: they are mainly due to \textit{overall} changes in medical
+seeking behavior during holiday, periods, and we can estimate such effects using
+historical claims data.
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/time_wise_correlation.pdf}
@@ -666,8 +668,9 @@ affected by Bexar County's reporting problems and, as shown in the last
 subsection, it is (in general) highly correlated with case rates, providing an
 alternate stream of data about COVID activity unaffected by backlogs. Similar
 reporting problems have occurred in many jurisdictions across the United States,
-making it valuable to cross-check against external sources not part of the same
-reporting systems.
+and audits have regularly discovered misclassified or unreported cases and
+deaths, making it valuable to cross-check against external sources not part of
+the same reporting systems.
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/bexar_compare.pdf}
