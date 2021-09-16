@@ -222,7 +222,7 @@ while enabling analyses of the impact of public health policies on public
 behavior, the economy, and disease spread \cite{Bonaccorsi:2020, Nouvellet:2021,
   Adjodah:2021, Jewell:2021}.
 
-The Delphi Group works with partner organizations and public data sets to build
+The Delphi Group worked with partner organizations and public data sets to build
 a massive database of indicators tracking COVID-19 activity and other relevant
 phenomena in the United States, which has been publicly available and
 continuously updated since April 2020. Alongside public data on reported cases
@@ -298,10 +298,10 @@ Table~\ref{tab:sources_signals}, and detailed documentation is available at
 
 \begin{table*}[t]
 \centering
-\caption{Data sources available in Delphi's COVIDcast API \cite{CovidcastAPI},
-  as of date of publication. The first group of data sources are produced by
-  Delphi from data not otherwise available publicly (or only available in
-  limited form); the second group is mirrored from public sources.}
+\caption{Data sources available in the COVIDcast API \cite{CovidcastAPI}, as of
+  date of publication. The first group of data sources are produced from data
+  not otherwise available publicly (or only available in limited form); the
+  second group is mirrored from public sources.}
 \begin{tabular}{>{\raggedright}p{1.2in} p{4.0in} l >{\raggedright\arraybackslash}p{0.5in}}
   \toprule
   \textbf{Data source} & \textbf{Signals available} & \textbf{First date} &
@@ -391,10 +391,10 @@ to as \textit{backfill}.
 
 For this reason, the COVIDcast API annotates every observation with two dates:
 the \textit{time value}, the date the underlying events (such as tests or
-doctor's visits) occurred, and the \textit{issue date} when Delphi aggregated
+doctor's visits) occurred, and the \textit{issue date} when we aggregated
 and reported the data for that time value. Importantly, there can be multiple
 observations for a single time value with different issue dates, for example if
-data is revised or claims records arrive late. Delphi tracks revisions to all
+data is revised or claims records arrive late. We track revisions to all
 data sources we ingest, including external data sources (such as sources
 tracking cases and deaths). Many external sources do not keep a public or
 conveniently accessible record of revisions of their data.
@@ -441,7 +441,7 @@ have additional restrictions imposed by the data source; see
 
 \subsection{Interactive Visualization}
 
-Since April 2020, Delphi has been maintaining and continually improving various
+Since April 2020, we have been maintaining and continually improving various
 online visualization tools for the COVIDcast indicators \cite{CovidcastViz}.
 These tools fetch data directly from the API, and allow for exploration of both
 temporal (e.g., time series graphs) and spatial (e.g., choropleth maps) trends
@@ -457,7 +457,7 @@ geographic aggregations and time scales.
 
 \subsection{COVID Forecasting}
 
-Since July 2020, Delphi has been regularly submitting short-term forecasts of
+Since July 2020, we have been regularly submitting short-term forecasts of
 COVID-19 case and death incidence, at the state and county levels, to the
 COVID-19 Forecast Hub \cite{ForecastHub}, with ``CMU-TimeSeries'' as the
 team-model name.  The process of building, training, and deploying our
