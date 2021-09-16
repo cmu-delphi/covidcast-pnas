@@ -391,11 +391,11 @@ to as \textit{backfill}.
 
 For this reason, the COVIDcast API annotates every observation with two dates:
 the \textit{time value}, the date the underlying events (such as tests or
-doctor's visits) occurred, and the \textit{issue date} when we aggregated
-and reported the data for that time value. Importantly, there can be multiple
+doctor's visits) occurred, and the \textit{issue date} when we aggregated and
+reported the data for that time value. Importantly, there can be multiple
 observations for a single time value with different issue dates, for example if
-data is revised or claims records arrive late. We track revisions to all
-data sources we ingest, including external data sources (such as sources
+data is revised or claims records arrive late. We track revisions to all data
+sources included in the API, including external data sources (such as sources
 tracking cases and deaths). Many external sources do not keep a public or
 conveniently accessible record of revisions of their data.
 
