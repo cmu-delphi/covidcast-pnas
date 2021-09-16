@@ -42,10 +42,10 @@ library(dplyr)
 
 \begin{figure}
 \includegraphics[width=\textwidth]{fig/severity-pyramid.pdf}
-\caption{The epidemiological "severity pyramid" represents the progression of
+\caption{The epidemiological ``severity pyramid'' represents the progression of
 cases from the public, through infection, through increasingly severe stages of
 disease. The annotations here represent the data sources collected by Delphi's
-COVIDcast Epidata API. TODO Edit to use consistent language to paper}
+COVIDcast Epidata API.}
 \end{figure}
 
 \clearpage
@@ -182,15 +182,18 @@ g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 4)
 
 \clearpage
 
-```{r hospitalization_time_trends_national, fig.cap="National trends, from April 2020 to April 2021, of HHS-reported confirmed COVID-19 hospital admissions, plus another hospitalization signal in the COVIDcast API. Here, the HHS data has been limited to values from 2020-08-01 onward due to changes in reporting behavior, and processed into a 7-day trailing average rate per 100,000 resident population using Census Bureau estimates for 2019. HSP-Hosp is the percentage of new hospital admissions with COVID-associated diagnoses, based on claims data from health system partners, smoothed in time and adjusted for systematic day-of-week effects (HSP-Hosp is available from an earlier date when working at finer geographical resolutions). HSP-Hosp has been scaled to have the same maximum value as the HHS data."}
-start_day = "2020-04-15"
-end_day = "2021-04-15"
-as_of_day = "2021-06-01"
+```{r hospitalization_time_trends_national, fig.cap="National trends, from August 2020 to August 2021, of HHS-reported confirmed COVID-19 hospital admissions, plus comparison signals in the COVIDcast API. (HHS data was not consistently reported before August 2020.) Here, the HHS data has been processed into a 7-day trailing average rate per 100,000 resident population using Census Bureau estimates for 2019. HSP-Hosp is the percentage of new hospital admissions with COVID-associated diagnoses, based on claims data from health system partners, smoothed in time and adjusted for systematic day-of-week effects (HSP-Hosp is available from an earlier date when working at finer geographical resolutions). HSP-Hosp, CTIS-CLI-in-community, and CHNG-CLI have been scaled to have the same maximum value as the HHS data."}
+start_day = "2020-08-15"
+end_day = "2021-08-15"
+as_of_day = "2021-09-01"
 
-HOSP_SOURCES <- c("hhs", "hospital-admissions")
-HOSP_SIGNALS <- c("confirmed_admissions_covid_1d", "smoothed_adj_covid19_from_claims")
-hosp_names = c("Hospitalizations", "HSP-Hosp")
-hosp_signal_has_national = c(TRUE, TRUE)
+HOSP_SOURCES <- c("hhs", "jhu-csse", "hospital-admissions", "fb-survey", "chng")
+HOSP_SIGNALS <- c("confirmed_admissions_covid_1d", "confirmed_7dav_incidence_prop",
+                  "smoothed_adj_covid19_from_claims",
+                  "smoothed_whh_cmnty_cli", "smoothed_adj_outpatient_covid")
+hosp_names = c("Hospitalizations", "Cases", "HSP-Hosp",
+               "CTIS-CLI-in-community", "CHNG-CLI")
+hosp_signal_has_national = c(TRUE, TRUE, TRUE, TRUE, TRUE)
 hhs_start_date = as.Date("2020-08-01")
 
 hosp_colors = c("black", scales::hue_pal()(length(HOSP_SIGNALS)-1))
@@ -285,7 +288,7 @@ for (i in seq_along(HOSP_SIGNALS)) {
 }
 ```
 
-```{r hosp-correlations-by-time, fig.cap="Geo-wise correlations with hospitalization rates derived from HHS data, from April 15, 2020 to April 15, 2021, calculated for all times with sufficient available data within this period, over all state-like jurisdictions for which each signal was reported on at least 50 days during this period, limited to state-day combinations for which both signals are available."}
+```{r hosp-correlations-by-time, fig.cap="Geo-wise correlations with hospitalization rates derived from HHS data, from August 15, 2020 to August 15, 2021, calculated for all times with sufficient available data within this period, over all state-like jurisdictions for which each signal was reported on at least 50 days during this period, limited to state-day combinations for which all signals are available."}
 n_hosp_signals = length(HOSP_SIGNALS)
 df_list_hosp_geowise_cor = vector("list", n_hosp_signals)
 for (i in 1:n_hosp_signals) {
@@ -310,7 +313,7 @@ ggplot(df_long_hosp_geowise_cor, aes(x = time_value, y = value)) +
   theme(legend.position = "bottom", legend.title = element_blank())
 ```
 
-```{r hosp-correlations-by-state, fig.cap="Time-wise correlations with hospitalization rates derived from HHS data, from April 15, 2020 to April 15, 2021, calculated over all state-like jurisdictions for which each signal was reported on at least 50 days during this period, limited to state-day combinations for which both signals are available."}
+```{r hosp-correlations-by-state, fig.cap="Time-wise correlations with hospitalization rates derived from HHS data, from August 15, 2020 to August 15, 2021, calculated over all state-like jurisdictions for which each signal was reported on at least 50 days during this period, limited to state-day combinations for which all signals are available."}
 df_list_hosp_timewise_cor = vector("list", length(HOSP_SIGNALS))
 for (i in seq_along(HOSP_SIGNALS)) {
   df_list_hosp_timewise_cor[[i]] = covidcast_cor(
