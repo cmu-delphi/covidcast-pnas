@@ -21,6 +21,7 @@ library(dplyr)
 library(tidyr)
 library(epitools)
 library(tidycensus)
+library(zoo)
 
 library(ggplot2)
 library(gridExtra)
@@ -540,6 +541,64 @@ symptom_rrs %>%
   arrange(desc(rr)) %>%
   kable(col.names = c("Symptom", "RR", "lower", "upper"),
         digits = 2)
+```
+
+## Trends in each signal, by Census region
+
+```{r fetch-signal-data}
+start_day <- "2020-04-06"
+end_day <- "2021-04-05"
+
+anosmia <- data %>%
+  mutate(date = as.Date(StartDatetime),
+         anosmia = is_selected(B2, "13"),
+         state = toupper(name_to_abbr(state_fips_to_name(fips)))) %>%
+  group_by(date, state) %>%
+  summarize(anosmia = weighted.mean(anosmia, weight, na.rm = TRUE)) %>%
+  select(time_value = date, value = anosmia, geo_value = state) %>%
+  as.covidcast_signal(signal = "anosmia")
+
+signals <- covidcast_signals(
+  c("fb-survey", "fb-survey", "jhu-csse", "hhs", "jhu-csse"),
+  c("raw_wcli", "raw_whh_cmnty_cli", "confirmed_incidence_prop",
+    "confirmed_admissions_covid_1d_prop", "deaths_incidence_prop"),
+  start_day, end_day,
+  geo_type = "state") %>%
+  aggregate_signals(format = "long")
+
+signals <- append(signals, anosmia)
+
+signals$signal <- factor(
+  signals$signal,
+  levels = c("anosmia", "raw_wcli", "raw_whh_cmnty_cli", "confirmed_incidence_prop",
+             "confirmed_admissions_covid_1d_prop", "deaths_incidence_prop"),
+  labels = c("Anosmia %", "CLI %", "Community CLI %", "Cases per 100,000",
+             "Hospitalizations per 100,000", "Deaths per 100,000"))
+
+to_plot <- signals %>%
+  mutate(geo_value = toupper(geo_value)) %>%
+  inner_join(select(state_census, ABBR, REGION, POPESTIMATE2019),
+             by = c("geo_value" = "ABBR")) %>%
+  group_by(REGION, time_value, signal) %>%
+  summarize(value = weighted.mean(value,
+                                  ifelse(data_source %in% c("jhu-csse", "hhs"),
+                                         POPESTIMATE2019, sample_size),
+                                  na.rm = TRUE))
+
+to_plot <- to_plot %>%
+  group_by(REGION, signal) %>%
+  arrange(time_value) %>%
+  mutate(value = rollmean(value, 7, fill = NA))
+
+ggplot(to_plot, aes(x = time_value, y = value, color = REGION)) +
+  geom_line() +
+  facet_wrap(vars(signal), nrow = 2, ncol = 3, scales = "free_y") +
+  labs(x = "Date", y = "Value") +
+  scale_x_date(date_breaks = "3 months",
+               date_labels = "%b %Y",
+               date_minor_breaks = "1 month") +
+  theme_bw() +
+  theme(legend.position = "bottom")
 ```
 
 ## Cumulative test positivity
