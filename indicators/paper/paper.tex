@@ -288,6 +288,7 @@ deaths data aggregated from public reporting by JHU CSSE \cite{Dong:2020} and by
 USAFacts \cite{USAFacts}, so that we can track revisions and updates to this data
 (see Section~\ref{subsec:revision_tracking}).
 
+% TODO Recount!
 Altogether, we collect 110 signals from 12 distinct sources, aggregate and
 process them, and provide them in a common format for public access. This
 unifies both unique (not available anywhere else) and standard COVID data
@@ -600,6 +601,14 @@ third. There are three noteworthy points:
   \label{fig:geo_wise_correlation}
 \end{figure}
 
+\begin{figure}[t]
+  \includegraphics[width=\columnwidth]{fig/time_wise_correlation.pdf}
+  \caption{Time-wise correlations with case rates, from April 15, 2020 to April
+    15, 2021, calculated over all counties for which all signals were available
+    and which had at least 500 cumulative cases by the end of this period.}
+  \label{fig:time_wise_correlation}
+\end{figure}
+
 \begin{itemize}
 \item This is different from what is observed in
   Figure~\ref{fig:geo_wise_correlation}, where the CTIS-CLI-in-community signal
@@ -656,14 +665,6 @@ issues. Fortunately, in principle, the holiday effects in claims signals should
 be correctable: they are mainly due to \textit{overall} changes in medical
 seeking behavior during holiday, periods, and we can estimate such effects using
 historical claims data.
-
-\begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/time_wise_correlation.pdf}
-  \caption{Time-wise correlations with case rates, from April 15, 2020 to April
-    15, 2021, calculated over all counties for which all signals were available
-    and which had at least 500 cumulative cases by the end of this period.}
-  \label{fig:time_wise_correlation}
-\end{figure}
 
 As a further example, Figure~\ref{fig:bexar_compare} displays data from Bexar
 County, Texas (which contains San Antonio) during July 2020. On July 16, 2020,
@@ -754,15 +755,16 @@ outreach efforts.
   \label{fig:vaccine-intent-compare}
 \end{figure}
 
-As an illustration, Figure~\ref{fig:vaccine-intent-compare} illustrates how
-CTIS results in January 2021, based on an item asking survey respondents whether
-they would accept a COVID-19 vaccine if one were vaccinated today, predicted
-actual uptake of COVID-19 vaccines by July 2021. It also illustrates a
-geographical disparity: in the Northeast, actual vaccination rates more closely
-match vaccine acceptance in January than they do in the South, where vaccination
-rates lag overall. While these results must be interpreted carefully due to
-potential sampling biases in the survey, they illustrate the potential of data
-in the COVIDcast API to inform public health decision-making.
+As an illustration, Figure~\ref{fig:vaccine-intent-compare} illustrates how CTIS
+results in January 2021, based on an item asking survey respondents whether they
+would accept a COVID-19 vaccine if one were vaccinated today, predicted actual
+uptake of COVID-19 vaccines by July 2021 (as reported by the Centers for Disease
+Control and Prevention). It also illustrates a geographical disparity: in the
+Northeast, actual vaccination rates more closely match vaccine acceptance in
+January than they do in the South, where vaccination rates lag overall. While
+these results must be interpreted carefully due to potential sampling biases in
+the survey, they illustrate the potential of data in the COVIDcast API to inform
+public health decision-making.
 
 \section{Discussion}
 
