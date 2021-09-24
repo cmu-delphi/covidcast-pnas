@@ -15,7 +15,15 @@ GeoMean <- function(x) exp(mean(log(x), na.rm = TRUE))
 pct_change <- function(x, n = 14, col_name = "pct_change"){
   # courtesy of Alden
   dt <- c(0,-n)
-  y = covidcast:::apply_shifts(x,dt) %>%
+  # y = covidcast:::apply_shifts(x,dt) %>%  clobbered in recent upgrade
+  x = x %>%
+    dplyr::group_by(geo_value) %>%
+    dplyr::arrange(time_value)
+  for (n in dt) {
+    varname <- sprintf("value%+d", n)
+    x <- x %>% dplyr::mutate(!!varname := covidcast:::shift(value, n))
+  }
+  y <- dplyr::select(x, -value) %>%
     rename(value = tidyselect::matches("value\\+"),
            lag_value = tidyselect::matches("value\\-")) %>%
     mutate(`:=`(!!col_name,(value - lag_value) / lag_value))

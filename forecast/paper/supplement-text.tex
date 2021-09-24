@@ -99,6 +99,43 @@ of moderate errors).  Indeed, Figure 5 of the main paper further
 corroborates this, in which we see the heaviest left tails occuring
 for \chngcli.
 
+\section{Statistical significance}
+
+In the Introduction of the main paper, we give some reasons that we avoid making
+formal statements about statistical significance, preferring instead to examine
+the stability of our results in different contexts. There are strong reasons to
+avoid model-based significance tests because the necessary assumptions about
+stationarity, independence, and the  model being true (or at least approximately
+true) are certainly violated. With those caveats in mind, we undertake two
+relatively assumption-lean investigations in this section. The first is a
+sign-test for whether the difference between the AR model’s relative WIS  and
+each other model’s relative WIS is centered at zero. By ``relative WIS'' we mean
+scaled by the strawman as displayed in Figure 3. To mitigate the dependence
+across time (which intuitively seems to matter more than that across space), we
+computed these tests in a stratified way, where for each forecast date we run a
+sign test on the scaled errors between two models over all 440 counties. The
+results are plotted as histograms in Figure \ref{fig:sign-test}. In this case,
+we use the total relative WIS over all aheads, but the histograms are largely
+similar for individual target horizons. If there were no difference, we would
+expect to see a uniform distribution. However, for all indicator-assisted
+models, we see many more small $P$-values than would be expected if the null
+hypothesis (that the AR model is better) were true.
+
+Another relatively assumption-lean method of testing for differences in forecast
+accuracy is the Diebold-Mariano test \cite{Diebold:2002,Diebold:2015,harvey1997testing}.
+Essentially, the differences between forecast losses are assumed to have a
+constant mean and a covariance that depends on time. Under these conditions, the
+asymptotic distribution for the standardized mean of the differences is limiting
+normal provided that a heteroskedasticity and autocorrelation robust estimate of
+the variance is used. Using the loss as weighted interval score across all HRRs
+and horizons (7 to 21 days ahead), we perform the DM test using both the mean
+relative to the strawman (as reported in the manuscript) and the geometric mean
+relative to the strawman as described above. The first two rows of Table
+\ref{tab:dm-test} displays 
+$P$-values for the test that the indicator-assisted model is no-better than the
+AR model. Only the CHNG-CLI model's $P$-value exceeds conventional statistical
+significance thresholds.  
+
 \section{Bootstrap results}
 
 As explained in Section 2.B. of the main paper, a (somewhat cynical)

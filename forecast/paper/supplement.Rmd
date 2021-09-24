@@ -1,5 +1,5 @@
 ---
-bibliography: [../../common/covidcast.bib, pnas-materials/pnas-sample.bib]
+bibliography: [../../common/covidcast.bib]
 output: 
   pdf_document:
     keep_tex: true
@@ -184,9 +184,11 @@ plotter(
 ```{r hot-honest-v-finalized, fig.cap="Relative AUC with vintage compared to finalized data. Using finalized data leads to overly optimistic hotspot performance."}
 left_join(
   hotspots_honest %>%
+    filter(period != "jm") %>%
     group_by(forecaster, ahead) %>%
     summarise(auc_honest = auc(value, actual)),
   hotspots_finalized %>%
+    filter(period != "jm") %>%
     group_by(forecaster, ahead) %>%
     summarise(auc_finalized = auc(value, actual))) %>%
   ggplot(aes(ahead, auc_honest / auc_finalized, color = forecaster)) + 
@@ -232,6 +234,77 @@ plotter(fcasts_honest %>% filter(period != "jm"),
 
 
 \clearpage
+
+<!-- Statistical significance -->
+
+```{r sign-test, fig.cap="P-values for a sign test that the WIS of the AR forecaster is smaller than that of the indicator-assisted model. Each P-value corresponds a particular forecast date."}
+fcast_colors2 <- fcast_colors[names(fcast_colors) != "AR"]
+
+st <- fcasts_honest %>%
+  filter(period != "jm") %>%
+  mutate(wis = wis / strawman_wis) %>%
+  select(forecaster, geo_value, ahead, forecast_date, wis) %>%
+  pivot_wider(names_from = forecaster, values_from = wis) %>%
+  mutate(across(AR:`Google-AA`, ~ AR - .x)) %>%
+  select(-AR) %>%
+  pivot_longer(`CHNG-CLI`:`Google-AA`, names_to = "forecaster", values_to = "dif") %>%
+  group_by(forecaster, forecast_date, geo_value) %>%
+  summarise(dif = sum(dif)) %>%
+  group_by(forecaster, forecast_date) %>%
+  summarise(p = binom.test(
+    x = sum(dif > 0),
+    n = n(),
+    alternative = "greater")$p.val)
+
+ggplot(st, aes(p)) +
+  geom_histogram(
+    aes(y = after_stat(density), color = forecaster, fill = forecaster), 
+    alpha = 0.4,
+    bins = 40) +
+  scale_color_manual(values = fcast_colors2, guide = guide_legend(nrow = 1)) +
+  scale_fill_manual(values = fcast_colors2, guide = guide_legend(nrow = 1)) +
+  facet_wrap(~forecaster) +
+  ylab("Frequency") +
+  xlab("P-value") +
+  scale_y_continuous(
+    labels = scales::percent_format(scale = 1, accuracy = 1)) +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+```
+
+
+```{r dm-test}
+errs <- fcasts_honest %>% 
+  filter(period != "jm") %>%
+  group_by(forecaster, forecast_date) %>%
+  summarise(
+    `Mean Relative WIS` = mean(wis) / mean(strawman_wis),
+    # mwis = mean(wis), 
+    `Geometric Mean Relative WIS` = GeoMean(wis / strawman_wis) #,
+    # gmwis = GeoMean(wis)
+    ) %>%
+  ungroup()
+ar <- errs %>% 
+  filter(forecaster == "AR") %>% 
+  select(-forecaster) %>%
+  pivot_longer(-forecast_date, names_to = "metric", values_to = "AR")
+notar <- errs %>%
+  filter(forecaster != "AR") %>% 
+  pivot_longer(-c("forecaster", "forecast_date"), names_to = "metric", values_to = "err")
+
+all_errs <- left_join(notar, ar)
+dms <- all_errs %>% 
+  group_by(forecaster, metric) %>% 
+  summarise(dm = forecast::dm.test(AR, err, "greater", h = 7 , power = 1)$p.value)
+
+
+
+kableExtra::kable(
+  bind_rows(dms) %>% 
+    pivot_wider(names_from = forecaster, values_from = dm), 
+  digits = 3, booktabs = TRUE, caption = "$P$-values for a Diebold-Mariano test for differences in forecast error. The test is for the null hypothesis of equal performance against the alternative that the indicator assisted model is better.")
+```
 
 
 <!-- Bootstrap stuff -->
