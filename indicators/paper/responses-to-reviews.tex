@@ -83,9 +83,8 @@ manuscripts unnecessarily. We have made some changes to the Results section
 accordingly. Most notably, we have replaced Figure 6 with one that more clearly
 shows a potential use case of the data presented beyond forecasting of cases; it
 now shows how data sources in the API could have aided in planning for the COVID
-vaccination campaign.
-
-TODO any additional changes?
+vaccination campaign. We have also introduced a new figure (discussed below) to
+make the value of revision data more clear, and adjusted language throughout.
 
 \begin{quote}
   The main value of the data discussed in the paper seems to focus on its
@@ -118,8 +117,24 @@ reported.
 When our correlation analyses show a high correlation between a signal and case
 reports on a specific date, that signal may have been available several days
 before the case reports were, depending on the time this occurred during the
-pandemic and the state's reporting practices. We have expanded Section 2.B to
-make this point clearer.
+pandemic and the state's reporting practices. Meanwhile, signals such as
+CTIS-CLI-in-community can be reported within 1--2 days of the survey responses.
+High correlations with case and death data hence indicate a high correlation
+with a case value that may have only been officially reported days after these
+signals.
+
+But this point is somewhat subtle; ideally, one would like to correlate our
+surveys against the number of new infections occurring on a date, rather than
+the number of cases reported on that date. These could be very different, since
+infections occur days or weeks before cases are reported, but ground-truth
+infection data is unavailable.
+
+Instead, we have added a new figure to illustrate a related point. Because we
+track revisions of signals, we can see how often officially reported case and
+death data is revised, and how long these revisions can occur after initial
+reporting. The new figure (now Figure 6) shows that case and death data can be
+subject to quite large revisions even 30--60 days after initial reporting,
+making it important to have supplementary data sources to check against.
 
 \begin{quote}
   The strength of observed correlations change (non-monotonically) over time,
@@ -144,10 +159,11 @@ discussion of the manuscript.
   like hospitalization or death).
 \end{quote}
 We have extended the Supplementary Information to include more detailed
-comparisons between our signals and reported COVID hospitalizations, including
-comparisons of correlations. These show broadly similar results as the COVID
-case analyses. Section 2.B now points to the Supplement for interested readers
-to examine these analyses.
+comparisons between our signals and reported COVID hospitalizations (as compiled
+by the Department of Health and Human Services), including comparisons of
+correlations. These show broadly similar results as the COVID case analyses.
+Section 2.B now points to the Supplement for interested readers to examine these
+analyses.
 
 \begin{quote}
   The case studies of signal utility that are provided seem stylized.
@@ -162,6 +178,8 @@ to retrospective audits of records that uncover cases and deaths that were
 incorrectly classified, and can affect case and death estimates months in the
 past. Until the audits are complete, policymakers would not know about the
 corrections, their magnitude, or the effects they'd have on policy decisions.
+The new Figure 6 illustrates this by showing the magnitude of revisions to case
+and death reports.
 
 Even for predictable backlogs, such as those that occur during major holidays,
 the backlog still means policymakers do not have an important signal: If case
@@ -192,10 +210,10 @@ We have adjusted the language in Section 2.C to make these points clearer.
   the data.
 \end{quote}
 We appreciate the interest in additional analyses, and our replacement of Figure
-6 is partly intended to address this concern about choice of case studies. It
-represents an example showing how these data sources can reveal points not
-available in other standard data sources, such as case and death data, and serve
-to aid public health decision-making.
+6 (with the new Figure 7) is partly intended to address this concern about
+choice of case studies. It represents an example showing how these data sources
+can reveal points not available in other standard data sources, such as case and
+death data, and serve to aid public health decision-making.
 
 We have chosen not to include additional descriptive statistics or comparisons
 between signals for two reasons. First, given the large number of signals
@@ -217,7 +235,13 @@ interesting signal behavior.
   and implications don't really hit home without connection to changes in
   specific forecasts.
 \end{quote}
-TODO
+We have extended the discussion of revisions, as mentioned above, to give
+another illustration of why having revision information for external data
+sources is valuable. Given the challenges of COVID forecasting, it did not seem
+in-scope for this paper to explore revision information and its impact on
+forecasting in great depth. We have also replaced the example in Section 2.E
+(now Figure 7) to be more topical and illustrate the unique value of the data
+more strongly.
 
 \begin{quote}
   Some of the verb tenses (e.g. line 33) feel awkward: ``The Delphi Group
