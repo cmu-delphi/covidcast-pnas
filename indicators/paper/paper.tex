@@ -723,16 +723,38 @@ suggests that statistical models could be fit (potentially separately for each
 location) to estimate the final values from preliminary reports. On the other
 hand, official public health reporting of COVID cases and deaths can be subject
 to revision as death certificates are audited and backlogs cleared, resulting in
-thousands of cases and deaths being added or removed. This process is much more
-difficult to predict, and thus claims data and other sources may be a useful
-stand-in while public health reports are aggregated and corrected.
+thousands of cases and deaths being added or removed.
+Figure~\ref{fig:backfill-compare} shows the amount of revision for several
+signals, in terms of the 95th percentile of relative change between initial
+estimates and revised estimates issued later; this shows that reported deaths
+can have large revisions comparable to revisions in claims-based signals. This
+backfill is much more difficult to predict, and thus claims data and other
+sources may be a useful stand-in while public health reports are aggregated and
+corrected.
 
-To reiterate a previous point, when training and validating forecast models (on
-historical data), users will want to use data that was known \textit{as of} the
-forecast date, not revised versions that only became available much later. The
-COVIDcast API makes all historical versions available and easily accessible for
-this purpose; and this feature plays a prominent role in our own analysis of
-forecasting and hotspot prediction models appearing in a companion paper.
+\begin{figure}[t]
+  \includegraphics[width=\columnwidth]{fig/backfill-compare.pdf}
+  \caption{95th percentile relative changes between initial values of key
+    signals, compared to the final values reported much later. Calculated using
+    each day's state-level estimates for the six months between October 15, 2020
+    and April 15, 2021; final values were those reported 120 days after the end
+    of this period. Even officially reported case and death data can have large
+    revisions 30--60 days after initial reporting; much of this is driven by
+    individual large revisions affecting specific states and dates, rather than
+    systematic changes affecting all states and dates.}
+  \label{fig:backfill-compare}
+\end{figure}
+
+To reiterate a previous point, when training and validating forecast models that
+use signals (on historical data), users will want to use data that was known
+\textit{as of} the forecast date, not revised versions that only became
+available much later. The COVIDcast API makes all historical versions available
+and easily accessible for this purpose; and this feature plays a prominent role
+in our own analysis of forecasting and hotspot prediction models appearing in a
+companion paper. Revisions to forecast targets, such as cases and deaths, also
+complicate the evaluation of forecast models: comparisons of forecasts to the
+ground truth may shift when the ground truth is revised weeks later. Only by
+systematically tracking revisions can this effect be monitored.
 
 \subsection{New Perspectives}
 
