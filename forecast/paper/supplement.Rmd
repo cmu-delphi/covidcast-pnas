@@ -430,7 +430,7 @@ up_down_df_summary %>%
   ggplot(aes(udf, mean , fill = forecaster)) +
   geom_bar(width = 0.6, position = position_dodge(width=0.6),
            stat = "identity") +
-  scale_fill_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
+  scale_fill_manual(values = fcast_colors[1:5], guide = guide_legend(nrow = 1)) +
   scale_y_continuous() +
   theme_bw() +
   geom_hline(yintercept = 0) +
@@ -524,7 +524,7 @@ bind_rows(con_tab %>% mutate(err = "Classification error"),
   ggplot(aes(udf, (m - mar) / abs(mar) , fill = forecaster)) +
   geom_bar(width = 0.6, position = position_dodge(width=0.6),
            stat = "identity") +
-  scale_fill_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
+  scale_fill_manual(values = fcast_colors[1:5], guide = guide_legend(nrow = 1)) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   theme_bw() +
   geom_hline(yintercept = 0) +
@@ -536,6 +536,7 @@ bind_rows(con_tab %>% mutate(err = "Classification error"),
 
 
 \clearpage
+
 
 
 <!-- Correlations with lagged actuals -->
@@ -614,7 +615,7 @@ up_down_df %>%
   ggplot(aes(udf, cor , fill = forecaster)) +
   geom_bar(width = 0.6, position = position_dodge(width=0.6),
            stat = "identity") +
-  scale_fill_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
+  scale_fill_manual(values = fcast_colors[1:5], guide = guide_legend(nrow = 1)) +
   theme_bw() +
   geom_hline(yintercept = 0) +
   theme(legend.position = "bottom", legend.title = element_blank())
@@ -781,7 +782,7 @@ df2 %>%
   geom_bar(width = 0.6, position = position_dodge(width=0.6),
            stat = "identity") +
   geom_hline(yintercept = 0) +
-  scale_fill_manual(values = fcast_colors) +
+  scale_fill_manual(values = fcast_colors[1:5], guide = guide_legend(nrow = 1)) +
   theme_bw() +
   ylab("Correlation") +
   xlab("") +
@@ -801,7 +802,7 @@ df2 %>%
   geom_bar(width = 0.6, position = position_dodge(width=0.6),
            stat = "identity") +
   geom_hline(yintercept = 0) +
-  scale_fill_manual(values = fcast_colors) +
+  scale_fill_manual(values = fcast_colors[1:5]) +
   theme_bw() +
   ylab("Correlation") +
   xlab("") +
@@ -872,6 +873,85 @@ plotter_hotspots(hotspots_honest)
 
 
 \clearpage
+
+
+<!-- Cumulative Mean -->
+
+```{r cumulative-mean, fig.cap="This figure shows the cumulative sum of WIS for each forecaster divided by the cumulative sum of WIS for the baseline model. The shaded background shows" }
+cumulatives <- fcasts_honest %>%
+  group_by(forecaster, forecast_date) %>%
+  summarise(mw = Mean(wis),
+            smw = Mean(strawman_wis),
+            gmw = GeoMean(wis / strawman_wis)) %>%
+  arrange(forecast_date) %>%
+  mutate(`Cumulative Mean` = cummean(mw) / cummean(smw),
+         `Cumulative Sum` = cumsum(mw) / cumsum(smw),
+         `Cumulative Geo Mean` = exp(cummean(log(gmw))),
+         `GM Regret` = cumsum(gmw) - cumsum(smw/smw),
+         `AM Regret` = cumsum(mw) - cumsum(smw),
+         `14 day trailing average` = RcppRoll::roll_meanl(mw / smw, n = 14L))
+
+us_cases <- covidcast::covidcast_signal(
+  "jhu-csse", "confirmed_7dav_incidence_num", "2020-03-01", "2021-01-01",
+  geo_type = "nation") %>% as_tibble() %>%
+  mutate(value = (value / max(value)) * .25 +  .75) %>%
+  filter(time_value > "2020-06-01")
+
+ggplot(cumulatives %>% filter(forecast_date < "2021-01-01"), 
+       aes(forecast_date, color = forecaster)) + 
+  geom_line(aes(y = `Cumulative Sum`)) +
+  annotate(x = us_cases$time_value, ymax = us_cases$value, ymin = -Inf,
+           geom = "ribbon", alpha = .1) +
+  geom_hline(yintercept = 1) +
+  xlab("forecast date") +
+  scale_color_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
+  theme_bw() +
+  theme(legend.position = "bottom", legend.title = element_blank())
+```
+
+
+```{r errs-in-space, fig.cap="Percent improvement in WIS relative to the AR forecaster by region (negative numbers indicate improved performance, positives indicate worsening)."}
+# fig.height = 9.6, fig.width = 6, out.width = "5in", out.height="8in", 
+by_hrr <- fcasts_honest %>% 
+  filter(period != "jm") %>%
+  group_by(forecaster, geo_value) %>% 
+  summarize(value = GeoMean(wis)) %>%
+  mutate(time_value = Sys.Date()) %>%
+  ungroup()
+by_hrr <- left_join(
+  by_hrr %>% filter(forecaster != "AR"), 
+  by_hrr %>% 
+    filter(forecaster == "AR") %>% 
+    rename(AR = value) %>%
+    select(geo_value, AR)) %>%
+  mutate(value = (value - AR) / AR * 100) %>%
+  group_by(forecaster) %>%
+  group_split()
+
+cc_sigs <- purrr::map(by_hrr,
+                   ~ as.covidcast_signal(
+                     .x, signal = "Improvement relative to AR",
+                     data_source = .x$forecaster[1],
+                     geo_type = "hrr"))
+br <- c(2.5, 5, 10, 25, 50)
+br <- c(-rev(br), 0, br)
+colours <- brewer_pal(palette = "RdBu")
+
+
+maps <- purrr::map(
+  cc_sigs, 
+  ~plot(.x, title = .x$forecaster[1], 
+        choro_params = list(breaks = br), 
+        choro_col = rev(colours(11))) +
+    theme(legend.position = "none"))
+
+map_plot <- cowplot::plot_grid(plotlist = maps, ncol = 3)
+map_leg <- get_legend(maps[[1]] + theme(legend.position = "bottom"))
+cowplot::plot_grid(map_plot, map_leg, ncol = 1, rel_heights = c(1, .1))
+```
+
+\clearpage
+
 
 
 

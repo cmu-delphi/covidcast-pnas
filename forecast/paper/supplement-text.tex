@@ -299,5 +299,29 @@ quite different in this period.  With a 21-day training window, it is
 common for there to be many fewer hotspots in training.
 
 
+\section{Examining accumulated error over time and space}
 
+Following the suggestion of an anonymous reviewer, we investigate two
+disaggregated versions of 
+the main forecasting result shown in Figure 3 on the manuscript. The first
+(Figure \ref{fig:cumulative-mean})
+displays the cumulative error (summed over all horizons) of each forecaster
+divided by the cumulative error 
+of the baseline.
+This perspective should illustrate how
+the models perform over time, drawing attention to any nonstationary behavior.
+During the initial increase in cases in July 2020, CTIS-CLIIC and Google-AA gain
+a lot relative to the AR model. All the indicators do much better than the AR
+model during the following downturn (the ebb of the second wave). The AR model
+actually improves over the indicators in October 2020, before losing a bit in
+late November.
+
+Figure \ref{fig:errs-in-space} examines the spatial behavior over the entire
+period of the indicator-assisted models relative to the AR. For ease of
+comparison, we show the percent improvement in each HRR. Negative numbers (blue)
+mean that the indicator helped while positives (red) mean that the indicator
+hurt forecasting performance. The clear pattern is that in most HRRs, the
+indicators improved performance, though usually by small amounts (2.5\%--10\%).
+In some isolated HRRs, performance was markedly worse, though there does not
+appear to be any particular pattern to these locations.
 

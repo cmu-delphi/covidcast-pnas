@@ -2,21 +2,28 @@
 
 cumulatives <- fcasts_honest %>%
   group_by(forecaster, forecast_date) %>%
-  summarise(w = sum(wis) / sum(strawman_wis)) %>%
+  summarise(mw = Mean(wis),
+            smw = Mean(strawman_wis),
+            gmw = GeoMean(wis / strawman_wis)) %>%
   arrange(forecast_date) %>%
-  mutate(`Cumulative Mean` = cummean(w),
-         `Cumulative Sum` = cumsum(w),
-         `14 day trailing average` = RcppRoll::roll_meanl(w, n = 14L))
+  mutate(`Cumulative Mean` = cummean(mw) / cummean(smw),
+         `Cumulative Sum` = cumsum(mw),
+         `Cumulative Geo Mean` = exp(cummean(log(gmw))),
+         `GM Regret` = cumsum(gmw) - cumsum(smw/smw),
+         `AM Regret` = cumsum(mw) - cumsum(smw),
+         `14 day trailing average` = RcppRoll::roll_meanl(mw / smw, n = 14L))
 
-
+  
+  
 fcast_colors <- c(RColorBrewer::brewer.pal(5, "Set1"), "#000000")
 names(fcast_colors) <- c("CHNG-CLI", "CHNG-COVID", "CTIS-CLIIC", "DV-CLI",
                          "Google-AA", "AR")
 
 
+
 ggplot(cumulatives %>% filter(forecast_date < "2021-01-01"), 
        aes(forecast_date, color = forecaster)) + 
-  geom_line(aes(y = `14 day trailing average`)) +
+  geom_line(aes(y = `Cumulative Geo Mean`)) +
   geom_hline(yintercept = 1) +
   xlab("forecast date") +
   scale_color_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
@@ -95,18 +102,21 @@ knitr::kable(dms %>% pivot_wider(names_from = forecaster, values_from = dm), dig
 
 days_gained <- function(forecaster, reference, aheads, ahead = 14L, 
                         smaller_is_better = TRUE) {
+  n <- length(forecaster)
   # check for non-monotonicity
   if (!any(aheads == ahead)) return(NA)
   if (smaller_is_better) {
-    if (is.unsorted(forecaster) || is.unsorted(reference)) return(NA) 
+    if (is.unsorted(forecaster)) return(NA) 
   } else {
-    if (is.unsorted(rev(forecaster)) || is.unsorted(rev(reference))) return(NA)
+    if (is.unsorted(rev(forecaster))) return(NA)
   }
   
   ystar <- reference[aheads == ahead]
   diffs <- forecaster - ystar
-  up_idx <- min(which(diffs >= 0))
-  down_idx <- max(which(diffs < 0))
+  up_idx <- min(which(diffs >= 0), n + 1) # catch Infty
+  if (up_idx > n) return(max(aheads - ahead))
+  down_idx <- max(which(diffs < 0), 0)
+  if (down_idx < 1) return(min(aheads - ahead))
   y1 <- forecaster[up_idx]
   x1 <- aheads[up_idx]
   m <- (y1 - forecaster[down_idx]) / (x1 - aheads[down_idx])
@@ -118,13 +128,13 @@ days_gained <- function(forecaster, reference, aheads, ahead = 14L,
 
 tt <- fcasts_honest %>% 
   filter(period != "jm") %>% 
-  select(forecaster, geo_value, ahead, forecast_date, wis) %>%
+  select(forecaster, geo_value, ahead, forecast_date, wis, strawman_wis) %>%
   arrange(geo_value, forecast_date, ahead) %>%
   group_by(geo_value, ahead, forecaster) %>%
   summarize(wis = GeoMean(wis)) %>%
   pivot_wider(names_from = forecaster, values_from = wis) %>%
   arrange(geo_value, ahead) %>%
-  group_by(geo_value) %>%
+  group_by(geo_value)
   summarize(across(`CHNG-CLI`:`Google-AA`, ~days_gained(.x, AR, ahead))) %>%
   pivot_longer(-geo_value)
 

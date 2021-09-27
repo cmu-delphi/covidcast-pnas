@@ -56,8 +56,11 @@
   autoregressive model can be useful in COVID-19 case forecasting and hotspot
   prediction.  We find that indicators based on de-identified medical insurance 
   claims, self-reported symptoms through online surveys, and COVID-related
-  internet search activity all provide a nontrivial boost in accuracy, though
-  their utility generally depends the pandemic's local dynamics (upswing,
+  internet search activity
+  % all provide a nontrivial boost in accuracy,
+  all provide a nontrivial improvement in forecast accuracy,
+  though
+  their utility generally depends on the pandemic's local dynamics (upswing,
   downswing, or flat period) at prediction time.
 }
 
@@ -143,11 +146,22 @@ While forecasting carries a rich literature that offers a wide range of
 techniques, see e.g., \cite{Hyndman:2018}, we purposely constrain ourselves to
 very simple models, avoiding common enhancements such as order selection,
 correction of outliers/anomalies in the data, and inclusion of regularization or
-nonlinearities. That said, analyses of forecasts submitted to the COVID-19
+nonlinearities.
+% Addition in response to Reviewer 1
+For the same reason, we do not account for any environmental factors that may
+well aid in forecasting---age structure, variants, holidays,
+reporting patterns, vaccination, public health measures, etc.
+% End addition
+That said, analyses of forecasts submitted to the COVID-19
 Forecast Hub \cite{ForecastHub} by a large community of modelers have shown that
 simple, robust models have consistently been among the best-performing over the
-pandemic \cite{Cramer:2021}, including time series models similar to those we
-consider in what follows.   
+pandemic, including time series models similar to those we
+consider in what follows.
+% Added in response to Reviewer 2
+\cite{Cramer:2021} investigates the performance of submitted forecasts for
+state-level deaths and shows that time series models perform among the top 5.
+Our internal evaluations suggests that the same is true (at least, if not to a
+greater extent) for case forecasting. 
 
 In our companion paper, we analyze correlations between various indicators and   
 COVID case rates. These correlations are natural summaries of the
@@ -192,7 +206,10 @@ see, e.g., \cite{Diebold:2002, McCraken:2007, Diebold:2015, Stokes:2017,
 Our take on this problem is in line with much of this literature; however, in
 order to avoid making any explicit assumptions, we do not attempt to make formal 
 significance statements, and instead, broadly examine the stability of our
-conclusions with respect to numerous modes of analysis.   
+conclusions with respect to numerous modes of analysis.
+% Addition upon review
+We have included a section in the Supplement that examines two assumption-lean
+methods for assessing the statistical significance of our main results.
 
 \section{Methods}
 
@@ -385,9 +402,14 @@ of signals for features, as we will detail shortly) June 9, 2020 for
 forecasting, and June 16, 2020 for hotspot prediction. (The bottleneck here is
 the CTIS-CLI-in-community signal, which does not exist before early April 2020,
 when the survey was first launched). The end date was chosen again with a 
-consideration to align both tasks as best as possible, and because few hotspots
-exist post December 31, 2020, due to the general and gradual decline of the
-pandemic in 2021.
+consideration to align both tasks as best as possible,
+% added to emphasize 
+and to coincide with the
+introduction of vaccinations.
+% Removed: this is no longer true unfortunately.
+% because few hotspots
+% exist post December 31, 2020, due to the general and gradual decline of the
+% pandemic in 2021.
 
 \paragraph{Forecasting Models}
 
@@ -498,6 +520,10 @@ quantile models in \eqref{eq:forecast_ar} and \eqref{eq:forecast_ar_x} using
 is minimized by the population quantiles of the target variable.  The use of WIS
 in COVID-19 forecast scoring is discussed in \cite{Bracher:2021}; WIS is also
 the main evaluation metric used in the COVID-19 Forecast Hub.
+% Addition in response to Reviewer 1
+More broadly, the specific form of WIS used here is a standard metric in the
+forecasting community for evaluating probabilistic interval forecasts, just as
+Mean Squared Forecast Error is standard for point forecasts.
 
 WIS is typically defined for quantile-based forecasts where the quantile levels
 are symmetric around 0.5.  This is the case for our choice in
@@ -681,9 +707,19 @@ be found at
 Figure~\ref{fig:forecast} (left panel) displays evaluation results for
 forecasting, stratified by ahead value and averaged over all HRRs and forecast
 dates.  Shown is the average WIS for each forecast model divided by that from a
-baseline model, which is basically a flat-line forecaster (its median forecast
-for $Y_{\ell,t+a}$ is always $Y_{\ell,t}$, with predicted quantiles defined
-around this based on historical variation). This is the same baseline model as
+% change since review
+baseline model.
+The baseline model is a flat-line forecaster which forms its median forecast by
+using the most recent value $Y_{\ell,t}$ as the median forecast for all aheads
+$Y_{\ell,t+a}$ . To create
+the quantiles, we use the empirical quantiles of the residuals from this
+forecast over the available history. 
+% old version
+% baseline model,
+% which is basically a flat-line forecaster (its median forecast
+% for $Y_{\ell,t+a}$ is always $Y_{\ell,t}$, with predicted quantiles defined
+% around this based on historical variation).
+This is the same baseline model as
 in the COVID-19 Forecast Hub. Here, we use the baseline model in order to scale
 mean WIS so that it gets put on an interpretable, unitless scale.  In the
 figure, we can see that all curves are below 1, which means (smaller WIS is
