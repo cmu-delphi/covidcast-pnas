@@ -235,7 +235,7 @@ dv_as_of <- map_dfr(as_ofs, function(as_of) {
     mutate(as_of = as_of)
 })
 
-## Now plot the each "as of" time series curve, faceted by state
+## Now plot each "as of" time series curve, faceted by state
 dv_as_of %>%
   mutate(geo_label = factor(
     geo_value, levels = states,
@@ -255,34 +255,6 @@ ggsave("../paper/fig/dv_as_of.pdf", width = 5, height = 4)
 ```
 
 ## Figure 6
-
-Percentage point increase in SafeGraph estimates of the percentage of people
-staying completely at home, based on aggregated mobile device data, between
-March 1, 2020 and April 15, 2020.
-
-```{r figure-6, message=FALSE, cache=TRUE}
-begin_date <- "2020-03-01"
-end_date <- "2020-04-15"
-
-begin_data <- covidcast_signal("safegraph", "completely_home_prop_7dav",
-                               begin_date, begin_date, geo_type = "state")
-end_data <- covidcast_signal("safegraph", "completely_home_prop_7dav",
-                             end_date, end_date, geo_type = "state")
-
-diffs <- begin_data %>%
-  inner_join(end_data, by = "geo_value", suffix = c(".begin", ".end")) %>%
-  mutate(value = 100 * (value.end - value.begin)) %>%
-  select(data_source = data_source.end, signal = signal.end, geo_value, value, issue = issue.end) %>%
-  mutate(time_value = end_date) %>%
-  as.data.frame %>%
-  as.covidcast_signal(signal = "safegraph-change",
-                      geo_type = "state")
-
-plot(diffs, plot_type = "choro", range = c(10, 30),
-     title = "", choro_params = list(legend_n = 5))
-
-ggsave("../paper/fig/mobility-drop.pdf", width = 5, height = 4)
-```
 
 County-level vaccination data obtained [from the
 CDC](https://data.cdc.gov/Vaccinations/COVID-19-Vaccinations-in-the-United-States-County/8xkx-amqh).
