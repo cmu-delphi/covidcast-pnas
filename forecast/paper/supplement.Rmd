@@ -303,7 +303,7 @@ dms <- all_errs %>%
 kableExtra::kable(
   bind_rows(dms) %>% 
     pivot_wider(names_from = forecaster, values_from = dm), 
-  digits = 3, booktabs = TRUE, caption = "$P$-values for a Diebold-Mariano test for differences in forecast error. The test is for the null hypothesis of equal performance against the alternative that the indicator assisted model is better.")
+  digits = 3, booktabs = TRUE, caption = "$P$-values for a one-sided Diebold-Mariano test for improvement in forecast error. The test is for the null hypothesis of equal performance against the alternative that the indicator assisted model is better.")
 ```
 
 
@@ -877,7 +877,7 @@ plotter_hotspots(hotspots_honest)
 
 <!-- Cumulative Mean -->
 
-```{r cumulative-mean, fig.cap="This figure shows the cumulative sum of WIS for each forecaster divided by the cumulative sum of WIS for the baseline model. The shaded background shows" }
+```{r cumulative-mean, fig.cap="This figure shows the cumulative sum of WIS for each forecaster divided by the cumulative sum of WIS for the baseline model. The shaded background shows total U.S. cases as reported by JHU-CSSE." }
 cumulatives <- fcasts_honest %>%
   group_by(forecaster, forecast_date) %>%
   summarise(mw = Mean(wis),

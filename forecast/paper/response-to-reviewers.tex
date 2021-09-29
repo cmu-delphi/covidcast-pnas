@@ -62,8 +62,8 @@
   this is a standard metric in the forecasting community (just as Mean Squared
   Forecast Error is standard), rather than an ``author decision''.  In principle,
   we would expect that different weights may alter the conclusions, though
-  likely not substantively. Applying a monotone function to tau only effectively
-  changes the quantile of interest, resulting in a mismatch between coverage you
+  likely not substantively. Applying a monotone function to $\tau$ only effectively
+  changes the quantile of interest, resulting in a mismatch between the coverage you
   tried to get and the coverage WIS is evaluating. Applying the function to $\tau$
   and $(1-\tau)$ results in an asymmetry, penalizing forecasts that miss on one
   side more than on the other.
@@ -117,13 +117,14 @@
 
 
 \begin{resp}
-  It seems that the Reviewer is referring to CHNG-COVID and DV-CLI. These are
+  It seems that the Reviewer is referring to CHNG-CLI, CHNG-COVID and DV-CLI. These are
   described in the Methods Section, Signals and Locations Subsection. To be more
   specific, Change 
   Healthcare is a large healthcare insurance claims processor. The difference
   between ``-CLI'' and ``-COVID'' is that the first measures insurance
-  claims related to symptoms
-  consistent with COVID while the second requires a medical diagnosis (through
+  claims involving symptoms
+  associated with COVID-like-illness  while the second requires a medical
+  diagnosis (through 
   testing or presumed positive by the medical provider). The ``DV'' modifier
   corresponds to different claims processors (not Change Healthcare) who wish to
   remain anonymous.
@@ -163,10 +164,6 @@ points and trends very easily.
   the evaluation period, the relative ordering remains fairly consistent. The AR
   model is easily the worst.
 
-  TODO I have added the code and a caption for the figure to the Supplement, but
-  no corresponding 
-  text. It seems a fairly minor addition, not necessarily deserving its own
-  section. 
 \end{resp}
 
 2. Are the results in this paper statistically significant? I see no discussion
@@ -197,7 +194,7 @@ authorship. And yet here I am.
   for comparing forecast accuracy. The results for this test are more mixed,
   likely due to nonstationarity the Reviewer mentions above (the indicators are
   more helpful in some periods than others, see also the upswing/downswing
-  discussion). 
+  discussion in Section 2C). 
 \end{resp}
 
 3. Are the results in this paper practically significant? I see no discussion of
@@ -229,7 +226,16 @@ prediction improvement. The plots that have been presented in Figure 4 say do
 none of those tasks.
 
 \begin{resp}
-  TODO Any ideas here? It's not clear to me that this is different from above.
+  We added the cumulative-sum plot as described above. Additionally, the
+  Reviewer's point aligns with much of  our motivation for Fig 4. If we were
+  predicting a single location's 
+  time series, then the cum-sum plot would provide all the information.
+  However, we have a separate time series prediction problem for each HRR, and
+  the upswings/downswings occur at different dates in different HRRs, so
+  conditioning on forecast date for the comparison (as is done in a
+  cumulative-sum plot) ends up adding together errors from different phases
+  of the pandemic. In Figure 4, we instead condition on phase of the pandemic,
+  which we think is more meaningful than calendar date. 
 \end{resp}
 
 5. The idea of using Asof data is of course important but I have known about it
@@ -237,10 +243,11 @@ for twenty years and practiced it routinely; it has apparently been in routine
 use in econometrics for 40 years.
 
 \begin{resp}
-  We appreciate the reviewer's perspective on the ubiquity of Asof data in
+  We appreciate the Reviewer's perspective on the ubiquity of Asof data in
   econometrics. But the epidemic modelling community is less aware. And it
   has a real and meaningful importance for model selection going forward. We
-  hope that this paper will lead to better behaviour in this community.
+  hope that this paper will lead to greater appreciation of this issue in this
+  community. 
 \end{resp}
 
 \subsection*{Comments on Significance Statement:}
@@ -279,9 +286,9 @@ Are there major misses that have taken place and could have been avoided?
   (out-of-sample) comparison of forecasting performance for state-of-the-art
   models can be found in reference 6 (Cramer et al.). That paper focuses on
   forecasting deaths rather than cases and at the state-level rather than
-  disaggregated HRRs. However, their ranking (Figure 2) puts the
+  disaggregated HRRs. However, their ranking (Figure 2 of Cramer et al.) puts the
   ``COVIDhub-Baseline'' about 10th out of 27 models. As we discuss in the
-  manuscript, that baseline is 
+  manuscript, that baseline is  
   the
   same as the baseline we use for forecasting in this paper: it propagates today
   forward and resamples the residuals to create quantiles (we have expanded the
