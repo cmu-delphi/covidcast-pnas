@@ -105,7 +105,7 @@
 
 \begin{table}
 
-\caption{\label{tab:dm-test}$P$-values for a Diebold-Mariano test for differences in forecast error. The test is for the null hypothesis of equal performance against the alternative that the indicator assisted model is better.}
+\caption{\label{tab:dm-test}$P$-values for a one-sided Diebold-Mariano test for improvement in forecast error. The test is for the null hypothesis of equal performance against the alternative that the indicator assisted model is better.}
 \centering
 \begin{tabular}[t]{lrrrrr}
 \toprule
@@ -159,6 +159,15 @@ Mean Relative WIS & 0.186 & 0.137 & 0.002 & 0.074 & 0.064\\
 \caption{Average difference between the WIS of the AR model and the WIS of the other forecasters. The indicator-assisted forecasters do best during down and flat periods.}\label{fig:upswing-summary}
 \end{figure}
 
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/upswing-summary-remake-1} 
+
+}
+
+\caption{REMAKE: Percent change in average WIS of the forecaster (AR or indicator assisted) relative to the baseline. All models perform poorly durning down periods, but the indicators help. During flat periods, the indicators improve slightly over the AR. During up periods, all forecasters do much better than the baseline, but only some do as well as AR.}\label{fig:upswing-summary-remake}
+\end{figure}
+
 \clearpage
 
 \begin{figure}
@@ -168,6 +177,15 @@ Mean Relative WIS & 0.186 & 0.137 & 0.002 & 0.074 & 0.064\\
 }
 
 \caption{Classification and loglikelihood separated into periods of upswing, downswing, and flat cases. Like the analysis of the forecasting task in the main paper (see Figure 7), performance is better during down and flat periods.}\label{fig:hotspots-upswing-downswing}
+\end{figure}
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/hotspots-upswing-downswing-remake-1} 
+
+}
+
+\caption{REMAKE: Classification and loglikelihood separated into periods of upswing, downswing, and flat cases. The indicator assisted models always have lower classification error relative to the null classifier, while the AR actually does worse in down and flat periods. In terms of loglikelihood, all forecasters have lower likelihood than the null classifier during up periods. In down and flat periods, the indicators generally improve over the AR, while the are worse during up periods.}\label{fig:hotspots-upswing-downswing-remake}
 \end{figure}
 
 \clearpage
@@ -268,8 +286,21 @@ Mean Relative WIS & 0.186 & 0.137 & 0.002 & 0.074 & 0.064\\
 
 }
 
-\caption{This figure shows the cumulative sum of WIS for each forecaster divided by the cumulative sum of WIS for the baseline model. The shaded background shows}\label{fig:cumulative-mean}
+\caption{This figure shows the cumulative sum of WIS for each forecaster divided by the cumulative sum of WIS for the baseline model. The shaded background shows total U.S. cases as reported by JHU-CSSE for the 14-day ahead target. Hashes along the $x$-axis denote weeks.}\label{fig:cumulative-mean}
 \end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/cumulative-geo-mean-1} 
+
+}
+
+\caption{This figure shows the cumulative geometric mean of WIS for each forecaster divided by the WIS for the baseline model. The shaded background shows total U.S. cases as reported by JHU-CSSE for the 14-day ahead target. Hashes along the $x$-axis denote weeks.}\label{fig:cumulative-geo-mean}
+\end{figure}
+
+\clearpage
 
 \begin{figure}
 
@@ -281,6 +312,26 @@ Mean Relative WIS & 0.186 & 0.137 & 0.002 & 0.074 & 0.064\\
 \end{figure}
 
 \clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/compare-to-hub-mean-1} 
+
+}
+
+\caption{This figure reproduces Figure 3 in the main paper but overlays scores for the forecasts submitted to the COVID-19 Forecast Hub. Grey lines correspond to the various teams that submitted during period our evaluation period. We have highlighted the COVIDhub-ensemble, which is the official forecast of the CDC.}\label{fig:compare-to-hub-mean}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/compare-to-hub-geomean-1} 
+
+}
+
+\caption{This figure is similar to Figure \ref{fig:fcast-adjusted}. In this case, we add 1 to both the forecaster WIS and the baseline WIS before scaling (to allow forecasters that achieve 0 error to appear), and we overlay scores for the forecasts submitted to the COVID-19 Forecast Hub. Grey lines correspond to the various teams that submitted during period our evaluation period. We have highlighted the COVIDhub-ensemble, which is the official forecast of the CDC.}\label{fig:compare-to-hub-geomean}
+\end{figure}
 
 
 \FloatBarrier

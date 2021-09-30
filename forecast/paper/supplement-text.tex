@@ -325,3 +325,30 @@ indicators improved performance, though usually by small amounts (2.5\%--10\%).
 In some isolated HRRs, performance was markedly worse, though there does not
 appear to be any particular pattern to these locations.
 
+\section{Comparisons to state-of-the-art forecasters}
+
+Since mid-July 2020, a number of forecasting teams (48 in total) have submitted
+1--4 week ahead state-level case forecasts to the COVID19 Forecast Hub
+\cite{ForecastHub}. To compare those forecasts to those created in this paper,
+we selected only those forecasters who submitted at least 300 forecasts for the
+2-week-ahead target before
+January 1, 2021 (approximately 1 forecast for each state for 6 weeks). This left
+32 forecasters, one of which, the COVIDhub-4-week-ensemble, was an exact
+duplicate of another. To make the comparison fair, we scaled by the
+COVIDhub-baseline as in Figure 3 of the manuscript. Figure
+\ref{fig:compare-to-hub-mean} shows all submitted forecasts (available 7, 14,
+and 21 days ahead) overlaid on Figure 3. We have highlighted the
+COVIDhub-ensemble in light blue for comparison. All the models developed in this
+paper beat the baseline, and would rank in the top 8 of 31 submitted forecasts
+over this period.
+
+A more fair comparison that directly adjusts for spatiotemporal difficulty is to
+use the geometric mean scaled by the baseline. This is the same idea shown in
+\ref{fig:fcast-adjusted}. We have also remade this figure overlaying submitted
+forecasts available on the Forecast Hub. It occasionally happens that a
+submitted forecast achieved a WIS of 0, so in this case we use the WIS$+ 1$
+rather than WIS for all forecasters. The result is shown in
+\ref{fig:compare-to-hub-geomean}. By this metric, the methods employed in this
+paper would rank in the top 2, beating the COVIDhub-ensemble at all forecast
+horizons. The improvement of the best indicator assisted model over the AR model
+is roughly the same as the improvement of the AR model over the COVIDhub-ensemble.

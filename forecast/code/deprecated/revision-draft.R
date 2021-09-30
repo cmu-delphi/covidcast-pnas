@@ -7,13 +7,26 @@ cumulatives <- fcasts_honest %>%
             gmw = GeoMean(wis / strawman_wis)) %>%
   arrange(forecast_date) %>%
   mutate(`Cumulative Mean` = cummean(mw) / cummean(smw),
-         `Cumulative Sum` = cumsum(mw),
+         `Cumulative Sum` = cumsum(mw) / cumsum(smw),
          `Cumulative Geo Mean` = exp(cummean(log(gmw))),
          `GM Regret` = cumsum(gmw) - cumsum(smw/smw),
          `AM Regret` = cumsum(mw) - cumsum(smw),
          `14 day trailing average` = RcppRoll::roll_meanl(mw / smw, n = 14L))
 
-  
+reltoAR <- cumulatives %>% 
+  select(forecaster, forecast_date, mw, gmw) %>%
+  ungroup()
+reltoAR <- left_join(
+  reltoAR %>% filter(forecaster != "AR"),
+  reltoAR %>% filter(forecaster == "AR") %>% select(-forecaster) %>%
+    rename(armw = mw, argmw = gmw)
+)  
+
+reltoAR <- reltoAR %>%
+  group_by(forecaster) %>%
+  arrange(forecast_date) %>%
+  mutate(cm = (mw - armw) / armw)
+
   
 fcast_colors <- c(RColorBrewer::brewer.pal(5, "Set1"), "#000000")
 names(fcast_colors) <- c("CHNG-CLI", "CHNG-COVID", "CTIS-CLIIC", "DV-CLI",
@@ -23,13 +36,22 @@ names(fcast_colors) <- c("CHNG-CLI", "CHNG-COVID", "CTIS-CLIIC", "DV-CLI",
 
 ggplot(cumulatives %>% filter(forecast_date < "2021-01-01"), 
        aes(forecast_date, color = forecaster)) + 
-  geom_line(aes(y = `Cumulative Geo Mean`)) +
+  geom_line(aes(y = `Cumulative Sum`)) +
   geom_hline(yintercept = 1) +
   xlab("forecast date") +
   scale_color_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
   theme_bw() +
   theme(legend.position = "bottom", legend.title = element_blank())
 
+ggplot(reltoAR %>% filter(forecast_date < "2021-01-01"), 
+       aes(forecast_date, color = forecaster)) + 
+  geom_line(aes(y = cm)) +
+  geom_hline(yintercept = 0) +
+  xlab("forecast date") +
+  scale_color_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
+  theme_bw() +
+  scale_y_continuous(labels = scales::percent_format()) +
+  theme(legend.position = "bottom", legend.title = element_blank())
 
 
 # Sign test ---------------------------------------------------------------
