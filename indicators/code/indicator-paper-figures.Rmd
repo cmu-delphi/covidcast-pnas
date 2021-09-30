@@ -259,7 +259,7 @@ ggsave("../paper/fig/dv_as_of.pdf", width = 5, height = 4)
 
 Amount of backfill of key signals from various sources, for comparison:
 
-```{r figure-6, message=FALSE, cache=TRUE}
+```{r figure-6-data, message=FALSE, cache=TRUE}
 SOURCES <- c("chng", "fb-survey", "jhu-csse", "jhu-csse")
 SIGNALS <- c("smoothed_outpatient_cli", "smoothed_whh_cmnty_cli",
              "confirmed_incidence_prop", "deaths_incidence_prop")
@@ -339,14 +339,16 @@ for (ii in seq_along(SOURCES)) {
 }
 
 pctile_df <- format_df(pctile_df)
+```
 
+```{r figure-6, cache=TRUE}
 pctile_df %>%
   ggplot(aes(x = lag, y = value, group = signal, color = signal)) +
   geom_line() +
   geom_text(data = filter(pctile_df, lag == min(lags)),
             aes(x = lag, y = value, label = signal, hjust = "left"),
             inherit.aes = FALSE, nudge_y = 0.015) +
-  labs(x = "Days since initial issue",
+  labs(x = "Lag after events",
        y = "95th percentile of absolute percent error",
        color = "Signal") +
   scale_y_continuous(labels = label_percent()) +

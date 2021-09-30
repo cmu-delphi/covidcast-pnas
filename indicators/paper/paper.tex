@@ -717,24 +717,26 @@ location) to estimate the final values from preliminary reports. On the other
 hand, official public health reporting of COVID cases and deaths can be subject
 to revision as death certificates are audited and backlogs cleared, resulting in
 thousands of cases and deaths being added or removed.
-Figure~\ref{fig:backfill-compare} shows the amount of revision for several
-signals, in terms of the 95th percentile of relative change between initial
-estimates and revised estimates issued later; this shows that reported deaths
-can have large revisions comparable to revisions in claims-based signals. This
-backfill is much more difficult to predict, and thus claims data and other
-sources may be a useful stand-in while public health reports are aggregated and
-corrected.
+Figure~\ref{fig:backfill-compare} shows relative differences between early
+signal values, reported 10--90 days after the underlying events, and later
+versions at least four months later. As the distribution of these revision
+amounts is highly skewed, the figure plots the 95th percentile of relative
+change, showing that reported deaths can have large revisions comparable to
+revisions in claims-based signals. This backfill is much more difficult to
+predict, and thus claims data and other sources may be a useful stand-in while
+public health reports are aggregated and corrected.
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/backfill-compare.pdf}
-  \caption{95th percentile relative changes between initial values of key
-    signals, compared to the final values reported much later. Calculated using
-    each day's state-level estimates for the six months between October 15, 2020
-    and April 15, 2021; final values were those reported 120 days after the end
-    of this period. Even officially reported case and death data can have large
-    revisions 30--60 days after initial reporting; much of this is driven by
-    individual large revisions affecting specific states and dates, rather than
-    systematic changes affecting all states and dates.}
+  \caption{The 95th percentiles of relative changes between early reported
+    values of key signals and final values reported much later. For each date
+    between October 15, 2020 and April 15, 2021, the values for each state
+    reported between 10 and 90 days later are compared to ``final'' versions
+    recorded as of August 13, 2021, 120 days after April 15. Even officially
+    reported case and death data can have large revisions 30--60 days or more
+    after initial reporting; much of this is driven by individual large
+    revisions affecting specific states and dates, rather than systematic
+    changes affecting all states and dates.}
   \label{fig:backfill-compare}
 \end{figure}
 
