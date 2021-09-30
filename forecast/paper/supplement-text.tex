@@ -99,6 +99,43 @@ of moderate errors).  Indeed, Figure 5 of the main paper further
 corroborates this, in which we see the heaviest left tails occuring
 for \chngcli.
 
+\section{Statistical significance}
+
+In the Introduction of the main paper, we give some reasons that we avoid making
+formal statements about statistical significance, preferring instead to examine
+the stability of our results in different contexts. There are strong reasons to
+avoid model-based significance tests because the necessary assumptions about
+stationarity, independence, and the  model being true (or at least approximately
+true) are certainly violated. With those caveats in mind, we undertake two
+relatively assumption-lean investigations in this section. The first is a
+sign-test for whether the difference between the AR model’s relative WIS  and
+each other model’s relative WIS is centered at zero. By ``relative WIS'' we mean
+scaled by the strawman as displayed in Figure 3. To mitigate the dependence
+across time (which intuitively seems to matter more than that across space), we
+computed these tests in a stratified way, where for each forecast date we run a
+sign test on the scaled errors between two models over all 440 counties. The
+results are plotted as histograms in Figure \ref{fig:sign-test}. In this case,
+we use the total relative WIS over all aheads, but the histograms are largely
+similar for individual target horizons. If there were no difference, we would
+expect to see a uniform distribution. However, for all indicator-assisted
+models, we see many more small $P$-values than would be expected if the null
+hypothesis (that the AR model is better) were true.
+
+Another relatively assumption-lean method of testing for differences in forecast
+accuracy is the Diebold-Mariano test \cite{Diebold:2002,Diebold:2015,harvey1997testing}.
+Essentially, the differences between forecast losses are assumed to have a
+constant mean and a covariance that depends on time. Under these conditions, the
+asymptotic distribution for the standardized mean of the differences is limiting
+normal provided that a heteroskedasticity and autocorrelation robust estimate of
+the variance is used. Using the loss as weighted interval score across all HRRs
+and horizons (7 to 21 days ahead), we perform the DM test using both the mean
+relative to the strawman (as reported in the manuscript) and the geometric mean
+relative to the strawman as described above. The first two rows of Table
+\ref{tab:dm-test} displays 
+$P$-values for the test that the indicator-assisted model is no-better than the
+AR model. Only the CHNG-CLI model's $P$-value exceeds conventional statistical
+significance thresholds.  
+
 \section{Bootstrap results}
 
 As explained in Section 2.B. of the main paper, a (somewhat cynical)
@@ -262,5 +299,56 @@ quite different in this period.  With a 21-day training window, it is
 common for there to be many fewer hotspots in training.
 
 
+\section{Examining accumulated error over time and space}
 
+Following the suggestion of an anonymous reviewer, we investigate two
+disaggregated versions of 
+the main forecasting result shown in Figure 3 on the manuscript. The first
+(Figure \ref{fig:cumulative-mean})
+displays the cumulative error (summed over all horizons) of each forecaster
+divided by the cumulative error 
+of the baseline.
+This perspective should illustrate how
+the models perform over time, drawing attention to any nonstationary behavior.
+During the initial increase in cases in July 2020, CTIS-CLIIC and Google-AA gain
+a lot relative to the AR model. All the indicators do much better than the AR
+model during the following downturn (the ebb of the second wave). The AR model
+actually improves over the indicators in October 2020, before losing a bit in
+late November.
 
+Figure \ref{fig:errs-in-space} examines the spatial behavior over the entire
+period of the indicator-assisted models relative to the AR. For ease of
+comparison, we show the percent improvement in each HRR. Negative numbers (blue)
+mean that the indicator helped while positives (red) mean that the indicator
+hurt forecasting performance. The clear pattern is that in most HRRs, the
+indicators improved performance, though usually by small amounts (2.5\%--10\%).
+In some isolated HRRs, performance was markedly worse, though there does not
+appear to be any particular pattern to these locations.
+
+\section{Comparisons to state-of-the-art forecasters}
+
+Since mid-July 2020, a number of forecasting teams (48 in total) have submitted
+1--4 week ahead state-level case forecasts to the COVID19 Forecast Hub
+\cite{ForecastHub}. To compare those forecasts to those created in this paper,
+we selected only those forecasters who submitted at least 300 forecasts for the
+2-week-ahead target before
+January 1, 2021 (approximately 1 forecast for each state for 6 weeks). This left
+32 forecasters, one of which, the COVIDhub-4-week-ensemble, was an exact
+duplicate of another. To make the comparison fair, we scaled by the
+COVIDhub-baseline as in Figure 3 of the manuscript. Figure
+\ref{fig:compare-to-hub-mean} shows all submitted forecasts (available 7, 14,
+and 21 days ahead) overlaid on Figure 3. We have highlighted the
+COVIDhub-ensemble in light blue for comparison. All the models developed in this
+paper beat the baseline, and would rank in the top 8 of 31 submitted forecasts
+over this period.
+
+A more fair comparison that directly adjusts for spatiotemporal difficulty is to
+use the geometric mean scaled by the baseline. This is the same idea shown in
+\ref{fig:fcast-adjusted}. We have also remade this figure overlaying submitted
+forecasts available on the Forecast Hub. It occasionally happens that a
+submitted forecast achieved a WIS of 0, so in this case we use the WIS$+ 1$
+rather than WIS for all forecasters. The result is shown in
+\ref{fig:compare-to-hub-geomean}. By this metric, the methods employed in this
+paper would rank in the top 2, beating the COVIDhub-ensemble at all forecast
+horizons. The improvement of the best indicator assisted model over the AR model
+is roughly the same as the improvement of the AR model over the COVIDhub-ensemble.
