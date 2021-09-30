@@ -60,7 +60,11 @@
   in our description of WIS. The weights used here are those used to evaluate
   forecasts submitted to the COVID-19 Forecast Hub and the CDC. More broadly,
   this is a standard metric in the forecasting community (just as Mean Squared
-  Forecast Error is standard), rather than an ``author decision''.  In principle,
+  Forecast Error is standard), rather than an ``author decision''.  With the
+  weights as used, it is equivalent to quantile loss and therefore is a discrete
+  version of CRPS (see [7]).
+
+  In principle,
   we would expect that different weights may alter the conclusions, though
   likely not substantively. Applying a monotone function to $\tau$ only effectively
   changes the quantile of interest, resulting in a mismatch between the coverage you
@@ -158,8 +162,8 @@ points and trends very easily.
   There is little reason to believe that this data is stationary. The models
   however are trained and evaluated over reasonably short periods (2-3 months),
   over which time the behavior may well be stationary. We have added a section
-  to the appendix that uses the cumulative mean as suggested (the sum is
-  difficult to see due to the scaling). With some exceptions at the beginning of
+  to the appendix that uses the cumulative sum normalized by baseline as
+  suggested. With some exceptions at the beginning of 
   the evaluation period, the relative ordering remains fairly consistent. The AR
   model is easily the worst.
 
@@ -172,28 +176,29 @@ authorship. And yet here I am.
 \begin{resp}
   This is an important point that we should have addressed more fully.
   Conventional methods for assessing statistical significance that we explored
-  were overconfident, to the point of being unbelievable. To a large degree,
-  this is a ``huge n, tiny p'' problem so even bootstrap analyses result in
-  extremely narrow intervals. Essentially, ``everything is significant''.
+  were overconfident, to the point of being unbelievable due to the
+  spatiotemporal correlation. 
 
   We also have strong reasons for not using model-based approaches (one being the
   nonstationarity the Reviewer mentions above, but also the belief that these
   models are wrong). We felt that the related investigation in 2B was more
   pertinent.
 
-  To respond more directly:
+  To respond more directly we have made a number of additions.:
 
   $\bullet$ We have added a section to the Supplement (and point
   to it around 
   line 85 in the main text), that performs a Sign Test for differences in
-  accuracy. P-values there tend to cluster near zero suggesting again that these
-  improvements are statistically significant.
+  accuracy. P-values there tend to cluster near zero and one suggesting some
+  periods have significantly improved accuracy for the indicator-assisted models
+  while in others, the reverse is true.
 
   $\bullet$ We also use a Diebold-Mariano test
-  for comparing forecast accuracy. The results for this test are more mixed,
-  likely due to nonstationarity the Reviewer mentions above (the indicators are
+  for comparing forecast accuracy. The results for this test are mixed, as would
+  be expected given the sign test and
+  the nonstationarity the Reviewer mentions above. The indicators are
   more helpful in some periods than others, see also the upswing/downswing
-  discussion in Section 2C). 
+  discussion in Section 2C. 
 \end{resp}
 
 3. Are the results in this paper practically significant? I see no discussion of
@@ -201,7 +206,9 @@ this question, which seems unbelievable for me to be saying, given that the
 authors refuse to consider statistical significance. And yet here I am.
 
 \begin{resp}
-  See also Reviewer 1 point 3. And the general comment below (Point 8).
+  See also Reviewer 1 point 3. And the general comment below (Point 8) where we
+  outline some specific changes we have made that bare on this point.
+  
   Practically, on average, if our goal is to predict 11 days ahead, when the AR
   model is at its best, CHNG-CLI
   doesn’t help (at least with these simple models). However, CHNG-COVID,
@@ -314,7 +321,13 @@ Are there major misses that have taken place and could have been avoided?
   Only those forecasters that submitted at least 300 forecasts (roughly 50
   states over 6 weeks during the 6 months examined) are shown. From this Figure
   it is clear that all of the forecasters considered in this paper beat most
-  submissions. 
+  submissions. In the second figure, we use the Geometric Mean scaled by the
+  baseline, which should be a more meaningful comparison, as argued elsewhere in
+  the supplement. By this metric, the methods employed in this
+  paper would rank in the top 2 of all submitted forecasts, beating the
+  COVIDhub-ensemble at all forecast 
+  horizons. The improvement of the best indicator assisted model over the AR model
+  is roughly the same as the improvement of the AR model over the COVIDhub-ensemble.
 \end{resp}
 
 
