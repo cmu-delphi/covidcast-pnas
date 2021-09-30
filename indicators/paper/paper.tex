@@ -239,13 +239,14 @@ effects of data revisions. Lastly, we provide R \cite{CovidcastR} and Python
 online dashboard to visualize the data \cite{CovidcastViz}.
 
 In a companion paper, we analyze the utility provided by a core set of the
-indicators in COVID-19 forecasting and hotspot prediction models.  In another
-companion paper, we elaborate on our research group's (Delphi's) large-scale
-public surveys, run in partnership with Facebook and available in aggregate form
-in the COVIDcast API. This paper focuses on the COVID-19 activity indicators
-themselves, describing the data streams, how they are processed and made
-publicly available, and insights that can be gained by combining novel data
-sources with standard public health surveillance datasets.
+indicators in COVID-19 forecasting and hotspot prediction models
+\cite{McDonald:2021}. In another companion paper, we elaborate on our research
+group's (Delphi's) large-scale public surveys, run in partnership with Facebook
+and available in aggregate form in the COVIDcast API \cite{Salomon:2021}. This
+paper focuses on the COVID-19 activity indicators themselves, describing the
+data streams, how they are processed and made publicly available, and insights
+that can be gained by combining novel data sources with standard public health
+surveillance datasets.
 
 \section{Methods}
 
@@ -264,7 +265,7 @@ hospitalizations that involved COVID diagnoses or symptoms.
 \paragraph{Internet-Based Surveys} Conducted in partnership with Facebook,
 Delphi's COVID-19 Trends and Impact Survey receives an average of 50,000 responses
 daily, and has received over 20 million responses since April 2020
-\cite{DelphiSurvey, Kreuter:2020}. From the surveys, we construct indicators on
+\cite{Salomon:2021, Kreuter:2020}. From the surveys, we construct indicators on
 symptoms, social distancing, vaccination, and other attitudes and behaviors
 related to COVID.
 
@@ -324,7 +325,7 @@ and restaurants, based on cell phone mobility data collected by SafeGraph
   COVID-19 Trends and Impact Survey & COVID symptoms, social distancing
 behaviors, mental health, economic impact, behavior (e.g., mask-wearing,
 vaccination attitudes), and COVID testing signals based on daily surveys
-conducted nationally by Delphi through Facebook \cite{DelphiSurvey,
+conducted nationally by Delphi through Facebook \cite{Salomon:2021,
 Kreuter:2020}. & 2020-04-06 & County$^{**}$ \\
   \midrule
   % Mirrored data from other sources
@@ -419,7 +420,7 @@ influence \cite{Brooks:2020}. Recent research has shown similar results for
 COVID-19 forecasts \cite{Kamarthi:2021}. We also examine this in our companion
 paper on forecasting, where we observe that training and validating models on
 finalized data yields overly optimistic estimates of true test-time
-performance.
+performance \cite{McDonald:2021}.
 
 \subsection{Public API}
 
@@ -534,7 +535,7 @@ correlation analysis in the next subsection.
 
 Besides tracking contemporaneous COVID activity, these and other indicators can
 be used to improve forecasts of future COVID case trends, as investigated in a
-companion paper.
+companion paper \cite{McDonald:2021}.
 
 \subsection{Correlation Analyses}
 
@@ -743,10 +744,11 @@ use signals (on historical data), users will want to use data that was known
 available much later. The COVIDcast API makes all historical versions available
 and easily accessible for this purpose; and this feature plays a prominent role
 in our own analysis of forecasting and hotspot prediction models appearing in a
-companion paper. Revisions to forecast targets, such as cases and deaths, also
-complicate the evaluation of forecast models: comparisons of forecasts to the
-ground truth may shift when the ground truth is revised weeks later. Only by
-systematically tracking revisions can this effect be monitored.
+companion paper \cite{McDonald:2021}. Revisions to forecast targets, such as
+cases and deaths, also complicate the evaluation of forecast models: comparisons
+of forecasts to the ground truth may shift when the ground truth is revised
+weeks later. Only by systematically tracking revisions can this effect be
+monitored.
 
 \subsection{New Perspectives}
 
@@ -793,16 +795,16 @@ same sources of error as public health reporting streams. This can be important
 both for robustness and situational awareness, allowing decision-makers to
 diagnose potential anomalies in standard surveillance streams, and for modeling
 tasks such as forecasting and nowcasting. Our companion paper on forecasting
-discusses this in more detail.
+discusses this in more detail \cite{McDonald:2021}.
 
 Second, the API features many other signals that are relevant to understanding
 aspects of the pandemic and its effects on the United States population that are
 not found in traditional public health streams, such as data on mobility
 patterns, internet search trends, mask wearing, and vaccine hesitancy, to name
-just a few. (The latter two signals are derived from the COVID-19 Trends and Impact
-Survey; our companion paper on this survey gives a more detailed view of its
-features and capabilities.) These signals have already supported pandemic
-research and  policy-making.
+just a few. (The latter two signals are derived from the COVID-19 Trends and
+Impact Survey; our companion paper on this survey gives a more detailed view of
+its features and capabilities \cite{Salomon:2021}.) These signals have already
+supported pandemic research and policy-making.
 
 Third, the underlying database tracks all revisions made to the data, allowing
 us to query the API to learn ``what was known when,'' which is critical for
