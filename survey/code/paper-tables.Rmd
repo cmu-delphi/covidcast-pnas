@@ -351,13 +351,15 @@ signals <- covidcast_signals(
   geo_type = "state")
 
 signals <- append(signals, list(anosmia)) %>%
-  aggregate_signals(format = "long")
+  aggregate_signals(format = "long") %>%
+  filter(!(signal == "confirmed_admissions_covid_1d_prop" &
+             time_value < as.Date("2020-07-15")))
 
 signals$signal <- factor(
   signals$signal,
   levels = c("anosmia", "raw_wcli", "raw_whh_cmnty_cli", "confirmed_incidence_prop",
              "confirmed_admissions_covid_1d_prop", "deaths_incidence_prop"),
-  labels = c("Anosmia %", "CLI %", "Community CLI %", "Cases per 100,000",
+  labels = c("Anosmia (%)", "CLI (%)", "Community CLI (%)", "Cases per 100,000",
              "Hospitalizations per 100,000", "Deaths per 100,000"))
 
 to_plot <- signals %>%
@@ -379,13 +381,15 @@ to_plot <- to_plot %>%
 ggplot(to_plot, aes(x = time_value, y = value, color = REGION)) +
   geom_line() +
   facet_wrap(vars(signal), nrow = 2, ncol = 3, scales = "free_y") +
-  labs(x = "Date", y = "Value", color = "Census Region") +
+  labs(x = "Date", y = "", color = "Census Region") +
   scale_x_date(date_breaks = "3 months",
                date_labels = "%b %Y",
                date_minor_breaks = "1 month",
                guide = guide_axis(angle = 45)) +
+  scale_y_continuous(minor_breaks = NULL) +
   theme_bw() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom",
+        strip.background = element_rect(color = "black", fill = "white"))
 
 ggsave("../paper/fig/signal-time-series.pdf",
        width = 7, height = 5)
@@ -466,6 +470,11 @@ data$positive_14d <- case_when(
   data$B10a == 1 ~ "Tested positive",
   TRUE ~ "All others"
 )
+
+# Force factor ordering
+data$positive_14d <- factor(
+  data$positive_14d,
+  levels = c("Tested positive", "All others"))
 
 symptoms <- list(
   "1" = "Fever",
@@ -585,12 +594,14 @@ ggplot(symptom_rates, aes(x = symptom, y = rate, fill = positive_14d)) +
     inherit.aes = FALSE) +
   scale_y_continuous(labels = label_percent(accuracy = 1),
                      sec.axis = sec_axis(~ . * rr_scale_factor,
-                                         name = "Relative risk")) +
+                                         name = "Relative risk"),
+                     minor_breaks = NULL) +
   scale_x_discrete(guide = guide_axis(angle = 45)) +
   labs(x = "", y = "Frequency among respondents",
        fill = "Group") +
   theme_bw() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom",
+        panel.grid.major.x = element_blank())
 
 ggsave("../paper/fig/symptoms-comparison.pdf")
 ```
@@ -646,7 +657,8 @@ state_case_rate <- covidcast_signal("jhu-csse", "confirmed_7dav_cumulative_num",
   select(state = geo_value, cumulative_cases = value, time_value, year, month) %>%
   inner_join(state_pops, by = "state") %>%
   inner_join(case_age_dist, by = c("year", "month")) %>%
-  mutate(case_rate_adult = cumulative_cases * frac_adult_cases / adult_pop * 100)
+  mutate(case_rate_adult = cumulative_cases * frac_adult_cases / adult_pop * 100) %>%
+  filter(state != "PR")
 
 state_case_compare <- data %>%
   filter(!is.na(fips)) %>%
@@ -666,23 +678,26 @@ state_case_compare <- data %>%
             .groups = "drop") %>%
   left_join(state_case_rate,
             by = c("state_abbr" = "state", "week" = "time_value"))
+```
 
+```{r case-rate-compare-plot}
 g <- ggplot(state_case_compare) +
-  facet_geo(~ state_abbr, grid = "us_state_with_DC_PR_grid1", label = "code") +
+  facet_geo(~ state_abbr, grid = "us_state_grid1", label = "code") +
   geom_line(aes(x = week, y = case_rate_adult, color = "Surveillance"),
             linetype = 1, size = 0.5) +
   geom_line(aes(x = week, y = ever_pos, color = "CTIS"),
             linetype = 1, size = 0.5) +
   scale_color_manual(values = c("lightblue", "gray50")) +
-  scale_y_continuous(breaks = c(0, 10),
+  scale_y_continuous(limits = c(0, 20), breaks = c(0, 10, 20),
                      minor_breaks = c(5, 15),
                      labels = label_percent(scale = 1,
                                             accuracy = 1)) +
-  scale_x_date(date_breaks = "4 months", date_labels = "%b",
-               date_minor_breaks = "1 month") +
+  scale_x_date(breaks = as.Date(c("2020-10-01", "2021-04-01")),
+               date_labels = "%b", minor_breaks = NULL) +
   labs(x = "", y = "", color = "") +
   theme_minimal() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom",
+        axis.text = element_text(size = rel(0.5)))
 
 ggsave("../paper/fig/cumulative-case-compare.pdf", g, width = 10, height = 7)
 
@@ -809,44 +824,47 @@ a <- ggplot(g1, aes(x = week, y = value, col = SVI_cat, group = SVI_cat)) +
   geom_line() +
   facet_wrap(. ~ var_cat, scales = "free", ncol = 4) +
   scale_color_discrete(name = "SVI") +
+  scale_y_continuous(minor_breaks = NULL, limits = c(0, NA)) +
   scale_x_date(date_breaks = "3 months", date_labels = "%b %Y",
                date_minor_breaks = "1 month") +
   labs(x = "", y = "") +
-  ylim(0,  NA) +
   theme_bw() +
   theme(legend.position = "bottom",
         legend.margin = margin(legend_top_margin, 0, 11 / 2, 0),
-        plot.margin = margin(11 / 2, 11 / 2, 0, 11 / 2))
+        plot.margin = margin(11 / 2, 11 / 2, 0, 11 / 2),
+        strip.background = element_rect(color = "black", fill = "white"))
 
 b <- ggplot(g2, aes(x = week, y = value, col = age_cat, group = age_cat)) +
   geom_line() +
   facet_wrap(. ~ var_cat, scales = "free", ncol = 4) +
   scale_color_discrete(name = "Age") +
+  scale_y_continuous(minor_breaks = NULL, limits = c(0, NA)) +
   scale_x_date(date_breaks = "3 months", date_labels = "%b %Y",
                date_minor_breaks = "1 month") +
   labs(x = "", y = "") +
-  ylim(0, NA) +
   theme_bw() +
   theme(legend.position = "bottom",
         legend.margin = margin(legend_top_margin, 0, 11 / 2, 0),
-        plot.margin = margin(11 / 2, 11 / 2, 0, 11 / 2))
+        plot.margin = margin(11 / 2, 11 / 2, 0, 11 / 2),
+        strip.background = element_rect(color = "black", fill = "white"))
 
 c <- ggplot(g3, aes(x = week, y = value, col = region, group = region)) +
   geom_line() +
   facet_wrap(. ~ var_cat, scales = "free", ncol = 4) +
   scale_color_discrete(name = "Region")  +
+  scale_y_continuous(minor_breaks = NULL, limits = c(0, NA)) +
   scale_x_date(date_breaks = "3 months", date_labels = "%b %Y",
                date_minor_breaks = "1 month") +
   labs(x = "", y = "") +
-  ylim(0, NA) +
   theme_bw() +
   theme(legend.position = "bottom",
         legend.margin = margin(legend_top_margin, 0, 11 / 2, 0),
-        plot.margin = margin(11 / 2, 11 / 2, 0, 11 / 2))
+        plot.margin = margin(11 / 2, 11 / 2, 0, 11 / 2),
+        strip.background = element_rect(color = "black", fill = "white"))
 
 g <- arrangeGrob(a, b, c, nrow = 3)
 
-ggsave("../paper/fig/contacts-masks-transport.pdf", g, width = 8, height = 5)
+ggsave("../paper/fig/contacts-masks-transport.pdf", g, width = 7, height = 6)
 ```
 
 ## Vaccine acceptance and hesitancy

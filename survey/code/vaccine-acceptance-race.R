@@ -89,17 +89,18 @@ ggplot(df[race_grp %in% c("Asian", "Black", "Hispanic", "White") &
             gender %in% c("Female", "Male") &
             sample_size >= 50],
        aes(x = age_cat_fb, y = pct_accepting, color = race_grp, group = race_grp)) +
-  geom_point(size = 2) +
-  geom_line(size = 1.2) +
+  geom_point() +
+  geom_line() +
   facet_grid(cols = vars(Region), rows = vars(gender)) +
   theme_bw() +
-  labs(x = "Age Group", y = "Vaccinated or accepting",
+  labs(x = "Age group (years)", y = "Vaccinated or accepting",
        color = "") +
   scale_y_continuous(labels = label_percent(accuracy = 1.0)) +
   scale_color_manual(breaks = c("Hispanic", "White", "Black", "Asian"),
                      values = c("Hispanic" = "#c42e31", "White" = "#832543",
                                 "Asian" = "#6399AC", "Black" = "#e5a825")) +
   theme(text = element_text(size = 12), legend.position = "bottom",
-        axis.text.x = element_text(angle = 45, hjust = 1))
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        strip.background = element_rect(color = "black", fill = "white"))
 
 ggsave("../paper/fig/age-race-vaccine-acceptance.pdf", width = 8, height = 5)
