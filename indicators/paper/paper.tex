@@ -695,17 +695,20 @@ part of the same reporting systems.
 The revision tracking feature in the API assists in model-building and
 evaluation. Figure~\ref{fig:dv_as_of} illustrates how one COVIDcast medical
 claims signal evolved as it was revised across multiple issue dates, in four
-different states, between June 1 and August 1, 2020. In each plot, the rightmost
-ends of the lines correspond to estimates for the last day that data are
-available for each issue date, which are generally the most tentative estimates,
-and appear to be significantly biased upward in Arizona in June 2020, and
-significantly biased downward in New York throughout June and July 2020.
+different states, between June 1 and August 1, 2020. This signal, known as
+DV-CLI, is similar to CHNG-CLI and measures outpatient doctor visits about
+COVID-related symptoms, but is provided by a different data partner. In each
+plot, the rightmost ends of the lines correspond to estimates for the last day
+that data are available for each issue date, which are generally the most
+tentative estimates, and appear to be significantly biased upward in Arizona in
+June 2020, and significantly biased downward in New York throughout June and
+July 2020.
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/dv_as_of.pdf}
   \caption{Estimated percentage of doctor's visits due to COVID-like illness
-    displayed across multiple issue dates, with later issue dates adding
-    additional data and revising past data from prior issue dates.}
+    (DV-CLI) displayed across multiple issue dates, with later issue dates
+    adding additional data and revising past data from prior issue dates.}
   \label{fig:dv_as_of}
 \end{figure}
 

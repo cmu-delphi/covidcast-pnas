@@ -260,10 +260,10 @@ ggsave("../paper/fig/dv_as_of.pdf", width = 5, height = 4)
 Amount of backfill of key signals from various sources, for comparison:
 
 ```{r figure-6-data, message=FALSE, cache=TRUE}
-SOURCES <- c("chng", "fb-survey", "jhu-csse", "jhu-csse")
-SIGNALS <- c("smoothed_outpatient_cli", "smoothed_whh_cmnty_cli",
+SOURCES <- c("doctor-visits", "fb-survey", "jhu-csse", "jhu-csse")
+SIGNALS <- c("smoothed_cli", "smoothed_whh_cmnty_cli",
              "confirmed_incidence_prop", "deaths_incidence_prop")
-NAMES <- c("lag", "CHNG-CLI", "CTIS-CLI-in-community", "Cases", "Deaths")
+NAMES <- c("lag", "DV-CLI", "CTIS-CLI-in-community", "Cases", "Deaths")
 
 calc_pct_abs_diff <- function(source, signal, start_date, end_date,
                               final_lag, lags) {
