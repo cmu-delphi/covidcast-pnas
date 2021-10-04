@@ -115,17 +115,18 @@ acquired funding.}
 \dropcap{T}racking and forecasting indicators from public health reporting
 streams---such as confirmed cases and deaths in the COVID-19 pandemic---is
 crucial for understanding disease spread, formulating public policy responses,
-and anticipating future public health resource needs.  In a companion paper, we
-describe our research group's (Delphi's) efforts in curating and maintaining a 
-database of real-time indicators that track COVID-19 activity and other relevant
-phenomena. The signals (a term we use synonomously with ``indicators'') in this
-database are accessible through the COVIDcast API \cite{CovidcastAPI}, with
-associated R \cite{CovidcastR} and Python \cite{CovidcastPy} packages for
-convenient data fetching and processing tools. In the current paper, we aim to
-quantify the utility provided by a core set of these indicators for two
-fundamental prediction tasks: probabilistic forecasting of COVID-19 case 
-rates and prediction of future COVID-19 case hotspots (defined by the event that
-a relative increase in COVID-19 cases exceeds a certain threshold). 
+and anticipating future public health resource needs.  A companion paper
+\cite{Reinhart:2021} describes our research group's (Delphi's) efforts in
+curating and maintaining a database of real-time indicators that track COVID-19
+activity and other relevant phenomena. The signals (a term we use synonomously
+with ``indicators'') in this database are accessible through the COVIDcast API
+\cite{CovidcastAPI}, with associated R \cite{CovidcastR} and Python
+\cite{CovidcastPy} packages for convenient data fetching and processing
+tools. In the current paper, we aim to quantify the utility provided by a core
+set of these indicators for two fundamental prediction tasks: probabilistic
+forecasting of COVID-19 case rates and prediction of future COVID-19 case
+hotspots (defined by the event that a relative increase in COVID-19 cases
+exceeds a certain threshold).
 
  At the outset, we should be clear that our intent in this paper is \textit{not}
 to provide an authoritative take on cutting-edge COVID-19 forecasting methods.
@@ -163,23 +164,22 @@ particularly flattering: the simple models examined here outperform most
 submitted models and approach the accuracy of the COVIDHub Ensemble used by the
 CDC. 
 
-
-In our companion paper, we analyze correlations between various indicators and   
-COVID case rates. These correlations are natural summaries of the
-contemporaneous association between an indicator and COVID cases, but they fall 
-short of delivering a satisfactory answer to the question that motivates the
-current article: is the information contained in an indicator demonstrably
-useful for the prediction tasks we care about? For such a question, lagged
-correlations (e.g., measuring the correlation between an indicator and COVID
-case rates several days in the future) move us in the right direction, but still
-do not move us all the way there. The question about \textit{utility for 
-  prediction} is focused on a much higher standard than simply asking 
-about correlations; to be useful in forecast or hotspot models, an indicator
-must provide relevant information that is not otherwise contained in past values
-of the case rate series itself. We will assess this in the most direct way
+In the companion paper \cite{Reinhart:2021}, we analyze correlations between
+various indicators and COVID case rates. These correlations are natural
+summaries of the contemporaneous association between an indicator and COVID
+cases, but they fall short of delivering a satisfactory answer to the question
+that motivates the current article: is the information contained in an indicator
+demonstrably useful for the prediction tasks we care about? For such a question,
+lagged correlations (e.g., measuring the correlation between an indicator and
+COVID case rates several days in the future) move us in the right direction, but
+still do not move us all the way there. The question about \textit{utility for
+  prediction} is focused on a much higher standard than simply asking about 
+correlations; to be useful in forecast or hotspot models, an indicator must
+provide relevant information that is not otherwise contained in past values of
+the case rate series itself. We will assess this in the most direct way
 possible: by inspecting the difference in predictive performance of simple
 autoregressive models trained with and without access to past values of a
-particular indicator.   
+particular indicator.
 
 There is another, more subtle issue in evaluating predictive utility that 
 deserves explicit mention, as it will play a key role in our analysis.
@@ -252,11 +252,11 @@ COVID-19 test, through standard public health reporting streams.
 For more details on the five indicators (including how these are precisely
 computed from the underlying data streams) we refer to
 \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html},
-which documents all of the signals in the COVIDcast API, and our companion paper
-on the API and database. For CTIS in particular, we refer to our companion paper
-on this survey. For the Google COVID-19 Search Trends data set, see
-\cite{GoogleSymptoms}; see also \cite{Klopfen:2020, Vaira:2020} for a 
-justification of the relevance of anosmia or ageusia to COVID-19 infection. 
+and the companion paper on the COVIDcast API and its signals
+\cite{Reinhart:2021}. For CTIS in particular, we refer to the companion paper
+\cite{Salomon:2021}. For the Google COVID-19 Search Trends data set, see
+\cite{GoogleSymptoms}; see also \cite{Klopfen:2020, Vaira:2020} for a
+justification of the relevance of anosmia or ageusia to COVID infection.   
 
 As for geographic resolution, we consider the prediction of COVID-19 case rates
 and hotspots aggregated at the level of an individual \textit{hospital referral
@@ -289,10 +289,11 @@ using data that would have been available to us \textit{as of}
 September 28 (imagine that we can ``rewind'' the clock to September 28 and query
 the COVIDcast API to get the latest data it would have had available at that
 point in time.)  This is possible because of the COVIDcast API's comprehensive
-data versioning system (described in more detail in our companion paper).  We
-also use the \texttt{evalcast} R package \cite{EvalcastR}, which streamlines the 
-process of training arbitrary prediction models over a sequence of prediction
-dates, by constructing the proper sequence of vintage training data sets.   
+data versioning system (described in more detail in the companion paper
+\cite{Reinhart:2021}).  We also use the \texttt{evalcast} R package
+\cite{EvalcastR}, which streamlines the process of training arbitrary
+prediction models over a sequence of prediction dates, by constructing the
+proper sequence of vintage training data sets.    
 
 \begin{figure}[tb!]
   \includegraphics[width=\columnwidth]{fig/revisions.pdf}
