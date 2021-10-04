@@ -122,19 +122,19 @@ models, we see many more small $P$-values than would be expected if the null
 hypothesis (that the AR model is better) were true.
 
 Another relatively assumption-lean method of testing for differences in forecast
-accuracy is the Diebold-Mariano test \cite{Diebold:2002,Diebold:2015,harvey1997testing}.
-Essentially, the differences between forecast losses are assumed to have a
-constant mean and a covariance that depends on time. Under these conditions, the
-asymptotic distribution for the standardized mean of the differences is limiting
-normal provided that a heteroskedasticity and autocorrelation robust estimate of
-the variance is used. Using the loss as weighted interval score across all HRRs
-and horizons (7 to 21 days ahead), we perform the DM test using both the mean
-relative to the strawman (as reported in the manuscript) and the geometric mean
-relative to the strawman as described above. The first two rows of Table
-\ref{tab:dm-test} displays 
-$P$-values for the test that the indicator-assisted model is no-better than the
-AR model. Only the CHNG-CLI model's $P$-value exceeds conventional statistical
-significance thresholds.  
+accuracy is the Diebold-Mariano test \cite{Diebold:2002, Diebold:2015,
+  Harvey:1997}. Essentially, the differences between forecast losses are assumed
+to have a constant mean and a covariance that depends on time. Under these
+conditions, the asymptotic distribution for the standardized mean of the
+differences is limiting normal provided that a heteroskedasticity and
+autocorrelation robust estimate of the variance is used. Using the loss as
+weighted interval score across all HRRs and horizons (7 to 21 days ahead), we
+perform the DM test using both the mean relative to the strawman (as reported in
+the manuscript) and the geometric mean relative to the strawman as described
+above. The first two rows of Table \ref{tab:dm-test} displays $P$-values for the
+test that the indicator-assisted model is no-better than the AR model. Only the
+CHNG-CLI model's $P$-value exceeds conventional statistical significance
+thresholds.   
 
 \section{Bootstrap results}
 
