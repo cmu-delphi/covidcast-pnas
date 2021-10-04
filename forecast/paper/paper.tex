@@ -50,15 +50,15 @@
 \significancestatement{Forecasting is a critical element in the public health
   response to any fast-moving epidemic or pandemic.  Predicting the future
   spread of some disease process, based on disease activity in the recent
-  past---say, using what is known as autoregressive modeling in the time series
-  literature---is a basic and widely-used method.  In this paper we study
-  whether including auxiliary indicators as additional features in such an
-  autoregressive model can be useful in COVID-19 case forecasting and hotspot
-  prediction.  We find that indicators based on de-identified medical insurance 
-  claims, self-reported symptoms through online surveys, and COVID-related
-  internet search activity all provide a nontrivial boost in accuracy, though
-  their utility generally depends the pandemic's local dynamics (upswing,
-  downswing, or flat period) at prediction time.
+  past---say, using autoregressive modeling from the time series literature---is 
+  a basic and widely-used method.  In this paper we study whether including
+  auxiliary indicators as additional features in such an autoregressive model
+  can be useful in COVID-19 case forecasting and hotspot prediction.  We find
+  that indicators based on de-identified medical insurance claims, self-reported
+  symptoms through online surveys, and COVID-related internet search activity
+  all provide a nontrivial improvement in forecast accuracy, though their
+  utility depends on the pandemic's local dynamics (upswing, downswing, or flat
+  period) at prediction time. 
 }
 
 % Please include corresponding author, author contribution and author
@@ -115,17 +115,18 @@ acquired funding.}
 \dropcap{T}racking and forecasting indicators from public health reporting
 streams---such as confirmed cases and deaths in the COVID-19 pandemic---is
 crucial for understanding disease spread, formulating public policy responses,
-and anticipating future public health resource needs.  In a companion paper, we
-describe our research group's (Delphi's) efforts in curating and maintaining a 
-database of real-time indicators that track COVID-19 activity and other relevant
-phenomena. The signals (a term we use synonomously with ``indicators'') in this
-database are accessible through the COVIDcast API \cite{CovidcastAPI}, with
-associated R \cite{CovidcastR} and Python \cite{CovidcastPy} packages for
-convenient data fetching and processing tools. In the current paper, we aim to
-quantify the utility provided by a core set of these indicators for two
-fundamental prediction tasks: probabilistic forecasting of COVID-19 case 
-rates and prediction of future COVID-19 case hotspots (defined by the event that
-a relative increase in COVID-19 cases exceeds a certain threshold). 
+and anticipating future public health resource needs.  A companion paper
+\cite{Reinhart:2021} describes our research group's (Delphi's) efforts in
+curating and maintaining a database of real-time indicators that track COVID-19
+activity and other relevant phenomena. The signals (a term we use synonomously
+with ``indicators'') in this database are accessible through the COVIDcast API
+\cite{CovidcastAPI}, with associated R \cite{CovidcastR} and Python
+\cite{CovidcastPy} packages for convenient data fetching and processing
+tools. In the current paper, we aim to quantify the utility provided by a core
+set of these indicators for two fundamental prediction tasks: probabilistic
+forecasting of COVID-19 case rates and prediction of future COVID-19 case
+hotspots (defined by the event that a relative increase in COVID-19 cases
+exceeds a certain threshold).
 
  At the outset, we should be clear that our intent in this paper is \textit{not}
 to provide an authoritative take on cutting-edge COVID-19 forecasting methods.
@@ -143,28 +144,39 @@ While forecasting carries a rich literature that offers a wide range of
 techniques, see e.g., \cite{Hyndman:2018}, we purposely constrain ourselves to
 very simple models, avoiding common enhancements such as order selection,
 correction of outliers/anomalies in the data, and inclusion of regularization or
-nonlinearities. That said, analyses of forecasts submitted to the COVID-19
+nonlinearities.
+% Addition in response to Reviewer 1
+For the same reason, we do not account for any environmental factors that may
+well aid in forecasting---age structure, variants, holidays,
+reporting patterns, vaccination, public health measures, etc.
+% End addition
+That said, analyses of forecasts submitted to the COVID-19
 Forecast Hub \cite{ForecastHub} by a large community of modelers have shown that
 simple, robust models have consistently been among the best-performing over the
-pandemic \cite{Cramer:2021}, including time series models similar to those we
-consider in what follows.   
+pandemic, including time series models similar to those we
+consider in what follows.
+% Added in response to Reviewer 2
+\cite{Cramer:2021} investigates the performance of submitted forecasts for
+state-level deaths and shows that time series models perform among the top 5.
+Our internal evaluations suggest that the same is true (at least, if not to a
+greater extent) for case forecasting. 
 
-In our companion paper, we analyze correlations between various indicators and   
-COVID case rates. These correlations are natural summaries of the
-contemporaneous association between an indicator and COVID cases, but they fall 
-short of delivering a satisfactory answer to the question that motivates the
-current article: is the information contained in an indicator demonstrably
-useful for the prediction tasks we care about? For such a question, lagged
-correlations (e.g., measuring the correlation between an indicator and COVID
-case rates several days in the future) move us in the right direction, but still
-do not move us all the way there. The question about \textit{utility for 
-  prediction} is focused on a much higher standard than simply asking 
-about correlations; to be useful in forecast or hotspot models, an indicator
-must provide relevant information that is not otherwise contained in past values
-of the case rate series itself. We will assess this in the most direct way
+In the companion paper \cite{Reinhart:2021}, we analyze correlations between
+various indicators and COVID case rates. These correlations are natural
+summaries of the contemporaneous association between an indicator and COVID
+cases, but they fall short of delivering a satisfactory answer to the question
+that motivates the current article: is the information contained in an indicator
+demonstrably useful for the prediction tasks we care about? For such a question,
+lagged correlations (e.g., measuring the correlation between an indicator and
+COVID case rates several days in the future) move us in the right direction, but
+still do not move us all the way there. The question about \textit{utility for
+  prediction} is focused on a much higher standard than simply asking about 
+correlations; to be useful in forecast or hotspot models, an indicator must
+provide relevant information that is not otherwise contained in past values of
+the case rate series itself. We will assess this in the most direct way
 possible: by inspecting the difference in predictive performance of simple
 autoregressive models trained with and without access to past values of a
-particular indicator.   
+particular indicator.
 
 There is another, more subtle issue in evaluating predictive utility that 
 deserves explicit mention, as it will play a key role in our analysis.
@@ -192,7 +204,11 @@ see, e.g., \cite{Diebold:2002, McCraken:2007, Diebold:2015, Stokes:2017,
 Our take on this problem is in line with much of this literature; however, in
 order to avoid making any explicit assumptions, we do not attempt to make formal 
 significance statements, and instead, broadly examine the stability of our
-conclusions with respect to numerous modes of analysis.   
+conclusions with respect to numerous modes of analysis.
+% Addition upon review
+In the Supplement we examine
+two assumption-lean
+methods for assessing the statistical significance of our main results.
 
 \section{Methods}
 
@@ -223,7 +239,7 @@ in the API, we study the following five:
   systems partners.  
 \item Google search trends for anosmia and ageusia (Google-AA): A measure of  
   Google search volume for queries that relate to anosmia or ageusia (loss of
-  smell or taste), based on Google's COVID-19 Search Trends data set.  
+  smell or taste), based on Google's COVID-19 Search Trends data set.
 \end{itemize}
 In short, we choose these indicators because, conceptually speaking, they
 measure aspects of an individual's disease progression that would plausibly
@@ -233,11 +249,11 @@ COVID-19 test, through standard public health reporting streams.
 For more details on the five indicators (including how these are precisely
 computed from the underlying data streams) we refer to
 \url{https://cmu-delphi.github.io/delphi-epidata/api/covidcast_signals.html},
-which documents all of the signals in the COVIDcast API, and our companion paper
-on the API and database. For CTIS in particular, we refer to our companion paper
-on this survey. For the Google COVID-19 Search Trends data set, see
-\cite{GoogleSymptoms}; see also \cite{Klopfen:2020, Vaira:2020} for a 
-justification of the relevance of anosmia or ageusia to COVID-19 infection. 
+and the companion paper on the COVIDcast API and its signals
+\cite{Reinhart:2021}. For CTIS in particular, we refer to the companion paper
+\cite{Salomon:2021}. For the Google COVID-19 Search Trends data set, see
+\cite{GoogleSymptoms}; see also \cite{Klopfen:2020, Vaira:2020} for a
+justification of the relevance of anosmia or ageusia to COVID infection.   
 
 As for geographic resolution, we consider the prediction of COVID-19 case rates
 and hotspots aggregated at the level of an individual \textit{hospital referral
@@ -270,10 +286,11 @@ using data that would have been available to us \textit{as of}
 September 28 (imagine that we can ``rewind'' the clock to September 28 and query
 the COVIDcast API to get the latest data it would have had available at that
 point in time.)  This is possible because of the COVIDcast API's comprehensive
-data versioning system (described in more detail in our companion paper).  We
-also use the \texttt{evalcast} R package \cite{EvalcastR}, which streamlines the 
-process of training arbitrary prediction models over a sequence of prediction
-dates, by constructing the proper sequence of vintage training data sets.   
+data versioning system (described in more detail in the companion paper
+\cite{Reinhart:2021}).  We also use the \texttt{evalcast} R package
+\cite{EvalcastR}, which streamlines the process of training arbitrary
+prediction models over a sequence of prediction dates, by constructing the
+proper sequence of vintage training data sets.    
 
 \begin{figure}[tb!]
   \includegraphics[width=\columnwidth]{fig/revisions.pdf}
@@ -385,9 +402,14 @@ of signals for features, as we will detail shortly) June 9, 2020 for
 forecasting, and June 16, 2020 for hotspot prediction. (The bottleneck here is
 the CTIS-CLI-in-community signal, which does not exist before early April 2020,
 when the survey was first launched). The end date was chosen again with a 
-consideration to align both tasks as best as possible, and because few hotspots
-exist post December 31, 2020, due to the general and gradual decline of the
-pandemic in 2021.
+consideration to align both tasks as best as possible,
+% added to emphasize 
+and to coincide with the
+introduction of vaccinations.
+% Removed: this is no longer true unfortunately.
+% because few hotspots
+% exist post December 31, 2020, due to the general and gradual decline of the
+% pandemic in 2021.
 
 \paragraph{Forecasting Models}
 
@@ -498,6 +520,10 @@ quantile models in \eqref{eq:forecast_ar} and \eqref{eq:forecast_ar_x} using
 is minimized by the population quantiles of the target variable.  The use of WIS
 in COVID-19 forecast scoring is discussed in \cite{Bracher:2021}; WIS is also
 the main evaluation metric used in the COVID-19 Forecast Hub.
+% Addition in response to Reviewer 1
+More broadly, the specific form of WIS used here is a standard metric in the
+forecasting community for evaluating probabilistic interval forecasts, just as
+Mean Squared Forecast Error is standard for point forecasts.
 
 WIS is typically defined for quantile-based forecasts where the quantile levels
 are symmetric around 0.5.  This is the case for our choice in
@@ -681,17 +707,18 @@ be found at
 Figure~\ref{fig:forecast} (left panel) displays evaluation results for
 forecasting, stratified by ahead value and averaged over all HRRs and forecast
 dates.  Shown is the average WIS for each forecast model divided by that from a
-baseline model, which is basically a flat-line forecaster (its median forecast
-for $Y_{\ell,t+a}$ is always $Y_{\ell,t}$, with predicted quantiles defined
-around this based on historical variation). This is the same baseline model as
-in the COVID-19 Forecast Hub. Here, we use the baseline model in order to scale
-mean WIS so that it gets put on an interpretable, unitless scale.  In the
-figure, we can see that all curves are below 1, which means (smaller WIS is
-better) that all of the models, including AR, outperform the baseline on average
-over the forecasting period.  On the other hand, the models deliver at best an
-improvement of about 20\% in average WIS over the baseline model, with this gap
-narrowing to about 10\% at the largest ahead values, illustrating the difficulty 
-of the forecasting problem.
+baseline model. The baseline model is a flat-line forecaster which forms its
+median forecast by using the most recent value $Y_{\ell,t}$ for all aheads
+$Y_{\ell,t+a}$, with predicted quantiles defined by the empirical distribution
+of the residuals from this median forecast over recent history. This is the same
+baseline model as in the COVID-19 Forecast Hub. Here, we use the baseline model
+in order to scale mean WIS to put it on an interpretable, unitless
+scale.  In the figure, we can see that all curves are below 1, which means
+(smaller WIS is better) that all of the models, including AR, outperform the
+baseline on average over the forecasting period.  On the other hand, the models
+deliver at best an improvement of about 20\% in average WIS over the baseline
+model, with this gap narrowing to about 10\% at the largest ahead values,
+illustrating the difficulty of the forecasting problem.
 
 We can also see from the figure that CHNG-COVID and DV-CLI offer the biggest
 gains over AR at small ahead values, followed by CTIS-CLI-in-community and
