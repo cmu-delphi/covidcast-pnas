@@ -15,6 +15,7 @@ library(gridExtra)
 library(ggplot2)
 library(scales)
 library(dplyr)
+library(tidyr)
 library(purrr)
 ```
 
@@ -235,7 +236,7 @@ dv_as_of <- map_dfr(as_ofs, function(as_of) {
     mutate(as_of = as_of)
 })
 
-## Now plot the each "as of" time series curve, faceted by state
+## Now plot each "as of" time series curve, faceted by state
 dv_as_of %>%
   mutate(geo_label = factor(
     geo_value, levels = states,
@@ -256,30 +257,151 @@ ggsave("../paper/fig/dv_as_of.pdf", width = 5, height = 4)
 
 ## Figure 6
 
-Percentage point increase in SafeGraph estimates of the percentage of people
-staying completely at home, based on aggregated mobile device data, between
-March 1, 2020 and April 15, 2020.
+Amount of backfill of key signals from various sources, for comparison:
 
-```{r figure-6, message=FALSE, cache=TRUE}
-begin_date <- "2020-03-01"
-end_date <- "2020-04-15"
+```{r figure-6-data, message=FALSE, cache=TRUE}
+SOURCES <- c("doctor-visits", "fb-survey", "jhu-csse", "jhu-csse")
+SIGNALS <- c("smoothed_cli", "smoothed_whh_cmnty_cli",
+             "confirmed_incidence_prop", "deaths_incidence_prop")
+NAMES <- c("lag", "DV-CLI", "CTIS-CLI-in-community", "Cases", "Deaths")
 
-begin_data <- covidcast_signal("safegraph", "completely_home_prop_7dav",
-                               begin_date, begin_date, geo_type = "state")
-end_data <- covidcast_signal("safegraph", "completely_home_prop_7dav",
-                             end_date, end_date, geo_type = "state")
+calc_pct_abs_diff <- function(source, signal, start_date, end_date,
+                              final_lag, lags) {
+  pctile_abs_change <- numeric(length(lags))
 
-diffs <- begin_data %>%
-  inner_join(end_data, by = "geo_value", suffix = c(".begin", ".end")) %>%
-  mutate(value = 100 * (value.end - value.begin)) %>%
-  select(data_source = data_source.end, signal = signal.end, geo_value, value, issue = issue.end) %>%
-  mutate(time_value = end_date) %>%
-  as.data.frame %>%
-  as.covidcast_signal(signal = "safegraph-change",
-                      geo_type = "state")
+  dates <- seq.Date(as.Date(start_date),
+                    as.Date(end_date),
+                    by = "1 day")
 
-plot(diffs, plot_type = "choro", range = c(10, 30),
-     title = "", choro_params = list(legend_n = 5))
+  # finalized value
+  df_final <- covidcast_signal(source, signal, start_date, end_date,
+                               as_of = end_date + final_lag,
+                               geo_type = "state") %>%
+    select(geo_value, time_value, value)
 
-ggsave("../paper/fig/mobility-drop.pdf", width = 5, height = 4)
+  for (ii in seq_along(lags)) {
+    lag <- lags[ii]
+    errs <- c()
+
+    for (jj in seq_along(dates)) {
+      date <- dates[jj]
+
+      df_prelim <- covidcast_signal(source, signal, date, date,
+                                    as_of = date + lag,
+                                    geo_type = "state")
+      if (nrow(df_prelim) == 0) {
+        next
+      }
+
+      df_prelim <- df_prelim %>%
+        select(geo_value, time_value, value) %>%
+        mutate(lag = lag)
+
+      errs_this_date <- df_final %>%
+        inner_join(df_prelim,
+                   by = c("geo_value", "time_value"),
+                   suffix = c(".final", ".prelim")) %>%
+        mutate(abs_diff = abs(value.prelim - value.final) / value.final) %>%
+        pull(abs_diff)
+
+      errs <- c(errs, errs_this_date)
+    }
+
+    pctile_abs_change[ii] <- quantile(errs, probs = 0.95, na.rm = TRUE,
+                                      names = FALSE)
+  }
+
+  return(pctile_abs_change)
+}
+
+format_df <- function(df) {
+  names(df) <- NAMES
+
+  df <- df %>%
+    pivot_longer(!lag, names_to = "signal", values_to = "value")
+
+  return(df)
+}
+
+start_date <- as.Date("2020-10-15")
+end_date <- as.Date("2021-04-15")
+final_lag <- 120
+lags <- c(90, 70, 50, 30, 10)
+
+pctile_df <- data.frame(lag = lags)
+
+for (ii in seq_along(SOURCES)) {
+  source <- SOURCES[ii]
+  signal <- SIGNALS[ii]
+
+  pctile_df[[signal]] <- calc_pct_abs_diff(source, signal, start_date, end_date,
+                                           final_lag, lags)
+}
+
+pctile_df <- format_df(pctile_df)
+```
+
+```{r figure-6, cache=TRUE}
+pctile_df %>%
+  ggplot(aes(x = lag, y = value, group = signal, color = signal)) +
+  geom_line() +
+  geom_text(data = filter(pctile_df, lag == min(lags)),
+            aes(x = lag, y = value, label = signal, hjust = "left"),
+            inherit.aes = FALSE, nudge_y = 0.015) +
+  labs(x = "Lag after events",
+       y = "95th percentile of absolute percent error",
+       color = "Signal") +
+  scale_y_continuous(labels = label_percent()) +
+  scale_x_continuous(breaks = lags) +
+  theme_bw() +
+  theme(legend.position = "none")
+
+ggsave("../paper/fig/backfill-compare.pdf", width = 5, height = 3.5)
+```
+
+## Figure 7
+
+County-level vaccination data obtained [from the
+CDC](https://data.cdc.gov/Vaccinations/COVID-19-Vaccinations-in-the-United-States-County/8xkx-amqh).
+Data downloaded on August 2, 2021. This data is in the public domain as a United
+States government work.
+
+```{r figure-7, message=FALSE, cache=TRUE}
+cdc <- read.csv("COVID-19_Vaccinations_in_the_United_States_County.csv") %>%
+  filter(Date == "07/20/2021")
+
+cdc_sm <- cdc %>%
+  select(FIPS, Series_Complete_18PlusPop_Pct, Administered_Dose1_Recip_18PlusPop_Pct) %>%
+  mutate(best_pop = pmax(Series_Complete_18PlusPop_Pct, Administered_Dose1_Recip_18PlusPop_Pct))
+
+vacc <- covidcast_signal("fb-survey", "smoothed_wcovid_vaccinated_or_accept",
+                         geo_type = "county", start_day = "2021-01-20",
+                         end_day = "2021-01-20")
+
+vacc_on_inauguration <- vacc %>%
+  mutate(location = abbr_to_name(geo_value, ignore.case = TRUE)) %>%
+  filter(time_value == "2021-01-20")
+
+w_cdc <- vacc_on_inauguration %>%
+  left_join(county_census, by = c("geo_value" = "FIPS")) %>%
+  left_join(cdc_sm, by = c("geo_value" = "FIPS")) %>%
+  mutate(REGION = case_when(
+    REGION == 1 ~ "Northeast",
+    REGION == 2 ~ "Midwest",
+    REGION == 3 ~ "South",
+    REGION == 4 ~ "West"))
+
+w_cdc %>%
+  filter(best_pop > 0, sample_size >= 250) %>%
+  ggplot(aes(x = value, y = Series_Complete_18PlusPop_Pct, color = REGION)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_x_continuous(labels = label_percent(scale = 1)) +
+  scale_y_continuous(labels = label_percent(scale = 1)) +
+  theme_bw() +
+  labs(x = "% willing to be vaccinated on January 20, 2021",
+       y = "% vaccinated on July 20, 2021", color = "Region") +
+  theme(legend.pos = "bottom", legend.direction = "horizontal")
+
+ggsave("../paper/fig/vaccine-intent-compare.pdf", width = 5, height = 4)
 ```

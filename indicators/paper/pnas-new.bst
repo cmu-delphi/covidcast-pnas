@@ -465,7 +465,8 @@ FUNCTION {format.vol.num.pages}
 %  }
 %  if$
   volume empty$
-  'skip$
+  { "" }
+%  'skip$
   { "\textbf{" volume field.or.null * "}" * }
   if$ 
   pages empty$
@@ -482,7 +483,7 @@ FUNCTION {format.vol.num.pages}
     if$
   }
   {
-    duplicate$ empty$
+  duplicate$ empty$
 	  { pop$ format.pages }
 %	  { ":" * pages n.dashify * }
       { ", " * pages n.dashify * }
