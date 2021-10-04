@@ -242,8 +242,7 @@ in the API, we study the following five:
   systems partners.  
 \item Google search trends for anosmia and ageusia (Google-AA): A measure of  
   Google search volume for queries that relate to anosmia or ageusia (loss of
-  smell or taste), based on Google's COVID-19 Search Trends data
-  set~\cite{GoogleSymptoms}.   
+  smell or taste), based on Google's COVID-19 Search Trends data set.
 \end{itemize}
 In short, we choose these indicators because, conceptually speaking, they
 measure aspects of an individual's disease progression that would plausibly
@@ -710,27 +709,18 @@ be found at
 Figure~\ref{fig:forecast} (left panel) displays evaluation results for
 forecasting, stratified by ahead value and averaged over all HRRs and forecast
 dates.  Shown is the average WIS for each forecast model divided by that from a
-% change since review
-baseline model.
-The baseline model is a flat-line forecaster which forms its median forecast by
-using the most recent value $Y_{\ell,t}$ as the median forecast for all aheads
-$Y_{\ell,t+a}$ . To create
-the quantiles, we use the empirical quantiles of the residuals from this
-forecast over the available history. 
-% old version
-% baseline model,
-% which is basically a flat-line forecaster (its median forecast
-% for $Y_{\ell,t+a}$ is always $Y_{\ell,t}$, with predicted quantiles defined
-% around this based on historical variation).
-This is the same baseline model as
-in the COVID-19 Forecast Hub. Here, we use the baseline model in order to scale
-mean WIS so that it gets put on an interpretable, unitless scale.  In the
-figure, we can see that all curves are below 1, which means (smaller WIS is
-better) that all of the models, including AR, outperform the baseline on average
-over the forecasting period.  On the other hand, the models deliver at best an
-improvement of about 20\% in average WIS over the baseline model, with this gap
-narrowing to about 10\% at the largest ahead values, illustrating the difficulty 
-of the forecasting problem.
+baseline model. The baseline model is a flat-line forecaster which forms its
+median forecast by using the most recent value $Y_{\ell,t}$ for all aheads
+$Y_{\ell,t+a}$, with predicted quantiles defined by the empirical distribution
+of the residuals from this median forecast over recent history. This is the same
+baseline model as in the COVID-19 Forecast Hub. Here, we use the baseline model
+in order to scale mean WIS to put it on an interpretable, unitless
+scale.  In the figure, we can see that all curves are below 1, which means
+(smaller WIS is better) that all of the models, including AR, outperform the
+baseline on average over the forecasting period.  On the other hand, the models
+deliver at best an improvement of about 20\% in average WIS over the baseline
+model, with this gap narrowing to about 10\% at the largest ahead values,
+illustrating the difficulty of the forecasting problem.
 
 We can also see from the figure that CHNG-COVID and DV-CLI offer the biggest
 gains over AR at small ahead values, followed by CTIS-CLI-in-community and
