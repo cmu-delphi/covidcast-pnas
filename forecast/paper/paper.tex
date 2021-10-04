@@ -522,11 +522,10 @@ quantile models in \eqref{eq:forecast_ar} and \eqref{eq:forecast_ar_x} using
 \cite{Gneiting:2007}.  WIS is a proper score, which means that its expectation 
 is minimized by the population quantiles of the target variable.  The use of WIS
 in COVID-19 forecast scoring is discussed in \cite{Bracher:2021}; WIS is also
-the main evaluation metric used in the COVID-19 Forecast Hub.
-% Addition in response to Reviewer 1
-More broadly, the specific form of WIS used here is a standard metric in the
-forecasting community for evaluating probabilistic interval forecasts, just as
-Mean Squared Forecast Error is standard for point forecasts.
+the main evaluation metric used in the COVID-19 Forecast Hub. More broadly, the
+specific form of WIS used here is a standard metric in the forecasting community
+for evaluating quantile-based probabilistic forecasts, just as mean squared
+forecast error is standard for point forecasts. 
 
 WIS is typically defined for quantile-based forecasts where the quantile levels
 are symmetric around 0.5.  This is the case for our choice in
