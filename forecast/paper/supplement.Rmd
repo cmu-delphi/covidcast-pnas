@@ -463,7 +463,7 @@ up_down_df_summary %>%
   
 
 ```{r upswing-histogram, include=FALSE, fig.width=9, fig.height=4.5}
-# Figure 4
+# Fgure 4
 up_down_df %>% 
   filter(period != "jm") %>%
   group_by(forecaster, udf) %>%
@@ -557,6 +557,29 @@ bind_rows(con_tab %>% mutate(err = "Classification error"),
 ```
 
 ```{r hotspots-upswing-downswing-remake, fig.cap="REMAKE: Classification and loglikelihood separated into periods of upswing, downswing, and flat cases. The indicator assisted models always have lower classification error relative to the null classifier, while the AR actually does worse in down and flat periods. In terms of loglikelihood, all forecasters have lower likelihood than the null classifier during up periods. In down and flat periods, the indicators generally improve over the AR, while the are worse during up periods."}
+# mycummean <- function(x) {
+#   isgood <- ! is.na(x)
+#   denom <- cumsum(isgood)
+#   x[!isgood] <- 0
+#   num <- cumsum(x)
+#   y <- num / denom
+#   y[is.na(y)] <- .5 # deal with empties at the beginning
+#   y
+# }
+# 
+# null_classifier <- readRDS(here("data", 
+#                                 "all_signals_wide_as_of_2020-05-18.RDS")) %>%
+#   rename(jhu = `value+0:jhu-csse_confirmed_7dav_incidence_prop`) %>%
+#   select(geo_value, time_value, jhu) %>%
+#   group_by(geo_value) %>%
+#   arrange(time_value) %>%
+#   mutate(lag_value = lag(jhu, 7),
+#          apc = (jhu - lag_value) / lag_value,
+#          hot = case_when(
+#            apc > .25 & lag_value > 30 ~ 1,
+#            apc <= .25 & lag_value > 30 ~ 0),
+#          null_class = mycummean(hot))
+  
 hot_udf <- inner_join(
   hotspots_honest %>% filter(period != "jm"),
   up_down %>% select(geo_value, target_end_date, udf))
@@ -567,7 +590,8 @@ con_tab <- hot_udf %>%
   filter(!is.na(actual)) %>%
   mutate(pred = value > cutoff) %>%
   group_by(forecaster, udf) %>%
-  summarise(m = mean(pred != actual) - .5) %>%
+  summarise(m = (mean(pred != actual) - cutoff) / cutoff,
+            err = mean(pred != actual)) %>%
   ungroup()
 
 # con_tab <- left_join(
@@ -578,16 +602,24 @@ con_tab <- hot_udf %>%
 
 llike_tab <- hot_udf %>%
   filter(!is.na(actual)) %>%
+  # left_join(null_classifier %>% select(geo_value, time_value, null_class) %>%
+  #             rename(target_end_date = time_value)) %>%
   mutate( # kill prob 0-1 predictions
     value = case_when(
       value < 1e-8 ~ 1e-8,
       value > 1-1e-8 ~ 1-1e-8,
-      TRUE ~ value
-    ),
+      TRUE ~ value),
+    # null_class = case_when(
+    #   null_class < 1e-8 ~ 1e-8,
+    #   null_class > 1-1e-8 ~ 1-1e-8,
+    #   TRUE ~ null_class),
     llike = (actual == 1) * log(value) + (actual == 0) * log(1 - value),
-    nulldev = (actual == 1) * log(.5) + (actual == 0) * log(1 - .5)) %>%
+    nulldev = (actual == 1) * log(cutoff) + 
+      (actual == 0) * log(1 - cutoff)) %>%
   group_by(forecaster, udf) %>%
-  summarise(m = mean(llike) - mean(nulldev)) %>%
+  summarise(m = (mean(llike) - mean(nulldev)) / abs(mean(nulldev)),
+            mm = mean(llike),
+            mmm = mean(nulldev)) %>%
   ungroup()
 
 # llike_tab <- left_join(
@@ -605,6 +637,7 @@ bind_rows(con_tab %>% mutate(err = "Classification error"),
   #scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   theme_bw() +
   geom_hline(yintercept = 0) +
+  scale_y_continuous(labels = scales::percent_format()) +
   facet_wrap(~err, scales = "free_y") +
   ylab("Improvement relative to the null classifier") +
   xlab("") +
@@ -791,7 +824,7 @@ df2 <- left_join(
 
 
 ```{r leading-only, include=FALSE, fig.width=6, fig.height=4}
-# Figure 6 in the manuscript
+# Figure 5 in the manuscript
 df2 %>%
   filter(period != "jm") %>%
   group_by(forecaster, udf) %>%
@@ -802,7 +835,7 @@ df2 %>%
   geom_bar(width = 0.6, position = position_dodge(width=0.6),
            stat = "identity") +
   geom_hline(yintercept = 0) +
-  scale_fill_manual(values = fcast_colors) +
+  scale_fill_manual(values = fcast_colors[1:5]) +
   guides(fill = guide_legend(nrow = 1)) +
   theme_bw() +
   ylab("Correlation") +
@@ -1100,7 +1133,7 @@ case_scores <- case_scores %>%
             geo_wis = GeoMean(wis / strawman_wis))
 ```
 
-```{r compare-to-hub-mean, fig.height = 8.5, fig.cap="This figure reproduces Figure 3 in the main paper but overlays scores for the forecasts submitted to the COVID-19 Forecast Hub. Grey lines correspond to the various teams that submitted during period our evaluation period. We have highlighted the COVIDhub-ensemble, which is the official forecast of the CDC."}
+```{r compare-to-hub-mean, fig.height = 8.5, fig.cap="This figure reproduces Figure 3 in the main paper but overlays scores for the forecasts submitted to the COVID-19 Forecast Hub. Grey lines correspond to the various teams that submitted during period our evaluation period. We have highlighted the COVIDhub-ensemble, which is the official forecast of the CDC.", include=FALSE}
 # Same as Fig 3 in the paper
 df <- summarizer(fcasts_honest %>% filter(period != "jm") %>%
                    group_by(ahead, forecaster), "wis", NULL, 
@@ -1125,7 +1158,7 @@ ggplot(df) +
 
 \clearpage
 
-```{r compare-to-hub-geomean, fig.height = 8.5, fig.cap="This figure is similar to Figure \\ref{fig:fcast-adjusted}. In this case, we add 1 to both the forecaster WIS and the baseline WIS before scaling (to allow forecasters that achieve 0 error to appear), and we overlay scores for the forecasts submitted to the COVID-19 Forecast Hub. Grey lines correspond to the various teams that submitted during period our evaluation period. We have highlighted the COVIDhub-ensemble, which is the official forecast of the CDC."}
+```{r compare-to-hub-geomean, fig.height = 8.5, fig.cap="This figure is similar to Figure \\ref{fig:fcast-adjusted}. In this case, we add 1 to both the forecaster WIS and the baseline WIS before scaling (to allow forecasters that achieve 0 error to appear), and we overlay scores for the forecasts submitted to the COVID-19 Forecast Hub. Grey lines correspond to the various teams that submitted during period our evaluation period. We have highlighted the COVIDhub-ensemble, which is the official forecast of the CDC.", include=FALSE}
 # Like supplement GeoMean figure, but adding 1
 df2 <- fcasts_honest %>% 
   filter(period != "jm") %>%

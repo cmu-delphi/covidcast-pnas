@@ -6,7 +6,7 @@
 
 \usepackage{newtxmath}
 \usepackage{newtxtext}
-
+\usepackage{graphicx}
 
 \usepackage{xcolor}
 \definecolor{cobalt}{rgb}{0.0, 0.28, 0.67}
@@ -312,9 +312,9 @@ Are there major misses that have taken place and could have been avoided?
   457). In particular, we emphasize that it is the same as that used by the
   COVID-19 Forecast Hub.
 
-  $\bullet$ We have added two figures to the supplement along with a section of
-  text (Section 9) that compares our forecasts with state-of-the-art forecasts
-  submitted to the COVID-19 Forecast Hub. The first (Figure S26) overlays the
+  $\bullet$ Here are adding two figures
+    that compare our forecasts with state-of-the-art forecasts
+  submitted to the COVID-19 Forecast Hub. The first overlays the
   scores from the submissions on top of Figure 3 from the manuscript. We should
   note that the submitted forecasts are at the state level, while ours are at
   the HRR level, but once scaled by the baseline, should be roughly comparable.
@@ -327,7 +327,32 @@ Are there major misses that have taken place and could have been avoided?
   paper would rank in the top 2 of all submitted forecasts, beating the
   COVIDhub-ensemble at all forecast 
   horizons. The improvement of the best indicator assisted model over the AR model
-  is roughly the same as the improvement of the AR model over the COVIDhub-ensemble.
+  is roughly the same as the improvement of the AR model over the
+  COVIDhub-ensemble.
+
+  \begin{figure}[tb]
+    \centering
+    \includegraphics[width=.9\textwidth]{fig/compare-to-hub-mean-1.pdf}
+    \caption{This figure reproduces Figure 3 in the main paper but overlays
+      scores for the forecasts submitted to the COVID-19 Forecast Hub. Grey
+      lines correspond to the various teams that submitted during period our
+      evaluation period. We have highlighted the COVIDhub-ensemble, which is the
+      official forecast of the CDC.}
+    \label{fig:compare-to-hub-mean}
+  \end{figure}
+
+  \begin{figure}[tb]
+    \centering
+    \includegraphics[width=.9\textwidth]{fig/compare-to-hub-geomean-1.pdf}
+    \caption{This figure is more like Figure S6 in the Supplement. In this case,
+      we add 1 to both the forecaster WIS and the baseline WIS before scaling
+      (to allow forecasters that achieve 0 error to appear), and we overlay
+      scores for the forecasts submitted to the COVID-19 Forecast Hub. Grey
+      lines correspond to the various teams that submitted during period our
+      evaluation period. We have highlighted the COVIDhub-ensemble, which is the
+      official forecast of the CDC.}
+    \label{fig:compare-to-hub-geomean}
+  \end{figure}
 \end{resp}
 
 
