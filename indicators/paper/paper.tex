@@ -459,7 +459,7 @@ and health experts, usage analytics from the site, and user surveys.% Key design
 \subsection{COVID Forecasting}
 
 Since July 2020, we have been regularly submitting short-term forecasts of
-COVID-19 case and death incidence, at the state and county levels, to the
+COVID-19 case and death incidence, at both the state and county levels, to the 
 COVID-19 Forecast Hub \cite{ForecastHub}, with ``CMU-TimeSeries'' as the
 team-model name.  The process of building, training, and deploying our
 forecasting models leverages much of the infrastructure described in this paper
@@ -534,7 +534,7 @@ correlation analysis in the next subsection.
 \end{figure}
 
 Besides tracking contemporaneous COVID activity, these and other indicators can
-be used to improve forecasts of future COVID case trends, as investigated in a
+be used to improve forecasts of future COVID case trends, as investigated in our
 companion paper \cite{McDonald:2021}.
 
 \subsection{Correlation Analyses}
@@ -573,15 +573,17 @@ activity, at a given time). Somewhat surprisingly, the survey-based
 CLI-in-community signal shows the strongest correlations for much of the time
 period. This clearly demonstrates the value of a large-scale survey such as CTIS
 for tracking symptoms and case trends, especially when other data is
-unavailable. The correlations vary over time in complex ways; while some of this
-variation is doubtless due to complex changes in public behavior, reporting and
-testing practices, and so on, some is also related to changes in overall
-COVID-19 case rates. For example, comparing against
-Figure~\ref{fig:time_trends_national}, we observe that correlations drop in
-February 2021 for several of the signals, matching when COVID cases also sharply
-decline. This decline likely caused the heterogeneity in case rates by county to
-decline, making it more difficult for any signal to achieve a high correlation
-by county.
+unavailable. 
+
+Also notable is the fact that the correlations fluctuate over time in complex
+ways; while some of this variation is likely due to changes in public behavior,
+reporting and testing practices, and so on, some is also related to changes in
+overall COVID-19 case trends. For example, comparing against
+Figure~\ref{fig:time_trends_national}, we see that correlations drop in February
+2021 for many of the signals, roughly matching the point in time when COVID
+cases also sharply decline. This decline likely caused the heterogeneity in case
+rates by county to decline, making it more difficult for any signal to achieve a
+high geo-wise correlation.
 
 Figure~\ref{fig:time_wise_correlation} summarizes time-wise correlations from
 these five signals over the same time period, and for the same set of counties.
@@ -668,14 +670,14 @@ JHU CSSE, smoothed using a 7-day trailing average). Meanwhile, Delphi's COVID
 Trends and Impact Survey averaged around 350 responses per day in Bexar County
 over the same time period, and was able to estimate the fraction of the
 population who know someone in their local community with COVID-Like Illness
-(CLI). As we can see in the right-hand panel of the figure, this signal was not
-affected by Bexar County's reporting problems and, as shown in the last
+(CLI). As we can see in the right-hand panel of the figure, this indicator was 
+not affected by Bexar County's reporting problems and, as shown in the last 
 subsection, it is (in general) highly correlated with case rates, providing an
-alternate stream of data about COVID activity unaffected by backlogs. Similar
-reporting problems have occurred in many jurisdictions across the United States,
-and audits have regularly discovered misclassified or unreported cases and
-deaths, making it valuable to cross-check against external sources not part of
-the same reporting systems.
+alternate stream of data about COVID activity unaffected by backlogs. In
+general, reporting problems have occurred in many jurisdictions across the
+United States, and audits have regularly discovered misclassified or unreported
+cases and deaths, making it valuable to cross-check against external sources not
+part of the same reporting systems.
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/bexar_compare.pdf}
@@ -713,18 +715,7 @@ reports and final values is over 20\% for such data, and only after roughly 35
 days do estimates typically match finalized values within 5\%. However, the
 systematic nature of this backfill, as illustrated in Figure~\ref{fig:dv_as_of},
 suggests that statistical models could be fit (potentially separately for each
-location) to estimate the final values from preliminary reports. On the other
-hand, official public health reporting of COVID cases and deaths can be subject
-to revision as death certificates are audited and backlogs cleared, resulting in
-thousands of cases and deaths being added or removed.
-Figure~\ref{fig:backfill-compare} shows relative differences between early
-signal values, reported 10--90 days after the underlying events, and later
-versions at least four months later. As the distribution of these revision
-amounts is highly skewed, the figure plots the 95th percentile of relative
-change, showing that reported deaths can have large revisions comparable to
-revisions in claims-based signals. This backfill is much more difficult to
-predict, and thus claims data and other sources may be a useful stand-in while
-public health reports are aggregated and corrected.
+location) to estimate the final values from preliminary reports. 
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/backfill-compare.pdf}
@@ -732,13 +723,26 @@ public health reports are aggregated and corrected.
     values of key signals and final values reported much later. For each date
     between October 15, 2020 and April 15, 2021, the values for each state
     reported between 10 and 90 days later are compared to ``final'' versions
-    recorded as of August 13, 2021, 120 days after April 15. Even officially
-    reported case and death data can have large revisions 30--60 days or more
-    after initial reporting; much of this is driven by individual large
-    revisions affecting specific states and dates, rather than systematic
-    changes affecting all states and dates.}
+    recorded as of August 13, 2021. Even officially reported case and death data
+    can have large revisions 30--60 days or more after initial reporting; much
+    of this is driven by individual large revisions affecting specific states
+    and dates, rather than systematic changes affecting all states and dates.} 
   \label{fig:backfill-compare}
 \end{figure}
+
+Figure~\ref{fig:backfill-compare} shows relative differences between early
+indicator values, reported 10--90 days after the underlying events, and later 
+versions at least four months later. As the distribution of these revision
+amounts is highly skewed, the figure plots the 95th percentile of relative
+change, showing that reported deaths can incur large relative error in initial
+values, comparable to that in claims-based signals.  However, for deaths, as
+well as cases, the revision pattern is not very systematic, with large
+corrections typically occuring at a sparse subset of locations and times
+(e.g., due to audits or backlogs being cleared, which can result in thousands of
+cases or deaths can be  added or removed all at once).  This backfill is much
+more difficult to predict than that of claims data, thus the latter (and other 
+sources) may be useful for nowcasting cases and deaths while public health 
+reports are being aggregated and corrected.   
 
 To reiterate a previous point, when training and validating forecast models that
 use signals (on historical data), users will want to use data that was known
