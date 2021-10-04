@@ -50,18 +50,15 @@
 \significancestatement{Forecasting is a critical element in the public health
   response to any fast-moving epidemic or pandemic.  Predicting the future
   spread of some disease process, based on disease activity in the recent
-  past---say, using what is known as autoregressive modeling in the time series
-  literature---is a basic and widely-used method.  In this paper we study
-  whether including auxiliary indicators as additional features in such an
-  autoregressive model can be useful in COVID-19 case forecasting and hotspot
-  prediction.  We find that indicators based on de-identified medical insurance 
-  claims, self-reported symptoms through online surveys, and COVID-related
-  internet search activity
-  % all provide a nontrivial boost in accuracy,
-  all provide a nontrivial improvement in forecast accuracy,
-  though
-  their utility generally depends on the pandemic's local dynamics (upswing,
-  downswing, or flat period) at prediction time.
+  past---say, using autoregressive modeling from the time series literature---is 
+  a basic and widely-used method.  In this paper we study whether including
+  auxiliary indicators as additional features in such an autoregressive model
+  can be useful in COVID-19 case forecasting and hotspot prediction.  We find
+  that indicators based on de-identified medical insurance claims, self-reported
+  symptoms through online surveys, and COVID-related internet search activity
+  all provide a nontrivial improvement in forecast accuracy, though their
+  utility depends on the pandemic's local dynamics (upswing, downswing, or flat
+  period) at prediction time. 
 }
 
 % Please include corresponding author, author contribution and author
@@ -246,7 +243,7 @@ in the API, we study the following five:
 \item Google search trends for anosmia and ageusia (Google-AA): A measure of  
   Google search volume for queries that relate to anosmia or ageusia (loss of
   smell or taste), based on Google's COVID-19 Search Trends data
-  set~\cite{Wahltinez2020}.   
+  set~\cite{GoogleSymptoms}.   
 \end{itemize}
 In short, we choose these indicators because, conceptually speaking, they
 measure aspects of an individual's disease progression that would plausibly
