@@ -693,20 +693,20 @@ part of the same reporting systems.
 \subsection{Revisions Matter}
 
 The revision tracking feature in the API assists in model-building and
-evaluation. Figure~\ref{fig:dv_as_of} illustrates how one COVIDcast medical
-claims signal evolved as it was revised across multiple issue dates, in four
-different states, between June 1 and August 1, 2020. This signal, known as
-DV-CLI, is similar to CHNG-CLI and measures outpatient doctor visits about
-COVID-related symptoms, but is provided by a different data partner. In each
-plot, the rightmost ends of the lines correspond to estimates for the last day
-that data are available for each issue date, which are generally the most
-tentative estimates, and appear to be significantly biased upward in Arizona in
+evaluation. Figure~\ref{fig:dv_as_of} illustrates how DV-CLI, a medical claims
+signal, evolved as it was revised across multiple issue dates, in four different
+states, between June 1 and August 1, 2020. DV-CLI is similar to CHNG-CLI and
+reflects outpatient visits with COVID-related symptoms (the two signals are
+based on claims data provided by different data partners, which cover different
+hospital systems). In each panel, the rightmost end of each colored line
+corresponds to an estimate for the last day of available data for a given issue
+date, which we can see tends to be significantly biased upward in Arizona in
 June 2020, and significantly biased downward in New York throughout June and
 July 2020.
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/dv_as_of.pdf}
-  \caption{Estimated percentage of doctor's visits due to COVID-like illness
+  \caption{Estimated percentage of outpatient visits due to COVID-like illness 
     (DV-CLI) displayed across multiple issue dates, with later issue dates
     adding additional data and revising past data from prior issue dates.}
   \label{fig:dv_as_of}
@@ -734,30 +734,30 @@ location) to estimate the final values from preliminary reports.
 \end{figure}
 
 Figure~\ref{fig:backfill-compare} shows relative differences between early
-indicator values, reported 10--90 days after the underlying events, and later 
+indicator values, reported 10--90 days after the underlying events, and later
 versions at least four months later. As the distribution of these revision
 amounts is highly skewed, the figure plots the 95th percentile of relative
 change, showing that reported deaths can incur large relative error in initial
 values, comparable to that in claims-based signals.  However, for deaths, as
 well as cases, the revision pattern is not very systematic, with large
-corrections typically occuring at a sparse subset of locations and times
-(e.g., due to audits or backlogs being cleared, which can result in thousands of
-cases or deaths can be  added or removed all at once).  This backfill is much
-more difficult to predict than that of claims data, thus the latter (and other 
-sources) may be useful for nowcasting cases and deaths while public health 
-reports are being aggregated and corrected.   
+corrections typically occuring at a sparse subset of locations and times (e.g.,
+due to audits or backlogs being cleared, which can result in thousands of cases
+or deaths can be added or removed all at once).  This backfill is much more
+difficult to predict than that of claims data, therefore the latter (and other
+sources) may be useful for nowcasting cases and deaths while public health
+reports are being aggregated and corrected.
 
-To reiterate a previous point, when training and validating forecast models that
-use signals (on historical data), users will want to use data that was known
-\textit{as of} the forecast date, not revised versions that only became
-available much later. The COVIDcast API makes all historical versions available
-and easily accessible for this purpose; and this feature plays a prominent role
-in our own analysis of forecasting and hotspot prediction models appearing in a
-companion paper \cite{McDonald:2021}.% Revisions to forecast targets, such as 
-% cases and deaths, also complicate the evaluation of forecast models:
-% comparisons of forecasts to the ground truth may shift when the ground truth
-% is revised weeks later. Only by systematically tracking revisions can this
-% effect be monitored.
+To reiterate a previous point, when building forecast models (on historical
+data) for retrospective evaluation purposes, users will want to use data that
+was known \textit{as of} the forecast date, not revised versions that only
+became available at a later time. Note that not only model training, but also
+model assessment, can be affected by the revision process (comparisons of
+forecasts to the ground truth may shift when the ground truth is revised weeks
+later). Only by systematically tracking revisions can all these effects be
+monitored and properly accounted for.  The COVIDcast API makes all historical
+versions available and easily accessible for this purpose; and this feature
+plays a prominent role in our own analysis of forecasting and hotspot prediction
+models appearing in a companion paper \cite{McDonald:2021}.
 
 \subsection{New Perspectives}
 
