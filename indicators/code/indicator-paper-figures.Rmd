@@ -399,8 +399,8 @@ w_cdc %>%
   scale_x_continuous(labels = label_percent(scale = 1)) +
   scale_y_continuous(labels = label_percent(scale = 1)) +
   theme_bw() +
-  labs(x = "Estimated % willing to be vaccinated, 2021-01-20",
-       y = "% vaccinated on 2021-07-20", color = "Region") +
+  labs(x = "% willing to be vaccinated on January 20, 2021",
+       y = "% vaccinated on July 20, 2021", color = "Region") +
   theme(legend.pos = "bottom", legend.direction = "horizontal")
 
 ggsave("../paper/fig/vaccine-intent-compare.pdf", width = 5, height = 4)
