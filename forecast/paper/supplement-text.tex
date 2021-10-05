@@ -1,105 +1,84 @@
+\section{Finalized Versus Vintage Data}
 
+The goal of this section is to quantify the effect of not properly accounting
+for the question of ``what was known when'' in performing retrospective
+evaluations of forecasters.  Figures \ref{fig:fcast-finalized} and
+\ref{fig:hot-finalized} show what Figures 3 and 4 in the main paper would have
+looked like if we had simply trained all models using the finalized data rather
+than using vintage data.  This comparison can be seen more straightforwardly in
+Figures \ref{fig:fcast-honest-v-finalized} and \ref{fig:hot-honest-v-finalized},
+which show the ratio in performance between the vintage and finalized versions.
+When methods are given the finalized version of the data rather than the version
+available at the time that the forecast would have been made, all methods appear
+(misleadingly) to have better performance than they would have had if run
+prospectively.  For example, for forecasting case rates 7-days ahead, the WIS of
+all methods is at least 8\% larger than what would have been achieved using
+finalized data.  This effect diminishes as the forecasting horizon increases,
+reflecting the fact that longer-horizon forecasters rely less heavily on recent
+data than very short-horizon forecasters.  Crucially, some methods are
+``helped'' more than others by the less scrupulous retrospective evaluation,
+underscoring the difficulty of avoiding misleading conclusions when performing
+retrospective evaluations of forecasters.
 
-\section{Examining the relative advantage of using finalized rather than vintage data}
-
-The goal of this section is to quantify the effect of
-not properly accounting for the question of ``what was known when'' in
-performing retrospective evaluations of forecasters.   Figures
-\ref{fig:fcast-finalized} and \ref{fig:hot-finalized} show 
-what Figures 3 and 4 in the main paper would have looked like if we
-had simply trained all models using the finalized data rather than
-using vintage data.  This comparison can be seen more
-straightforwardly in Figures \ref{fig:fcast-honest-v-finalized} and
-\ref{fig:hot-honest-v-finalized}, which show the ratio in performance between
-the vintage and finalized 
-versions.  When methods are 
-given the finalized version of the data rather than the version available at the
-time that the forecast would have been made, all methods 
-appear (misleadingly) to have better performance than they would
-have had if run prospectively.  For example, for forecasting case rates
-7-days ahead, the WIS of all methods is at least 8\% larger than what would have been
-achieved using finalized data.  This effect
-diminishes as the forecasting horizon increases, reflecting the fact
-that longer-horizon forecasters rely less heavily on recent data than very
-short-horizon forecasters.  Crucially, some methods are
-``helped'' more than others by the less scrupulous retrospective
-evaluation, underscoring the difficulty of avoiding misleading
-conclusions when performing retrospective evaluations of forecasters.
-
-\chngcli~(and, to a lesser extent, the other claims-based
-signals) is the most  
-affected by this distinction, reflecting the latency in claims-based
-reporting.  This underscores the importance of efforts to provide ``nowcasts'' for
-claims signals 
-(which corresponds to a 0-ahead forecast of what the claims
-signal's value will be once all data has been collected). Looking at
-the \chngcli~and \dv~curves in Figure \ref{fig:fcast-finalized}, we
-can see that they perform very similarly when trained on the finalized data.
-This is reassuring 
-because they are, in principle, measuring the same thing (namely, the percentage of
-outpatient visits that are primarily about COVID-related symptoms).
-The substantial difference in their curves in Figure 3 of the
-main paper must therefore reflect their having very different
-backfill profiles.  
+\chngcli~(and, to a lesser extent, the other claims-based signals) is the most
+affected by this distinction, reflecting the latency in claims-based reporting.
+This underscores the importance of efforts to provide ``nowcasts'' for claims
+signals (which corresponds to a 0-ahead forecast of what the claims signal's
+value will be once all data has been collected). Looking at the \chngcli~and
+\dv~curves in Figure \ref{fig:fcast-finalized}, we can see that they perform
+very similarly when trained on the finalized data.  This is reassuring because
+they are, in principle, measuring the same thing (namely, the percentage of
+outpatient visits that are primarily about COVID-related symptoms).  The
+substantial difference in their curves in Figure 3 of the main paper must
+therefore reflect their having very different backfill profiles.
   
-While using finalized rather than vintage data affects \dv~the least for forecasting,
-it is one of the most affected methods for the
-hotspot problem. 
+While using finalized rather than vintage data affects \dv~the least for
+forecasting, it is one of the most affected methods for the hotspot problem.
 This is a reminder that the forecasting and hotspot problems are fundamentally
-distinct.  For example, the hotspot problem does not measure
-the ability to distinguish between flat and downward trends.
+distinct.  For example, the hotspot problem does not measure the ability to
+distinguish between flat and downward trends.
 
-Even the \ar~model is affected by this distinction, reflecting the
-fact that the case rates themselves (i.e., the response values) are also
-subject to revision.  The forecasters based on indicators are thus
-affected both by revisions to the indicators and by revisions to the
-case rates.  In the case of the \gs~model, in which we only used finalized
-values for the \gs~indicator, the difference in performance can be
-wholly attributed to revisions of case rates.
+Even the \ar~model is affected by this distinction, reflecting the fact that the
+case rates themselves (i.e., the response values) are also subject to revision.
+The forecasters based on indicators are thus affected both by revisions to the
+indicators and by revisions to the case rates.  In the case of the \gs~model, in
+which we only used finalized values for the \gs~indicator, the difference in
+performance can be wholly attributed to revisions of case rates.
 
+\section{Aggregation with Geometric Mean}
 
-
-
-\section{Aggregating with geometric mean}
-
-In this section, we consider using the geometric mean instead of the
-arithmetic mean when aggregating the weighted interval score (WIS) across
-location-time pairs. 
-There are three reasons why using the geometric mean may be desirable.
+In this section, we consider using the geometric mean instead of the arithmetic
+mean when aggregating the weighted interval score (WIS) across location-time
+pairs.  There are three reasons why using the geometric mean may be desirable.
 \begin{enumerate}
-\item  WIS is right-skewed, being bounded below by zero and having
-  occasional very large values.   Figure \ref{fig:wis-densities} illustrates that the
-  densities appear roughly log-Gaussian.  The geometric mean is a
-  natural choice in such a context since the relative ordering of forecasters is
-  determined by the arithmetic mean of the {\em logarithm} of their WIS
-  values.
-\item In the main paper, we report the ratio of the mean WIS of a
-  forecaster to the mean WIS of the baseline forecaster. Another
-  choice could be to take the mean of the ratio of WIS values for the
-  two methods. This latter choice would penalize a method less for
-  doing poorly where the baseline forecaster also does poorly.
-  Using instead the geometric mean makes the order of aggregation and
-  scaling immaterial since the ratio of geometric means is the same as
-  the geometric mean of ratios.
-\item If one imagines that a forecaster's WIS is composed of
-  multiplicative space-time effects $S_{\ell,t}$ shared across all forecasters,
-  i.e. $\WIS(F_{\ell,t,f},Y_{\ell,t})=S_{\ell,t}E_{f,t}$ with $E_{f,t}$ a
-  forecaster-specific error, then
-  taking the ratio of two forecasters' geometric mean WIS values will
-  effectively cancel these space-time effects.
+\item WIS is right-skewed, being bounded below by zero and having occasional 
+  very large values.  Figure \ref{fig:wis-densities} illustrates that the
+  densities appear roughly log-Gaussian.  The geometric mean is a natural choice  
+  in such a context since the relative ordering of forecasters is determined by
+  the arithmetic mean of the {\em logarithm} of their WIS values.
+\item In the main paper, we report the ratio of the mean WIS of a forecaster to
+  the mean WIS of the baseline forecaster. Another choice could be to take the
+  mean of the ratio of WIS values for the two methods. This latter choice would
+  penalize a method less for doing poorly where the baseline forecaster also
+  does poorly.  Using instead the geometric mean makes the order of aggregation
+  and scaling immaterial since the ratio of geometric means is the same as the 
+  geometric mean of ratios.
+\item If one imagines that a forecaster's WIS is composed of multiplicative
+  space-time effects $S_{\ell,t}$ shared across all forecasters,
+  i.e., $\WIS(F_{\ell,t,f},Y_{\ell,t})=S_{\ell,t}E_{f,t}$ with $E_{f,t}$ a
+  forecaster-specific error, then taking the ratio of two forecasters' geometric
+  mean WIS values will effectively cancel these space-time effects. 
 \end{enumerate}
 
-Figure \ref{fig:fcast-adjusted} uses the geometric
-mean for aggregation.  Comparing this with Figure 3 of the main paper,
-we see that the main conclusions are largely unchanged; however,
-\chngcli~now appears better than \ar.  This behavior would be
-expected if \chngcli's poor performance is attributable to a
-relatively small number of large errors (as opposed to a large number
-of moderate errors).  Indeed, Figure 5 of the main paper further
-corroborates this, in which we see the heaviest left tails occuring
-for \chngcli.
+Figure \ref{fig:fcast-adjusted} uses the geometric mean for aggregation.
+Comparing this with Figure 3 of the main paper, we see that the main conclusions
+are largely unchanged; however, \chngcli~now appears better than \ar.  This
+behavior would be expected if \chngcli's poor performance is attributable to a
+relatively small number of large errors (as opposed to a large number of
+moderate errors).  Indeed, Figure 5 of the main paper further corroborates this,
+in which we see the heaviest left tails occuring for \chngcli.
 
-\section{Statistical significance}
+\section{Statistical Significance}
 
 In the Introduction of the main paper, we give some reasons that we avoid making
 formal statements about statistical significance, preferring instead to examine
@@ -118,12 +97,12 @@ results are plotted as histograms in Figure \ref{fig:sign-test}. In this case,
 we use the total relative WIS over all aheads, but the histograms are largely
 similar for individual target horizons. If there were no difference, we would
 expect to see a uniform distribution. However, for all indicator-assisted
-models, we see many more small $P$-values than would be expected if the null
+models, we see many more small p-values than would be expected if the null
 hypothesis (that the AR model is better) were true.
 
 Another relatively assumption-lean method of testing for differences in forecast
 accuracy is the Diebold-Mariano test \cite{Diebold:2002, Diebold:2015,
-  Harvey:1997}. Essentially, the differences between forecast losses are assumed
+Harvey:1997}. Essentially, the differences between forecast losses are assumed
 to have a constant mean and a covariance that depends on time. Under these
 conditions, the asymptotic distribution for the standardized mean of the
 differences is limiting normal provided that a heteroskedasticity and
@@ -131,86 +110,73 @@ autocorrelation robust estimate of the variance is used. Using the loss as
 weighted interval score across all HRRs and horizons (7 to 21 days ahead), we
 perform the DM test using both the mean relative to the strawman (as reported in
 the manuscript) and the geometric mean relative to the strawman as described
-above. The first two rows of Table \ref{tab:dm-test} displays $P$-values for the
+above. The first two rows of Table \ref{tab:dm-test} displays p-values for the
 test that the indicator-assisted model is no-better than the AR model. Only the
-CHNG-CLI model's $P$-value exceeds conventional statistical significance
-thresholds.   
+CHNG-CLI model's p-value exceeds conventional statistical significance
+thresholds.
 
-\section{Bootstrap results}
+\section{Bootstrap Results}
 
-As explained in Section 2.B. of the main paper, a (somewhat cynical)
-hypothesis for why we see benefits in forecasting and hotspot
-prediction is that the indicators are not actually providing useful
-information but they are instead acting as a sort of ``implicit
-regularization,''  leading to shrinkage on the autoregressive
-coefficients and therefore to less volatile predictions.  To investigate
-this hypothesis, we consider fitting  ``noise features'' that in truth
-should have zero coefficients.  Recall (from the main paper) that at each
-forecast date, we 
-train a model on 6,426 location-time pairs.  Indicator models are
-based on six features, corresponding to the three autoregressive terms
-and the three lagged indicator values.  To form noise indicator features,
-we replace their values with those from a randomly chosen time-space pair
-(while keeping the autoregressive 
-features fixed).  In particular, at each location $\ell$ and
-time $t$, for the forecasting task we replace the triplet $(X_{\ell,t}, X_{\ell,t-7},
-X_{\ell,t-14})$ in Eq. (3) of the main paper with the triplet $(X_{\ell^*,t^*},
-X_{\ell^*,t^*-7}, 
-X_{\ell^*,t^*-14})$, where $(\ell^*,t^*)$ is a location-time pair
-sampled with replacement from the 6,426 location-time pairs.  
-Likewise in the hotspot prediction task, we replace the triplet
-$(X_{\ell,t}^\Delta, X_{\ell,t-7}^\Delta, 
-X_{\ell,t-14}^\Delta)$ in Eq. (5) of the main paper with
-$(X_{\ell^*,t^*}^\Delta, X_{\ell^*,t^*-7}^\Delta, 
-X_{\ell^*,t^*-14}^\Delta)$.
-Figures
-\ref{fig:fcast-booted}--\ref{fig:hot-booted} show the results.  No
-method exhibits a noticeable performance gain over the \ar~method,
-leading us to dismiss the implicit regularization hypothesis.
-
-
+As explained in Section 2.B. of the main paper, a (somewhat cynical) hypothesis
+for why we see benefits in forecasting and hotspot prediction is that the
+indicators are not actually providing useful information but they are instead
+acting as a sort of ``implicit regularization,'' leading to shrinkage on the
+autoregressive coefficients and therefore to less volatile predictions.  To
+investigate this hypothesis, we consider fitting ``noise features'' that in
+truth should have zero coefficients.  Recall (from the main paper) that at each
+forecast date, we train a model on 6,426 location-time pairs.  Indicator models
+are based on six features, corresponding to the three autoregressive terms and
+the three lagged indicator values.  To form noise indicator features, we replace
+their values with those from a randomly chosen time-space pair (while keeping
+the autoregressive features fixed).  In particular, at each location $\ell$ and
+time $t$, for the forecasting task we replace the triplet $(X_{\ell,t},
+X_{\ell,t-7}, X_{\ell,t-14})$ in Eq. (3) of the main paper with the triplet
+$(X_{\ell^*,t^*}, X_{\ell^*,t^*-7}, X_{\ell^*,t^*-14})$, where $(\ell^*,t^*)$ is
+a location-time pair sampled with replacement from the 6,426 location-time
+pairs.  Likewise in the hotspot prediction task, we replace the triplet
+$(X_{\ell,t}^\Delta, X_{\ell,t-7}^\Delta, X_{\ell,t-14}^\Delta)$ in Eq. (5) of
+the main paper with $(X_{\ell^*,t^*}^\Delta, X_{\ell^*,t^*-7}^\Delta,
+X_{\ell^*,t^*-14}^\Delta)$.  Figures
+\ref{fig:fcast-booted}--\ref{fig:hot-booted} show the results.  No method
+exhibits a noticeable performance gain over the \ar~method, leading us to
+dismiss the implicit regularization hypothesis.
 
 \section{Upswings and Downswings}
 
-In this section we provide extra details about the upswing / flat / downswing 
-analysis described in the main text. Figure \ref{fig:upswing-summary} shows
-the overall results, examining the average difference $\WIS(AR) - \WIS(F)$ in 
+In this section we provide extra details about the upswing / flat / downswing
+analysis described in the main text. Figure \ref{fig:upswing-summary} shows the
+overall results, examining the average difference $\WIS(AR) - \WIS(F)$ in
 period. Figure \ref{fig:hotspots-upswing-downswing} shows the same information
-for the hotspot task. On average, during downswings and flat periods, the 
-indicator-assisted models have lower classification error and higher 
-log likelihood than the AR model. For hotspots, both Google-AA and CTIS-CLIIC
+for the hotspot task. On average, during downswings and flat periods, the
+indicator-assisted models have lower classification error and higher log
+likelihood than the AR model. For hotspots, both Google-AA and CTIS-CLIIC
 perform better than the AR model during upswings, in contrast to the forecasting
-task, where only Google-AA improves. For a related analysis, Figure 
-\ref{fig:cor-wis-ratio} shows histograms of the Spearman
-correlation (Spearman's $\rho$, a rank-based measure of association) between
-the $\WIS(F)/\WIS(AR)$ and the magnitude of the swing. Again we see that case
-rate increases are positively related to diminished performance of the 
-indicator models.
+task, where only Google-AA improves. For a related analysis, Figure
+\ref{fig:cor-wis-ratio} shows histograms of the Spearman correlation (Spearman's
+$\rho$, a rank-based measure of association) between the $\WIS(F)/\WIS(AR)$ and
+the magnitude of the swing. Again we see that case rate increases are positively
+related to diminished performance of the indicator models.
 
-One hypothesis for diminished relative performance during upswings is that 
-the AR model tends to overpredict downswings and underpredict upswings. Adding
-indicators appears to help avoid this behavior on the downswing but not as much 
+One hypothesis for diminished relative performance during upswings is that the
+AR model tends to overpredict downswings and underpredict upswings. Adding
+indicators appears to help avoid this behavior on the downswing but not as much
 on upswings. Figure \ref{fig:upswing-corr-table} shows the correlation between
 between $\WIS(AR) - \WIS(F)$ and the difference of their median forecasts.
-During 
-downswings, this correlation is large, implying that improved relative
-performance 
-of $F$ is related to making lower forecasts than the AR model. The opposite is
-true during upswings. This is largely to be expected. However, the relationship
-attenuates in flat periods and during upswings. That is, when performance is
-better 
-in those cases, it may be due to other factors than simply making predictions
-in the correct direction, for example, narrower confidence intervals.
+During downswings, this correlation is large, implying that improved relative
+performance of $F$ is related to making lower forecasts than the AR model. The
+opposite is true during upswings. This is largely to be expected. However, the
+relationship attenuates in flat periods and during upswings. That is, when
+performance is better in those cases, it may be due to other factors than simply
+making predictions in the correct direction, for example, narrower confidence
+intervals.
 
-
-\section{Leadingness and laggingness}
+\section{Leadingness and Laggingness}
 
 In Section 2.D of the main text, we discuss the extent to which the indicators
 are leading or lagging case rates during different periods. To define the amount
 of leadingness or laggingness at location $\ell$, we use the cross correlation
-function (CCF) 
-between the two time series. The $\CCF_\ell(a)$ of an indicator $X_{\ell}$ and case
-rates $Y_{\ell}$ is defined as
+function (CCF) between the two time series. The $\CCF_\ell(a)$ of an indicator
+$X_{\ell}$ and case rates $Y_{\ell}$ is defined as
 % \[
 % \CCF_{\ell,t}(a) = \frac{1}{n_a} \sum_{i=1}^{n_a} \left( ( X_{\ell,t,i+a} -
 %   \overline{X}_{\ell,t}) / s^{X}_{\ell,t}\right) \left( ( Y_{\ell,t,i} -
@@ -220,45 +186,37 @@ rates $Y_{\ell}$ is defined as
 % shifted in time by $a$ days, and $\overline{X}_{\ell,t}$, $s^X_{\ell,t}$
 % are the sample mean and
 % standard deviation of $X_{\ell,t}$ (respectively $Y_{\ell,t}$). The result is a
-their Pearson correlation where $X_\ell$ has been
-% sequence of Pearson correlations for each selected $a$, where we
-aligned
-with the values of $Y_{\ell}$ that occurred $a$ days earlier.
-Thus, for any $a>0$, $\CCF_{\ell}(a)>0$ indicates that
-$Y_{\ell,t}$ is moving together with $X_{\ell,t+a}$.
-% days in the future.
-In this case we say that $X_{\ell}$ is lagging
-$Y_{\ell}$. For $a<0$, $\CCF_{\ell}(a)>0$ means that $Y_{\ell,t}$ is
-positively correlated with $X_{\ell,t-a}$, so we say that
-$X_{\ell}$ leads $Y_{\ell}$.
+their Pearson correlation where $X_\ell$ has been aligned with the values of
+$Y_{\ell}$ that occurred $a$ days earlier.  Thus, for any $a>0$,
+$\CCF_{\ell}(a)>0$ indicates that $Y_{\ell,t}$ is moving together with
+$X_{\ell,t+a}$.  In this case we say that $X_{\ell}$ is lagging $Y_{\ell}$. For
+$a<0$, $\CCF_{\ell}(a)>0$ means that $Y_{\ell,t}$ is positively correlated with
+$X_{\ell,t-a}$, so we say that $X_{\ell}$ leads $Y_{\ell}$.
 
 Figure \ref{fig:ccf-dv-finalized} shows the standardized signals for the HRR
 containing Charlotte, North Carolina, from August 1, 2020 until the end of
 September. These are the same signals shown in Figure 1 in the manuscript but
-using finalized data. To
-define ``leadingness'' we compute $\CCF_{\ell}(a)$ (as implemented with the R
-function {\tt ccf()}) for each $a\in
-\{-15,\ldots,15\}$ using the 56 days leading up to the target date. This is the same
-amount of data used to train the forecasters: 21 days of training data, 21 days
-to get the response at $a=21$, and 14 days for the longest lagged value. The
-orange dashed horizontal line represents the 95\% significance threshold for
-correlations based on 56 observations. Any correlations larger in magnitude than
-this value are considered statistically significant under the null hypothesis of
-no relationship. We define leadingness to be the sum of the significant
+using finalized data. To define ``leadingness'' we compute $\CCF_{\ell}(a)$ (as
+implemented with the R function {\tt ccf()}) for each $a\in \{-15,\ldots,15\}$
+using the 56 days leading up to the target date. This is the same amount of data
+used to train the forecasters: 21 days of training data, 21 days to get the
+response at $a=21$, and 14 days for the longest lagged value. The orange dashed
+horizontal line represents the 95\% significance threshold for correlations
+based on 56 observations. Any correlations larger in magnitude than this value
+are considered statistically significant under the null hypothesis of no
+relationship. We define leadingness to be the sum of the significant
 correlations that are leading (those above the dashed line with $a<0$) while
 laggingness is the same but for $a>0$. In the figure, there are three
 significant correlations on the ``leading'' side (at $a = -5, -4, -3$), so
-leadingness will be the sum of those values while laggingness is 0:
-%correlations, so both scores will be 0:
-on September 28 in Charlotte, \dv~is leading cases
-leading but not lagging.
+leadingness will be the sum of those values while laggingness is 0: on September
+28 in Charlotte, \dv~is leading cases leading but not lagging.
 
 Figure \ref{fig:lagging-only} shows the correlation between laggingness and the
 difference in indicator WIS and AR WIS. Unlike leadingness (Figure 5 in the
-manuscript) there is no obvious relationship that holds consistently
-across indicators. This is heartening as laggingness
-should not aid forecasting performance. On the other hand, if an indicator is
-more lagging than it is leading, this may suggest diminished performance.
+manuscript) there is no obvious relationship that holds consistently across
+indicators. This is heartening as laggingness should not aid forecasting
+performance. On the other hand, if an indicator is more lagging than it is
+leading, this may suggest diminished performance.
 Figure~\ref{fig:diff-in-lead-lag} shows the correlation of the difference in
 leadingness and laggingness with the difference in WIS. The pattern here is
 largely similar to the pattern in leadingness described in the manuscript: the
@@ -266,53 +224,45 @@ relationship is strongest in down periods and weakest in up periods with the
 strength diminishing as we move from down to flat to up for all indicators.
 
 In calculating the CCF and the associated leadingness and laggingness scores, we
-have used the finalized data, and we look at the behavior at the 
-target date of the forecast. That is we are using the same data to
-evaluate predictive accuracy as to determine
-leadingness and laggingness. It should be noted that the leadingness of the
-indicator at the time the model is trained may also be important. Thus, we could
-calculate separate leadingness and laggingness scores for the trained model and
-for the evaluation data and examine their combination in some way. We do not
-pursue this combination further and leave this investigation for future work.
+have used the finalized data, and we look at the behavior at the target date of
+the forecast. That is we are using the same data to evaluate predictive accuracy
+as to determine leadingness and laggingness. It should be noted that the
+leadingness of the indicator at the time the model is trained may also be
+important. Thus, we could calculate separate leadingness and laggingness scores
+for the trained model and for the evaluation data and examine their combination
+in some way. We do not pursue this combination further and leave this
+investigation for future work.
 
+% \section{Examining data in 2021}
 
+% In this section, we investigate the sensitivity of the results to the
+% period over which we train and evaluate the models.  In the main
+% paper, we end all evaluation on December 31, 2020.  Figures
+% \ref{fig:fcast-alldates}--\ref{fig:hot-alldates} show how the
+% results would differ if we extended this analysis through March
+%   31, 2021. Comparing Figure \ref{fig:fcast-alldates} to Figure 3 of
+% the main paper, one sees that as ahead increases most methods now improve
+% relative to the baseline forecaster. When compared to other methods, 
+% \chngcli~appears much better than
+% it had previously; however, all forecasters other than \chngcov~and
+% \dv~are performing less well relative to the baseline than before.
+% These changes are likely due to the differing nature of the pandemic
+% in 2021, with flat and downward trends much more common than upward
+% trajectories.  Indeed, the nature of the hotspot prediction problem is
+% quite different in this period.  With a 21-day training window, it is
+% common for there to be many fewer hotspots in training.
 
-
-
-\section{Examining data in 2021}
-
-In this section, we investigate the sensitivity of the results to the
-period over which we train and evaluate the models.  In the main
-paper, we end all evaluation on December 31, 2020.  Figures
-\ref{fig:fcast-alldates}--\ref{fig:hot-alldates} show how the
-results would differ if we extended this analysis through March
-  31, 2021. Comparing Figure \ref{fig:fcast-alldates} to Figure 3 of
-the main paper, one sees that as ahead increases most methods now improve
-relative to the baseline forecaster. When compared to other methods, 
-\chngcli~appears much better than
-it had previously; however, all forecasters other than \chngcov~and
-\dv~are performing less well relative to the baseline than before.
-These changes are likely due to the differing nature of the pandemic
-in 2021, with flat and downward trends much more common than upward
-trajectories.  Indeed, the nature of the hotspot prediction problem is
-quite different in this period.  With a 21-day training window, it is
-common for there to be many fewer hotspots in training.
-
-
-\section{Examining accumulated error over time and space}
+\section{Aggregation Over Time and Space}
 
 Following the suggestion of an anonymous reviewer, we investigate two
-disaggregated versions of 
-the main forecasting result shown in Figure 3 on the manuscript. The first
-(Figure \ref{fig:cumulative-mean})
-displays the cumulative error (summed over all horizons) of each forecaster
-divided by the cumulative error 
-of the baseline.
-This perspective should illustrate how
-the models perform over time, drawing attention to any nonstationary behavior.
-During the initial increase in cases in July 2020, CTIS-CLIIC and Google-AA gain
-a lot relative to the AR model. All the indicators do much better than the AR
-model during the following downturn (the ebb of the second wave). The AR model
+disaggregated versions of the main forecasting result shown in Figure 3 on the
+manuscript. The first (Figure \ref{fig:cumulative-mean}) displays the cumulative
+error (summed over all horizons) of each forecaster divided by the cumulative
+error of the baseline.  This perspective should illustrate how the models
+perform over time, drawing attention to any nonstationary behavior.  During the
+initial increase in cases in July 2020, CTIS-CLIIC and Google-AA gain a lot
+relative to the AR model. All the indicators do much better than the AR model
+during the following downturn (the ebb of the second wave). The AR model
 actually improves over the indicators in October 2020, before losing a bit in
 late November.
 
@@ -324,8 +274,6 @@ hurt forecasting performance. The clear pattern is that in most HRRs, the
 indicators improved performance, though usually by small amounts (2.5\%--10\%).
 In some isolated HRRs, performance was markedly worse, though there does not
 appear to be any particular pattern to these locations.
-
-
 
 % \section{Comparisons to state-of-the-art forecasters}
 

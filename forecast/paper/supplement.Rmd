@@ -953,7 +953,7 @@ gg
 
 
 <!-- Examining data in 2021 -->
-
+<!--
 ```{r fcast-alldates, fig.cap="Forecast performance over all periods. Performance largely improves for all forecasters with the inclusion of data in 2021."}
 plotter(fcasts_honest,
         "wis", Mean, scaler = "strawman_wis", 
@@ -975,7 +975,7 @@ plotter(fcasts_honest,
 ```{r hot-alldates, fig.cap="Area under the curve for hotspot predictions including data in 2021. Performance degrades relative to the period in 2020. However, there are far fewer hotspots during this period as case rates declined in much of the country."}
 plotter_hotspots(hotspots_honest)
 ```
-
+-->
 
 
 
