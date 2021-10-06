@@ -266,7 +266,7 @@ hospitalizations that involved COVID diagnoses or symptoms.
 
 \paragraph{Internet-Based Surveys} Conducted in partnership with Facebook,
 Delphi's COVID-19 Trends and Impact Survey receives an average of 50,000 responses
-daily, and has received over 20 million responses since April 2020
+daily, and has received over 25 million responses since April 2020
 \cite{Salomon:2021, Kreuter:2020}. From the surveys, we construct indicators on
 symptoms, social distancing, vaccination, and other attitudes and behaviors
 related to COVID.
@@ -292,7 +292,7 @@ USAFacts \cite{USAFacts}, so that we can track revisions and updates to this dat
 (see Section~\ref{subsec:revision_tracking}).
 
 Altogether, we produce over 170 signals from 12 distinct sources, and provide
-them in a common format for public access. This unifies both unique (unavailable
+them in a common format foc access. This unifies both unique (unavailable
 anywhere else) and standard COVID data streams into a single common 
 format, enabling efficient comparison and modeling. A summary of the data
 sources and signals in the API is in Table~\ref{tab:sources_signals}, and
@@ -585,7 +585,10 @@ Figure~\ref{fig:time_trends_national}, we see that correlations drop in February
 2021 for many of the signals, roughly matching the point in time when COVID
 cases also sharply decline. This decline likely caused the heterogeneity in case
 rates by county to decline, making it more difficult for any signal to achieve a
-high geo-wise correlation.
+high geo-wise correlation. Correlations between confirmed cases and cases 1--3
+weeks prior (shown in the Supplementary Information) show a similar correlation
+drop in February 2021, showing that the drop is due to a change in case data and
+not problems with the other signals.
 
 Figure~\ref{fig:time_wise_correlation} summarizes time-wise correlations from
 these five signals over the same time period, and for the same set of counties.
@@ -723,15 +726,15 @@ suggests that statistical models could be fit (potentially separately for each
 location) to estimate the final values from preliminary reports.
 
 \begin{figure}[t]
-  \includegraphics[width=\columnwidth]{fig/backfill-compare.pdf}
-  \caption{The 95th percentiles of relative changes between early reported
-    values of key signals and final values reported much later. For each date
+  \includegraphics[width=\columnwidth]{backfill-compare.pdf}
+  \caption{The 95th percentiles of relative error of early reported values of
+    key signals compared to final values reported much later. For each date
     between October 15, 2020 and April 15, 2021, the values for each state
     reported between 10 and 90 days later are compared to ``final'' versions
     recorded as of August 13, 2021. Even officially reported case and death data
     can have large revisions 30--60 days or more after initial reporting; much
     of this is driven by individual large revisions affecting specific states
-    and dates, rather than systematic changes affecting all states and dates.} 
+    and dates, rather than systematic changes affecting all states and dates.}
   \label{fig:backfill-compare}
 \end{figure}
 
@@ -740,11 +743,11 @@ indicator values, reported 10--90 days after the underlying events, and later
 versions at least four months later. As the distribution of these revision
 amounts is highly skewed, the figure plots the 95th percentile of relative
 change, showing that reported deaths can incur large relative error in initial
-values, comparable to that in claims-based signals.  However, for deaths, as
-well as cases, the revision pattern is not very systematic, with large
-corrections typically occuring at a sparse subset of locations and times (e.g.,
-due to audits or backlogs being cleared, which can result in thousands of cases
-or deaths can be added or removed all at once).  This backfill is much more
+values, comparable to that in claims-based signals. However, for deaths, as well
+as cases, these large revisions are not very systematic, with large corrections
+typically occuring at a sparse subset of locations and times (e.g., due to
+audits or backlogs being cleared, which can result in thousands of cases or
+deaths can be added or removed all at once). This backfill is much more
 difficult to predict than that of claims data, therefore the latter (and other
 sources) may be useful for nowcasting cases and deaths while public health
 reports are being aggregated and corrected.
