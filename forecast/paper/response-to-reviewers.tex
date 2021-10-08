@@ -85,10 +85,10 @@
 
 \begin{resp}
   During the period discussed in the main paper, vaccinations had essentially no
-  effect. On Dec 31 2000, when the main evaluation period ends,  according to
+  effect. On Dec 31 2020, when the main evaluation period ends,  according to
   CDC data, about 1\% of the population 
   had received 1 dose. That said, we should probably be more specific in the
-  paragraph on lines 31-40: our goal is to use very simple models that do not
+  paragraph on lines 31--40: our goal is to use very simple models that do not
   account for extra information (vaccinations but also strains of the virus,
   ``super-spreader'' events, etc.).
 
@@ -156,8 +156,10 @@ points and trends very easily.
 
 \begin{resp}
   There is little reason to believe that this data is stationary. The models
-  however are trained and evaluated over reasonably short periods (2-3 months),
-  over which time the behavior may well be stationary. We have added a section
+  however are trained and evaluated over reasonably short periods (2--3 months),
+  over which time the behavior may well be stationary.
+
+  $\bullet$ We have added a section
   to the appendix that uses the cumulative sum normalized by baseline as
   suggested. With some exceptions at the beginning of 
   the evaluation period, the relative ordering remains fairly consistent. The AR
@@ -285,7 +287,7 @@ Are there major misses that have taken place and could have been avoided?
   We have tried to focus mainly on simple time series models in this paper
   rather than comparing to other more elaborate models. A careful
   (out-of-sample) comparison of forecasting performance for state-of-the-art
-  models can be found in reference 6 (Cramer et al.). That paper focuses on
+  models can be found in reference 7 (Cramer et al.). That paper focuses on
   forecasting deaths rather than cases and at the state-level rather than
   disaggregated HRRs. However, their ranking (Figure 2 of Cramer et al.) puts the
   ``COVIDhub-Baseline'' about 10th out of 27 models. As we discuss in the
@@ -314,6 +316,8 @@ Are there major misses that have taken place and could have been avoided?
   scores from the submissions on top of Figure 3 from the manuscript. We should
   note that the submitted forecasts are at the state level, while ours are at
   the HRR level, but once scaled by the baseline, should be roughly comparable.
+  (Note also, these are for cases, not deaths as described in the previous
+  bullet.) 
   Only those forecasters that submitted at least 300 forecasts (roughly 50
   states over 6 weeks during the 6 months examined) are shown. From this Figure
   it is clear that all of the forecasters considered in this paper beat most
