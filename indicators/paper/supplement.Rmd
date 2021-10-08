@@ -49,6 +49,41 @@ COVIDcast Epidata API.}
 \end{figure}
 
 \clearpage
+```{r case-correlation-lagged-data}
+start_day <- "2020-04-15"
+end_day <- "2021-04-15"
+as_of_day <- "2021-06-01"
+
+
+df_cases <- covidcast_signal("jhu-csse", "confirmed_7dav_incidence_prop",
+                             start_day, end_day, as_of = as_of_day)
+
+names <- c("7 days", "14 days", "21 days")
+lags <- c(7, 14, 21)
+df_cor <- vector("list", length(lags))
+
+for (ii in seq_along(lags)) {
+  df_cor[[ii]] <- covidcast_cor(df_cases, df_cases, dt_y = lags[ii],
+                                by = "time_value")
+  df_cor[[ii]]$signal <- names[ii]
+}
+
+df <- do.call(rbind, df_cor)
+df$signal <- factor(df$signal, levels = names, labels = names)
+```
+
+```{r case-correlation-lagged-plot, fig.cap="Correlation between confirmed cases and case reports 1, 2, or 3 weeks prior, for all counties in the United States with case reporting. Cases are correlated with future cases as one might expect, but note the precipitous drop in correlation in February 2021. This matches the correlation drop between other COVIDcast signals and cases during the same time period, supporting the hypothesis that the drop was due to decreased heterogeneity in case rates by county."}
+ggplot(df, aes(x = time_value, y = value)) +
+  geom_line(aes(color = signal)) +
+  ylim(0, NA) +
+  labs(x = "Date", y = "Correlation") +
+  scale_x_date(date_breaks = "3 months", date_labels = "%b %Y",
+               date_minor_breaks = "1 month") +
+  theme_bw() +
+  theme(legend.position = "bottom", legend.title = element_blank())
+```
+
+\clearpage
 
 ```{r state-trends}
 SOURCES <- c("jhu-csse", "chng", "chng", "fb-survey")
