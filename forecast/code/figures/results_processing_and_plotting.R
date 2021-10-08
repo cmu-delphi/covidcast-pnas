@@ -22,7 +22,7 @@ plotter <- function(df, y, aggr,
   facet_layer <- NULL
   if (facet_by_period) {
     period_labels <- c(jj = "June - July", as = "Aug - Sep", o = "Oct",
-                       nd = "Nov - Dec", jm = "Jan - Mar")
+                       nd = "Nov - Dec") #, jm = "Jan - Mar")
     df <- df %>% group_by(period, .add = TRUE)
     facet_layer <- facet_wrap(~period, scales = "free_y",
                               labeller = labeller(period = period_labels))
@@ -45,7 +45,7 @@ plotter_hotspots <- function(df, facet_by_period = FALSE) {
   facet_layer <- NULL
   if (facet_by_period) {
     period_labels <- c(jj = "June - July", as = "Aug - Sep", o = "Oct",
-                       nd = "Nov - Dec", jm = "Jan - Mar")
+                       nd = "Nov - Dec")#, jm = "Jan - Mar")
     df <- df %>% group_by(period, .add = TRUE)
     facet_layer <- facet_wrap(~period, scales = "free_y",
                               labeller = labeller(period = period_labels))
@@ -69,11 +69,11 @@ period_processing <- function(res) {
     month(forecast_date) %in% 6:7 ~ "jj",
     month(forecast_date) %in% 8:9 ~ "as",
     month(forecast_date) %in% 10 ~ "o",
-    month(forecast_date) %in% 11:12 ~ "nd",
-    month(forecast_date) %in% 1:3 ~ "jm"))
+    month(forecast_date) %in% 11:12 ~ "nd"))
+    #month(forecast_date) %in% 1:3 ~ "jm"))
   res <- mutate(res,
                 period = fct_relevel(as.factor(period),
-                                     "jj","as","o","nd", "jm"))
+                                     "jj","as","o","nd"))#, "jm"))
   res
 }
 

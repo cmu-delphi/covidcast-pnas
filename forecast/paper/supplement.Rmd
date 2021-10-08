@@ -44,13 +44,13 @@ source(here("code", "figures", "hotspot_funs.R"))
 
 ```{r data-loading}
 actuals <- readRDS(here("data", "confirmed_7dav_incidence_prop.RDS"))
-fcasts_honest <- readRDS(here("data", "results_honest.RDS")) %>%
+fcasts_honest <- readRDS(here("data", "revised_chng", "results_honest.RDS")) %>%
   process_res_cases(actuals) %>%
   filter(forecaster != "gs_inherit") 
 fcasts_finalized <- readRDS(here("data", "results_dishonest.RDS")) %>%
   process_res_cases(actuals) %>%
   filter(forecaster != "gs_inherit")
-hotspots_honest <- readRDS(here("data", "hotspots_honest.RDS")) %>%
+hotspots_honest <- readRDS(here("data", "revised_chng", "hotspots_honest.RDS")) %>%
   process_res_hotspots() %>%
   filter(forecaster != "gs_inherit")
 hotspots_finalized <- readRDS(here("data", "hotspots_dishonest.RDS")) %>%
@@ -121,7 +121,7 @@ names(hrr_tab) <- pull(hrr_names, hrrnum)
 
 ```{r fcast, include=FALSE}
 # Figure 3 in the paper
-fig3 <- plotter(fcasts_honest %>% filter(period != "jm"), 
+fig3 <- plotter(fcasts_honest, 
         "wis", Mean, scaler = "strawman_wis", 
         order_of_operations = c("aggr","scale")) +
   ylab("Mean WIS (relative to baseline)")
@@ -130,7 +130,7 @@ fig3
 
 ```{r hot, include=FALSE}
 # Figure 4 in the manuscript
-fig4 <- plotter_hotspots(hotspots_honest %>% filter(period != "jm")) + 
+fig4 <- plotter_hotspots(hotspots_honest) + 
   geom_hline(yintercept = 0.5)
 fig4
 ```
@@ -147,7 +147,7 @@ plot_grid(comb1, leg, ncol = 1, rel_heights = c(1,.1))
 
 
 ```{r fcast-finalized, fig.cap="Forecasting performance using finalized data. Compare to Figure 3 in the manuscript."}
-plotter(fcasts_finalized %>% filter(period != "jm"), 
+plotter(fcasts_finalized, 
         "wis", Mean, scaler = "strawman_wis", 
         order_of_operations = c("aggr","scale")) +
   ylab("Mean WIS (relative to baseline)")
@@ -158,7 +158,7 @@ plotter(fcasts_finalized %>% filter(period != "jm"),
 
 
 ```{r hot-finalized, fig.cap="Hotspot prediction performance using finalized data. Compare to Figure 4 in the manuscript."}
-plotter_hotspots(hotspots_finalized %>% filter(period != "jm")) +
+plotter_hotspots(hotspots_finalized) +
   geom_hline(yintercept = 0.5)
 ```
 
@@ -168,8 +168,8 @@ plotter_hotspots(hotspots_finalized %>% filter(period != "jm")) +
 ```{r fcast-honest-v-finalized, fig.cap="Relative forecast WIS with vintage compared to finalized data. Using finalized data leads to overly optimistic performance."}
 plotter(
   left_join(
-    fcasts_honest %>% filter(period != "jm") %>% select(forecaster:wis),
-    fcasts_finalized %>% filter(period != "jm") %>% select(forecaster:wis) %>%
+    fcasts_honest %>% select(forecaster:wis),
+    fcasts_finalized %>% select(forecaster:wis) %>%
       rename(finalized_wis = wis)
     ), 
   "wis", Mean, scaler = "finalized_wis", 
@@ -184,11 +184,9 @@ plotter(
 ```{r hot-honest-v-finalized, fig.cap="Relative AUC with vintage compared to finalized data. Using finalized data leads to overly optimistic hotspot performance."}
 left_join(
   hotspots_honest %>%
-    filter(period != "jm") %>%
     group_by(forecaster, ahead) %>%
     summarise(auc_honest = auc(value, actual)),
   hotspots_finalized %>%
-    filter(period != "jm") %>%
     group_by(forecaster, ahead) %>%
     summarise(auc_finalized = auc(value, actual))) %>%
   ggplot(aes(ahead, auc_honest / auc_finalized, color = forecaster)) + 
@@ -212,7 +210,7 @@ left_join(
 
 
 ```{r wis-densities, fig.cap="Weighted interval score appears to more closely resemble a log-Gaussian distribution."}
-ggplot(fcasts_honest %>% filter(period != "jm"), 
+ggplot(fcasts_honest, 
        aes(wis, fill = forecaster)) +
   geom_density() +
   scale_x_log10() +
@@ -226,7 +224,7 @@ ggplot(fcasts_honest %>% filter(period != "jm"),
 \clearpage
 
 ```{r fcast-adjusted, fig.cap="Relative forecast performance using vintage data and summarizing with the more robust geometric mean."}
-plotter(fcasts_honest %>% filter(period != "jm"), 
+plotter(fcasts_honest, 
         "wis", GeoMean, scaler = "strawman_wis", 
         order_of_operations = c("scale","aggr")) +
   ylab("Geometric mean of WIS (relative to baseline)")
@@ -241,7 +239,6 @@ plotter(fcasts_honest %>% filter(period != "jm"),
 fcast_colors2 <- fcast_colors[names(fcast_colors) != "AR"]
 
 st <- fcasts_honest %>%
-  filter(period != "jm") %>%
   mutate(wis = wis / strawman_wis) %>%
   select(forecaster, geo_value, ahead, forecast_date, wis) %>%
   pivot_wider(names_from = forecaster, values_from = wis) %>%
@@ -276,7 +273,6 @@ ggplot(st, aes(p)) +
 
 ```{r dm-test}
 errs <- fcasts_honest %>% 
-  filter(period != "jm") %>%
   group_by(forecaster, forecast_date) %>%
   summarise(
     `Mean Relative WIS` = mean(wis) / mean(strawman_wis),
@@ -310,13 +306,14 @@ kableExtra::kable(
 <!-- Bootstrap stuff -->
 
 ```{r bootstrap-loading}
-fcasts_booted <- readRDS(here("data","results_honest_bootstrapped.RDS")) %>%
+fcasts_booted <- readRDS(
+  here("data", "results_honest_bootstrapped.RDS")) %>%
   process_res_cases(actuals) %>%
   filter(forecaster != "gs_inherit")
 if (params$fd_casefloor >= 0) {
   fcasts_booted <- filter_case_floor(fcasts_booted, cases7dav, params)
 }
-hotspots_booted <- readRDS(here("data", "hotspots_honest_bootstrapped.RDS")) %>%
+hotspots_booted <- readRDS(here("data", "revised_chng", "hotspots_honest_bootstrapped.RDS")) %>%
   process_res_hotspots() %>%
   filter(forecaster != "gs_inherit")
 if (params$flag_jumps > 0) {
@@ -334,7 +331,7 @@ hotspots_booted <- intersect_averagers( # Deal with DV NaN's
 ```
 
 ```{r fcast-booted, fig.cap = "Forecast performance when indicators are replaced with samples from their empirical distribution. Performance is largely similar to the AR model."}
-plotter(fcasts_booted %>% filter(period != "jm"), 
+plotter(fcasts_booted, 
         "wis", Mean, scaler = "strawman_wis", 
         order_of_operations = c("aggr","scale")) +
   ylab("Mean WIS (relative to baseline)")
@@ -343,7 +340,7 @@ plotter(fcasts_booted %>% filter(period != "jm"),
 \clearpage
 
 ```{r fcast-booted-adjusted, fig.cap = "Forecast performance as measured with the geometric mean when indicators are replaced with samples from their empirical distribution. Performance is largely similar to the AR model."}
-plotter(fcasts_booted %>% filter(period != "jm"), 
+plotter(fcasts_booted, 
         "wis", GeoMean, scaler = "strawman_wis", 
         order_of_operations = c("scale","aggr")) +
   ylab("Geometric mean of WIS (relative to baseline)")
@@ -352,7 +349,7 @@ plotter(fcasts_booted %>% filter(period != "jm"),
 \clearpage
 
 ```{r hot-booted, fig.cap = "Hotspot prediction performance when indicators are replaced with samples from their empirical distribution. Performance is largely similar to the AR model."}
-plotter_hotspots(hotspots_booted %>% filter(period != "jm")) + 
+plotter_hotspots(hotspots_booted) + 
   geom_hline(yintercept = 0.5)
 ```
 
@@ -364,17 +361,10 @@ plotter_hotspots(hotspots_booted %>% filter(period != "jm")) +
 
 
 
-
-
-
-
-
-
-
 <!-- Upswings vs. downswings -->
 
 ```{r up-down-processing}
-preds <- readRDS(here("data", "predictions_honest.RDS"))
+preds <- readRDS(here("data", "revised_chng", "predictions_honest.RDS"))
 preds <- preds %>% 
   filter(abs(quantile - 0.5) < 1e-6) %>% 
   select(-quantile) %>%
@@ -422,7 +412,6 @@ up_down_df <- left_join(corr_df %>%
 
 ```{r upswing-summary, fig.cap="Average difference between the WIS of the AR model and the WIS of the other forecasters. The indicator-assisted forecasters do best during down and flat periods."}
 up_down_df_summary <- up_down_df %>%
-  filter(period != "jm") %>%
   group_by(forecaster, udf) %>%
   summarise(mean = Mean(AR_wis - wis))
 up_down_df_summary %>%
@@ -444,7 +433,6 @@ up_down_df_summary <- inner_join(
     corr_df, 
     fcasts_honest %>% select(ahead, geo_value, forecast_date, strawman_wis)),
   up_down, by = c("geo_value","target_end_date")) %>%
-  filter(period != "jm") %>%
   group_by(forecaster, udf) %>%
   summarise(mean = Mean(wis) / Mean(strawman_wis) - 1)
 up_down_df_summary %>%
@@ -465,7 +453,6 @@ up_down_df_summary %>%
 ```{r upswing-histogram, include=FALSE, fig.width=9, fig.height=4.5}
 # Fgure 4
 up_down_df %>% 
-  filter(period != "jm") %>%
   group_by(forecaster, udf) %>%
   ggplot(aes(AR_wis - wis, fill = forecaster)) +
   geom_histogram(bins = 100) +
@@ -483,7 +470,6 @@ up_down_df %>%
 
 ```{r upswing-histogram-logged, eval = FALSE, fig.cap="Not sure if we want this here. Similar to Figure 5 in the manuscript but taking logs. "}
 up_down_df %>% 
-  filter(period != "jm") %>%
   group_by(forecaster, udf) %>%
   ggplot(aes((AR_wis + 1) / (wis + 1), fill = forecaster)) +
   geom_histogram(bins = 100) +
@@ -504,7 +490,7 @@ up_down_df %>%
 
 ```{r hotspots-upswing-downswing, fig.cap="Classification and loglikelihood separated into periods of upswing, downswing, and flat cases. Like the analysis of the forecasting task in the main paper (see Figure 7), performance is better during down and flat periods."}
 hot_udf <- inner_join(
-  hotspots_honest %>% filter(period != "jm"),
+  hotspots_honest,
   up_down %>% select(geo_value, target_end_date, udf))
 
 cutoff <- mean(hot_udf %>% filter(forecaster == "AR") %>% pull(actual))
@@ -581,7 +567,7 @@ bind_rows(con_tab %>% mutate(err = "Classification error"),
 #          null_class = mycummean(hot))
   
 hot_udf <- inner_join(
-  hotspots_honest %>% filter(period != "jm"),
+  hotspots_honest,
   up_down %>% select(geo_value, target_end_date, udf))
 
 cutoff <- mean(hot_udf %>% filter(forecaster == "AR") %>% pull(actual))
@@ -652,8 +638,8 @@ bind_rows(con_tab %>% mutate(err = "Classification error"),
 
 ```{r cor-with-actuals}
 comparison_df <- left_join(
-  fcasts_honest %>% filter(forecaster != "AR", period != "jm"),
-  fcasts_honest %>% filter(forecaster == "AR", period != "jm") %>%
+  fcasts_honest %>% filter(forecaster != "AR"),
+  fcasts_honest %>% filter(forecaster == "AR") %>%
     select(-c(forecaster,target_end_date)) %>%
     rename(ar3_wis = wis),
   by = c("geo_value", "ahead", "forecast_date")) %>%
@@ -718,7 +704,6 @@ ggplot(pct_chng_df %>%
 
 ```{r upswing-corr-table, fig.cap="Correlation of the difference in WIS with the difference in median predictions for the AR model relative to the indicator-assisted forecaster. In down periods, improvements in forecast risk are highlycorrelated with lower median predictions. The opposite is true in up periods. This suggests, as one might expect that improved performance of the indicator-assisted model is attributable to being closer to the truth then the AR model. This conclusion is stronger in down periods then in up periods."}
 up_down_df %>% 
-  filter(period != "jm") %>% 
   group_by(forecaster, udf) %>%
   summarise(cor = cor(AR_wis - wis, AR_med - med)) %>%
   ggplot(aes(udf, cor , fill = forecaster)) +
@@ -826,7 +811,6 @@ df2 <- left_join(
 ```{r leading-only, include=FALSE, fig.width=6, fig.height=4}
 # Figure 5 in the manuscript
 df2 %>%
-  filter(period != "jm") %>%
   group_by(forecaster, udf) %>%
   summarise(
     leadingness = cor(AR_wis - wis, leading, use = "pairwise.complete.obs"),
@@ -853,7 +837,6 @@ df2 %>%
 ```{r leading-and-lagging, eval=FALSE}
 # Deprecated
 df2 %>%
-  filter(period != "jm") %>%
   group_by(forecaster, udf) %>%
   summarise(
     leadingness = cor(AR_wis - wis, leading, use = "pairwise.complete.obs"),
@@ -882,7 +865,6 @@ gg
 ```{r lagging-only, fig.cap="Correlation of the difference in WIS with the  laggingness of the indicator at the target date, stratified by up, down, or flat period. Compare to Figure 5 in the manuscript."}
 # Deprecated
 df2 %>%
-  filter(period != "jm") %>%
   group_by(forecaster, udf) %>%
   summarise(
     leadingness = cor(AR_wis - wis, leading, use = "pairwise.complete.obs"),
@@ -903,7 +885,6 @@ df2 %>%
 ```{r diff-in-lead-lag, fig.cap = "Correlation of the difference between leadingness and laggingness with the difference in WIS. The relationship is essentially the same as described in the manuscript and shown in Figure 5."}
 # Deprecated
 df2 %>%
-  filter(period != "jm") %>%
   group_by(forecaster, udf) %>%
   summarise(cor = cor(AR_wis - wis, leading - lagging, 
                       use = "pairwise.complete.obs")) %>%
@@ -947,35 +928,6 @@ gg
 
 
 
-
-
-
-
-
-<!-- Examining data in 2021 -->
-<!--
-```{r fcast-alldates, fig.cap="Forecast performance over all periods. Performance largely improves for all forecasters with the inclusion of data in 2021."}
-plotter(fcasts_honest,
-        "wis", Mean, scaler = "strawman_wis", 
-        order_of_operations = c("aggr","scale")) +
-  ylab("Mean WIS (relative to baseline)")
-```
-
-\clearpage
-
-```{r fcast-alldates-adjusted, fig.cap="Forcast performance over all periods aggregaged with the geometric mean. Again, the inclusion of data in 2021 leads to improved performance."}
-plotter(fcasts_honest, 
-        "wis", GeoMean, scaler = "strawman_wis", 
-        order_of_operations = c("scale","aggr")) +
-  ylab("Geometric mean of WIS (relative to baseline)")
-```
-
-\clearpage
-
-```{r hot-alldates, fig.cap="Area under the curve for hotspot predictions including data in 2021. Performance degrades relative to the period in 2020. However, there are far fewer hotspots during this period as case rates declined in much of the country."}
-plotter_hotspots(hotspots_honest)
-```
--->
 
 
 
@@ -1052,7 +1004,6 @@ ggplot(cumulatives %>% filter(forecast_date < "2021-01-01")) +
 ```{r errs-in-space, fig.cap="Percent improvement in WIS relative to the AR forecaster by region (negative numbers indicate improved performance, positives indicate worsening)."}
 # fig.height = 9.6, fig.width = 6, out.width = "5in", out.height="8in", 
 by_hrr <- fcasts_honest %>% 
-  filter(period != "jm") %>%
   group_by(forecaster, geo_value) %>% 
   summarize(value = GeoMean(wis)) %>%
   mutate(time_value = Sys.Date()) %>%
@@ -1135,7 +1086,7 @@ case_scores <- case_scores %>%
 
 ```{r compare-to-hub-mean, fig.height = 8.5, fig.cap="This figure reproduces Figure 3 in the main paper but overlays scores for the forecasts submitted to the COVID-19 Forecast Hub. Grey lines correspond to the various teams that submitted during period our evaluation period. We have highlighted the COVIDhub-ensemble, which is the official forecast of the CDC.", include=FALSE}
 # Same as Fig 3 in the paper
-df <- summarizer(fcasts_honest %>% filter(period != "jm") %>%
+df <- summarizer(fcasts_honest %>%
                    group_by(ahead, forecaster), "wis", NULL, 
                  "strawman_wis", Mean, c("aggr","scale"))
 ggplot(df) +
@@ -1161,7 +1112,6 @@ ggplot(df) +
 ```{r compare-to-hub-geomean, fig.height = 8.5, fig.cap="This figure is similar to Figure \\ref{fig:fcast-adjusted}. In this case, we add 1 to both the forecaster WIS and the baseline WIS before scaling (to allow forecasters that achieve 0 error to appear), and we overlay scores for the forecasts submitted to the COVID-19 Forecast Hub. Grey lines correspond to the various teams that submitted during period our evaluation period. We have highlighted the COVIDhub-ensemble, which is the official forecast of the CDC.", include=FALSE}
 # Like supplement GeoMean figure, but adding 1
 df2 <- fcasts_honest %>% 
-  filter(period != "jm") %>%
   group_by(ahead, forecaster) %>%
   summarise(wis = GeoMean((wis + 1) / (strawman_wis + 1)))
 
