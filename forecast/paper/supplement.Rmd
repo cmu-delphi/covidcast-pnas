@@ -44,13 +44,13 @@ source(here("code", "figures", "hotspot_funs.R"))
 
 ```{r data-loading}
 actuals <- readRDS(here("data", "confirmed_7dav_incidence_prop.RDS"))
-fcasts_honest <- readRDS(here("data", "revised_chng", "results_honest.RDS")) %>%
+fcasts_honest <- readRDS(here("data", "results_honest.RDS")) %>%
   process_res_cases(actuals) %>%
   filter(forecaster != "gs_inherit") 
 fcasts_finalized <- readRDS(here("data", "results_dishonest.RDS")) %>%
   process_res_cases(actuals) %>%
   filter(forecaster != "gs_inherit")
-hotspots_honest <- readRDS(here("data", "revised_chng", "hotspots_honest.RDS")) %>%
+hotspots_honest <- readRDS(here("data", "hotspots_honest.RDS")) %>%
   process_res_hotspots() %>%
   filter(forecaster != "gs_inherit")
 hotspots_finalized <- readRDS(here("data", "hotspots_dishonest.RDS")) %>%
@@ -313,7 +313,7 @@ fcasts_booted <- readRDS(
 if (params$fd_casefloor >= 0) {
   fcasts_booted <- filter_case_floor(fcasts_booted, cases7dav, params)
 }
-hotspots_booted <- readRDS(here("data", "revised_chng", "hotspots_honest_bootstrapped.RDS")) %>%
+hotspots_booted <- readRDS(here("data", "hotspots_honest_bootstrapped.RDS")) %>%
   process_res_hotspots() %>%
   filter(forecaster != "gs_inherit")
 if (params$flag_jumps > 0) {
@@ -364,7 +364,7 @@ plotter_hotspots(hotspots_booted) +
 <!-- Upswings vs. downswings -->
 
 ```{r up-down-processing}
-preds <- readRDS(here("data", "revised_chng", "predictions_honest.RDS"))
+preds <- readRDS(here("data", "predictions_honest.RDS"))
 preds <- preds %>% 
   filter(abs(quantile - 0.5) < 1e-6) %>% 
   select(-quantile) %>%
@@ -427,27 +427,6 @@ up_down_df_summary %>%
   theme(legend.position = "bottom", legend.title = element_blank())
 ```  
 
-```{r upswing-summary-remake, fig.cap="REMAKE: Percent change in average WIS of the forecaster (AR or indicator assisted) relative to the baseline. All models perform poorly durning down periods, but the indicators help. During flat periods, the indicators improve slightly over the AR. During up periods, all forecasters do much better than the baseline, but only some do as well as AR."}
-up_down_df_summary <- inner_join(
-  left_join(
-    corr_df, 
-    fcasts_honest %>% select(ahead, geo_value, forecast_date, strawman_wis)),
-  up_down, by = c("geo_value","target_end_date")) %>%
-  group_by(forecaster, udf) %>%
-  summarise(mean = Mean(wis) / Mean(strawman_wis) - 1)
-up_down_df_summary %>%
-  ggplot(aes(udf, mean, fill = forecaster)) +
-  geom_bar(width = 0.6, position = position_dodge(width=0.6),
-           stat = "identity") +
-  scale_fill_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
-  theme_bw() +
-  scale_y_continuous(labels = scales::percent_format()) +
-  geom_hline(yintercept = 0) +
-  ylab("% change in Forecaster WIS\n relative to Baseline") +
-  xlab("") +
-  theme(legend.position = "bottom", legend.title = element_blank())
-```  
-
   
 
 ```{r upswing-histogram, include=FALSE, fig.width=9, fig.height=4.5}
@@ -488,7 +467,8 @@ up_down_df %>%
 \clearpage
 
 
-```{r hotspots-upswing-downswing, fig.cap="Classification and loglikelihood separated into periods of upswing, downswing, and flat cases. Like the analysis of the forecasting task in the main paper (see Figure 7), performance is better during down and flat periods."}
+
+```{r hotspots-upswing-downswing, fig.cap="Classification and loglikelihood separated into periods of upswing, downswing, and flat cases. Like the analysis of the forecasting task in the main paper (see Figure 7), relative performance is better during down and flat periods."}
 hot_udf <- inner_join(
   hotspots_honest,
   up_down %>% select(geo_value, target_end_date, udf))
@@ -542,7 +522,7 @@ bind_rows(con_tab %>% mutate(err = "Classification error"),
   theme(legend.position = "bottom", legend.title = element_blank())
 ```
 
-```{r hotspots-upswing-downswing-remake, fig.cap="REMAKE: Classification and loglikelihood separated into periods of upswing, downswing, and flat cases. The indicator assisted models always have lower classification error relative to the null classifier, while the AR actually does worse in down and flat periods. In terms of loglikelihood, all forecasters have lower likelihood than the null classifier during up periods. In down and flat periods, the indicators generally improve over the AR, while the are worse during up periods."}
+```{r hotspots-upswing-downswing-remake, fig.cap="REMAKE: Classification and loglikelihood separated into periods of upswing, downswing, and flat cases. The indicator assisted models always have lower classification error relative to the null classifier, while the AR actually does worse in down and flat periods. In terms of loglikelihood, all forecasters have lower likelihood than the null classifier during up periods. In down and flat periods, the indicators generally improve over the AR, while the are worse during up periods.", eval=FALSE}
 # mycummean <- function(x) {
 #   isgood <- ! is.na(x)
 #   denom <- cumsum(isgood)
@@ -574,7 +554,7 @@ cutoff <- mean(hot_udf %>% filter(forecaster == "AR") %>% pull(actual))
 
 con_tab <- hot_udf %>% 
   filter(!is.na(actual)) %>%
-  mutate(pred = value > cutoff) %>%
+  mutate(pred = value > .5) %>%
   group_by(forecaster, udf) %>%
   summarise(m = (mean(pred != actual) - cutoff) / cutoff,
             err = mean(pred != actual)) %>%
@@ -734,7 +714,30 @@ up_down_df %>%
 
 \clearpage
 
+```{r upswing-summary-remake, fig.cap="Percent change in average WIS of the forecaster (AR or indicator assisted) relative to the baseline. All models perform poorly durning down periods, but the indicators help. During flat periods, the indicators improve slightly over the AR. During up periods, all forecasters do much better than the baseline, but only some do as well as AR."}
+up_down_df_summary <- inner_join(
+  left_join(
+    corr_df, 
+    fcasts_honest %>% select(ahead, geo_value, forecast_date, strawman_wis)),
+  up_down, by = c("geo_value","target_end_date")) %>%
+  group_by(forecaster, udf) %>%
+  summarise(mean = Mean(wis) / Mean(strawman_wis) - 1)
+up_down_df_summary %>%
+  ggplot(aes(udf, mean, fill = forecaster)) +
+  geom_bar(width = 0.6, position = position_dodge(width=0.6),
+           stat = "identity") +
+  scale_fill_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
+  theme_bw() +
+  scale_y_continuous(labels = scales::percent_format()) +
+  geom_hline(yintercept = 0) +
+  ylab("% change in Forecaster WIS\n relative to Baseline") +
+  xlab("") +
+  theme(legend.position = "bottom", legend.title = element_blank())
+```  
 
+
+
+\clearpage
 
 <!-- Leadingness and laggingness -->
 

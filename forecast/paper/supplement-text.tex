@@ -170,6 +170,15 @@ performance is better in those cases, it may be due to other factors than simply
 making predictions in the correct direction, for example, narrower confidence
 intervals.
 
+It is important to note, that even though some indicators, notably CHNG-COVID 
+and CHNG-CLI underperform relative to the AR model during upswings, all models 
+dramatically outperform the baseline in such periods. Figure 
+\ref{fig:upswing-summary-remake} shows the performance of all forecasters relative
+to the null model. All forecasters suffer relative to the baseline during down 
+periods, but the AR is the worst. In contrast, all models beat the baseline
+during up periods, even CHNG-COVID and CHNG-CLI, though not by quite as much as the
+AR does.
+
 \section{Leadingness and Laggingness}
 
 In Section 2.D of the main text, we discuss the extent to which the indicators
@@ -255,7 +264,7 @@ investigation for future work.
 \section{Aggregation Over Time and Space}
 
 Following the suggestion of an anonymous reviewer, we investigate two
-disaggregated versions of the main forecasting result shown in Figure 3 on the
+other disaggregated versions of the main forecasting result shown in Figure 3 on the
 manuscript. The first (Figure \ref{fig:cumulative-mean}) displays the cumulative
 error (summed over all horizons) of each forecaster divided by the cumulative
 error of the baseline.  This perspective should illustrate how the models
@@ -264,7 +273,9 @@ initial increase in cases in July 2020, CTIS-CLIIC and Google-AA gain a lot
 relative to the AR model. All the indicators do much better than the AR model
 during the following downturn (the ebb of the second wave). The AR model
 actually improves over the indicators in October 2020, before losing a bit in
-late November.
+late November. The second (Figure \ref{fig:cumulative-geo-mean}) repeats this 
+analysis but aggregating by Geometric mean as described above and displays a
+similar pattern.
 
 Figure \ref{fig:errs-in-space} examines the spatial behavior over the entire
 period of the indicator-assisted models relative to the AR. For ease of
@@ -274,31 +285,3 @@ hurt forecasting performance. The clear pattern is that in most HRRs, the
 indicators improved performance, though usually by small amounts (2.5\%--10\%).
 In some isolated HRRs, performance was markedly worse, though there does not
 appear to be any particular pattern to these locations.
-
-% \section{Comparisons to state-of-the-art forecasters}
-
-% Since mid-July 2020, a number of forecasting teams (48 in total) have submitted
-% 1--4 week ahead state-level case forecasts to the COVID19 Forecast Hub
-% \cite{ForecastHub}. To compare those forecasts to those created in this paper,
-% we selected only those forecasters who submitted at least 300 forecasts for the
-% 2-week-ahead target before
-% January 1, 2021 (approximately 1 forecast for each state for 6 weeks). This left
-% 32 forecasters, one of which, the COVIDhub-4-week-ensemble, was an exact
-% duplicate of another. To make the comparison fair, we scaled by the
-% COVIDhub-baseline as in Figure 3 of the manuscript. Figure
-% \ref{fig:compare-to-hub-mean} shows all submitted forecasts (available 7, 14,
-% and 21 days ahead) overlaid on Figure 3. We have highlighted the
-% COVIDhub-ensemble in light blue for comparison. All the models developed in this
-% paper beat the baseline, and would rank in the top 8 of 31 submitted forecasts
-% over this period.
-
-% A more fair comparison that directly adjusts for spatiotemporal difficulty is to
-% use the geometric mean scaled by the baseline. This is the same idea shown in
-% \ref{fig:fcast-adjusted}. We have also remade this figure overlaying submitted
-% forecasts available on the Forecast Hub. It occasionally happens that a
-% submitted forecast achieved a WIS of 0, so in this case we use the WIS$+ 1$
-% rather than WIS for all forecasters. The result is shown in
-% \ref{fig:compare-to-hub-geomean}. By this metric, the methods employed in this
-% paper would rank in the top 2, beating the COVIDhub-ensemble at all forecast
-% horizons. The improvement of the best indicator assisted model over the AR model
-% is roughly the same as the improvement of the AR model over the COVIDhub-ensemble.
