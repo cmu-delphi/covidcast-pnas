@@ -370,7 +370,7 @@ Data downloaded on August 2, 2021. This data is in the public domain as a United
 States government work.
 
 ```{r figure-7, message=FALSE, cache=TRUE}
-cdc <- read.csv("COVID-19_Vaccinations_in_the_United_States_County.csv") %>%
+cdc <- read.csv("COVID-19_Vaccinations_in_the_United_States_County.csv.gz") %>%
   filter(Date == "07/20/2021")
 
 cdc_sm <- cdc %>%

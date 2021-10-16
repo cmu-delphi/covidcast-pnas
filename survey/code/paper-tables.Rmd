@@ -767,7 +767,10 @@ make_df <- function(f, var = SVI_cat) {
 pops <- state_census %>%
   select(state = NAME, region = REGION)
 
-# SVI
+# Centers for Disease Control and Prevention/Agency for Toxic Substances and
+# Disease Registry/Geospatial Research, Analysis, and Services Program.
+# CDC/ATSDR Social Vulnerability Index 2018 Database US.
+# https://www.atsdr.cdc.gov/placeandhealth/svi/data_documentation_download.html
 svi <- read.csv("data/SVI2018_US_COUNTY.csv") %>%
   mutate(SVI_cat = case_when(RPL_THEMES >= 0.75 ~ "1st quartile",
                              RPL_THEMES >= 0.5 & RPL_THEMES < 0.75 ~ "2nd quartile",
