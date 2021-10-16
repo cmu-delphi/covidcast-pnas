@@ -1,7 +1,7 @@
 ---
 title: COVIDcast Indicators figures and tables
 author: Alex Reinhart, et al.
-date: June 23, 2021
+date: October 16, 2021
 ---
 
 This code accompanies the paper "An Open Repository of Real-Time COVID-19
@@ -22,8 +22,11 @@ library(purrr)
 This file can be knit to HTML using
 `rmarkdown::render("indicator-paper-figures.Rmd")` from within R, using the
 [rmarkdown package](https://cran.r-project.org/package=rmarkdown). By default it
-also saves publication-ready PDF versions of figures to the `../paper/fig/`
+saves publication-ready PDF versions of figures to the `../paper/fig/`
 directory.
+
+This file was run with R version 4.0.4 and the versions of all packages
+available in October 2021.
 
 ## Figure 1
 
@@ -367,7 +370,7 @@ Data downloaded on August 2, 2021. This data is in the public domain as a United
 States government work.
 
 ```{r figure-7, message=FALSE, cache=TRUE}
-cdc <- read.csv("COVID-19_Vaccinations_in_the_United_States_County.csv") %>%
+cdc <- read.csv("COVID-19_Vaccinations_in_the_United_States_County.csv.gz") %>%
   filter(Date == "07/20/2021")
 
 cdc_sm <- cdc %>%

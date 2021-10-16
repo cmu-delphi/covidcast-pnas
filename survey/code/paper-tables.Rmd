@@ -21,6 +21,7 @@ library(dplyr)
 library(tidyr)
 library(epitools)
 library(tidycensus)
+library(zoo)
 
 library(ggplot2)
 library(gridExtra)
@@ -72,6 +73,20 @@ data <- rbind(d1, d2, fill = TRUE)
 
 rm(d1, d2)
 gc()
+```
+
+Some essential cleaning. We use 5-digit FIPS codes with leading zeros by
+convention, and we'll want region names for plots:
+
+```{r clean-data}
+data$fips <- ifelse(is.na(data$fips), NA_character_, sprintf("%05d", data$fips))
+
+state_census$REGION <- case_when(
+  state_census$REGION == 1 ~ "Northeast",
+  state_census$REGION == 2 ~ "Midwest",
+  state_census$REGION == 3 ~ "South",
+  state_census$REGION == 4 ~ "West"
+)
 ```
 
 ## Metadata
@@ -187,17 +202,9 @@ data %>%
 ```{r demo-region}
 data %>%
   select(fips, weight) %>%
-  mutate(
-    fips = ifelse(is.na(fips), NA_character_, sprintf("%05d", fips)),
-    state_abbr = toupper(name_to_abbr(state_fips_to_name(fips)))) %>%
+  mutate(state_abbr = toupper(name_to_abbr(state_fips_to_name(fips)))) %>%
   inner_join(select(state_census, REGION, ABBR),
              by = c("state_abbr" =  "ABBR")) %>%
-  mutate(REGION = case_when(
-    REGION == 1 ~ "Northeast",
-    REGION == 2 ~ "Midwest",
-    REGION == 3 ~ "South",
-    REGION == 4 ~ "West"
-  )) %>%
   proportionate(REGION) %>%
   kable(col.names = c("Region", "Number", "Unweighted %", "Weighted %"),
         digits = 1, format.args = list(big.mark = ","))
@@ -314,7 +321,79 @@ data %>%
         digits = 1, format.args = list(big.mark = ","))
 ```
 
-### Tested given symptoms
+## Trends in each signal, by Census region
+
+Figure 2:
+
+```{r signal-anosmia-trends, message=FALSE}
+gc()
+
+start_day <- "2020-04-06"
+end_day <- "2021-04-05"
+
+anosmia <- data %>%
+  select(StartDatetime, B2, fips, weight) %>%
+  filter(!is.na(fips)) %>%
+  mutate(date = as.Date(StartDatetime),
+         anosmia = is_selected(split_options(B2), "13"),
+         state = toupper(name_to_abbr(state_fips_to_name(fips)))) %>%
+  group_by(date, state) %>%
+  summarize(anosmia = 100 * weighted.mean(anosmia, weight, na.rm = TRUE),
+            sample_size = sum(!is.na(anosmia))) %>%
+  select(time_value = date, value = anosmia, geo_value = state, sample_size) %>%
+  as.covidcast_signal(signal = "anosmia", geo_type = "state")
+
+signals <- covidcast_signals(
+  c("fb-survey", "fb-survey", "jhu-csse", "hhs", "jhu-csse"),
+  c("raw_wcli", "raw_whh_cmnty_cli", "confirmed_incidence_prop",
+    "confirmed_admissions_covid_1d_prop", "deaths_incidence_prop"),
+  start_day, end_day,
+  geo_type = "state")
+
+signals <- append(signals, list(anosmia)) %>%
+  aggregate_signals(format = "long") %>%
+  filter(!(signal == "confirmed_admissions_covid_1d_prop" &
+             time_value < as.Date("2020-07-15")))
+
+signals$signal <- factor(
+  signals$signal,
+  levels = c("anosmia", "raw_wcli", "raw_whh_cmnty_cli", "confirmed_incidence_prop",
+             "confirmed_admissions_covid_1d_prop", "deaths_incidence_prop"),
+  labels = c("Anosmia (%)", "CLI (%)", "Community CLI (%)", "Cases per 100,000",
+             "Hospitalizations per 100,000", "Deaths per 100,000"))
+
+to_plot <- signals %>%
+  mutate(geo_value = toupper(geo_value)) %>%
+  inner_join(select(state_census, ABBR, REGION, POPESTIMATE2019),
+             by = c("geo_value" = "ABBR")) %>%
+  group_by(REGION, time_value, signal) %>%
+  summarize(value = weighted.mean(value,
+                                  ifelse(data_source %in% c("jhu-csse", "hhs"),
+                                         POPESTIMATE2019, sample_size),
+                                  na.rm = TRUE))
+
+to_plot <- to_plot %>%
+  filter(REGION != "X") %>%
+  group_by(REGION, signal) %>%
+  arrange(time_value) %>%
+  mutate(value = rollmean(value, 7, fill = NA))
+
+ggplot(to_plot, aes(x = time_value, y = value, color = REGION)) +
+  geom_line() +
+  facet_wrap(vars(signal), nrow = 2, ncol = 3, scales = "free_y") +
+  labs(x = "Date", y = "", color = "Census Region") +
+  scale_x_date(date_breaks = "3 months",
+               date_labels = "%b %Y",
+               date_minor_breaks = "1 month",
+               guide = guide_axis(angle = 45)) +
+  scale_y_continuous(minor_breaks = NULL) +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        strip.background = element_rect(color = "black", fill = "white"))
+
+ggsave("../paper/fig/signal-time-series.pdf",
+       width = 7, height = 5)
+```
 
 ## Occupation
 
@@ -391,6 +470,11 @@ data$positive_14d <- case_when(
   data$B10a == 1 ~ "Tested positive",
   TRUE ~ "All others"
 )
+
+# Force factor ordering
+data$positive_14d <- factor(
+  data$positive_14d,
+  levels = c("Tested positive", "All others"))
 
 symptoms <- list(
   "1" = "Fever",
@@ -495,7 +579,7 @@ for (ii in seq_len(nrow(symptom_rrs))) {
 }
 ```
 
-Now plot:
+Now plot (Figure 1):
 
 ```{r symptoms-compare-plot}
 rr_scale_factor <- 70
@@ -510,14 +594,16 @@ ggplot(symptom_rates, aes(x = symptom, y = rate, fill = positive_14d)) +
     inherit.aes = FALSE) +
   scale_y_continuous(labels = label_percent(accuracy = 1),
                      sec.axis = sec_axis(~ . * rr_scale_factor,
-                                         name = "Relative risk")) +
+                                         name = "Relative risk"),
+                     minor_breaks = NULL) +
   scale_x_discrete(guide = guide_axis(angle = 45)) +
   labs(x = "", y = "Frequency among respondents",
        fill = "Group") +
   theme_bw() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom",
+        panel.grid.major.x = element_blank())
 
-ggsave("figures/symptoms-comparison.pdf")
+ggsave("../paper/fig/symptoms-comparison.pdf")
 ```
 
 In table form, so we can quote it:
@@ -544,16 +630,19 @@ symptom_rrs %>%
 
 ## Cumulative test positivity
 
-Based on code from Minttu Rönn.
+Figure 3. Based on code from Minttu Rönn.
 
 We use 7-day average cumulative incidence (per 100,000 population) to match the
 7-day averaging used in the survey estimates. The survey data will have one
 estimate per week, rather than per day, and so when we join the two data frames
 we'll get one JHU case rate per week.
 
-```{r case-rate-compare}
-# State adult populations, from Census data
+```{r case-rate-compare, message=FALSE}
+# Estimates of the Total Resident Population and Resident Population Age 18
+# Years and Older for the United States, States, and Puerto Rico: July 1, 2019
+# (SCPRC-EST2019-18+POP-RES)
 state_pops <- read.csv("state-age-pops.csv")
+
 # State-level age distributions of cases, from CDC data
 case_age_dist <- read.csv("case-age-distribution.csv")
 
@@ -568,7 +657,8 @@ state_case_rate <- covidcast_signal("jhu-csse", "confirmed_7dav_cumulative_num",
   select(state = geo_value, cumulative_cases = value, time_value, year, month) %>%
   inner_join(state_pops, by = "state") %>%
   inner_join(case_age_dist, by = c("year", "month")) %>%
-  mutate(case_rate_adult = cumulative_cases * frac_adult_cases / adult_pop * 100)
+  mutate(case_rate_adult = cumulative_cases * frac_adult_cases / adult_pop * 100) %>%
+  filter(state != "PR")
 
 state_case_compare <- data %>%
   filter(!is.na(fips)) %>%
@@ -581,7 +671,6 @@ state_case_compare <- data %>%
       TRUE ~ NA
     ),
     week = floor_date(as.Date(StartDatetime), unit = "week"),
-    fips = sprintf("%05d", fips),
     state_abbr = name_to_abbr(state_fips_to_name(fips))
   ) %>%
   group_by(week, state_abbr) %>%
@@ -589,25 +678,28 @@ state_case_compare <- data %>%
             .groups = "drop") %>%
   left_join(state_case_rate,
             by = c("state_abbr" = "state", "week" = "time_value"))
+```
 
+```{r case-rate-compare-plot}
 g <- ggplot(state_case_compare) +
-  facet_geo(~ state_abbr, grid = "us_state_with_DC_PR_grid1", label = "code") +
+  facet_geo(~ state_abbr, grid = "us_state_grid1", label = "code") +
   geom_line(aes(x = week, y = case_rate_adult, color = "Surveillance"),
             linetype = 1, size = 0.5) +
   geom_line(aes(x = week, y = ever_pos, color = "CTIS"),
             linetype = 1, size = 0.5) +
   scale_color_manual(values = c("lightblue", "gray50")) +
-  scale_y_continuous(breaks = c(0, 10),
+  scale_y_continuous(limits = c(0, 20), breaks = c(0, 10, 20),
                      minor_breaks = c(5, 15),
                      labels = label_percent(scale = 1,
                                             accuracy = 1)) +
-  scale_x_date(date_breaks = "4 months", date_labels = "%b",
-               date_minor_breaks = "1 month") +
+  scale_x_date(breaks = as.Date(c("2020-10-01", "2021-04-01")),
+               date_labels = "%b", minor_breaks = NULL) +
   labs(x = "", y = "", color = "") +
   theme_minimal() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom",
+        axis.text = element_text(size = rel(0.5)))
 
-ggsave("figures/cumulative-case-compare.pdf", g, width = 10, height = 7)
+ggsave("../paper/fig/cumulative-case-compare.pdf", g, width = 10, height = 7)
 
 g
 ```
@@ -615,7 +707,7 @@ g
 We should also calculate correlations between state reports and survey estimates
 during the last week of data:
 
-```{r}
+```{r case-rate-correlations}
 max(state_case_compare$week)
 
 final_week <- state_case_compare %>%
@@ -643,7 +735,7 @@ cor(final_week$case_rate_adult, final_week$ever_pos,
 
 ## Contacts, masks, and public transport
 
-Based on code from Alyssa Bilinski.
+Figure 4. Based on code from Alyssa Bilinski.
 
 ```{r external-data}
 make_df <- function(f, var = SVI_cat) {
@@ -671,14 +763,20 @@ make_df <- function(f, var = SVI_cat) {
       var == "masks_not_always" ~ "Not always masked in public (%)"))
 }
 
-pops <- read.csv("data/population.csv")
+# We don't actually need populations -- just region codes
+pops <- state_census %>%
+  select(state = NAME, region = REGION)
 
-# SVI
+# Centers for Disease Control and Prevention/Agency for Toxic Substances and
+# Disease Registry/Geospatial Research, Analysis, and Services Program.
+# CDC/ATSDR Social Vulnerability Index 2018 Database US.
+# https://www.atsdr.cdc.gov/placeandhealth/svi/data_documentation_download.html
 svi <- read.csv("data/SVI2018_US_COUNTY.csv") %>%
   mutate(SVI_cat = case_when(RPL_THEMES >= 0.75 ~ "1st quartile",
                              RPL_THEMES >= 0.5 & RPL_THEMES < 0.75 ~ "2nd quartile",
                              RPL_THEMES >= 0.25 & RPL_THEMES < 0.5 ~ "3rd quartile",
-                             RPL_THEMES < 0.25 ~ "4th quartile")) %>%
+                             RPL_THEMES < 0.25 ~ "4th quartile"),
+         FIPS = sprintf("%05d", FIPS)) %>%
   select(FIPS, SVI_cat)
 ```
 
@@ -692,7 +790,7 @@ contacts_data <- data %>%
     C13 = ifelse(!is.na(C13), C13, C13b), # Replaced in Wave 10; treat as identical
     C14 = ifelse(!is.na(C14), C14, C14a), # Replaced in Wave 8; treat as identical
     C13_options = split_options(C13),
-    state = state_fips_to_name(ifelse(is.na(fips), NA_character_, sprintf("%05d", fips))),
+    state = state_fips_to_name(fips),
     week = floor_date(as.Date(StartDatetime), unit = "week"),
     any_work = ifelse(is.na(C10_1_1), 0, C10_1_1),
     any_shopping = ifelse(is.na(C10_2_1), 0, C10_2_1),
@@ -710,7 +808,7 @@ contacts_data <- data %>%
                         D2 > 5 ~ "65+")
   ) %>%
   left_join(svi, by = c("fips" = "FIPS")) %>%
-  left_join(pops, by = c("state" = "StateName"))
+  left_join(pops, by = c("state"))
 ```
 
 Produce the plots:
@@ -720,46 +818,61 @@ g1 <- make_df(contacts_data, var = SVI_cat)
 g2 <- make_df(contacts_data, var = age_cat)
 g3 <- make_df(contacts_data, var = region)
 
-# TODO See if we can merge these into one big facet_grid so the widths match
-# (not sure how to deal with legends?)
+# Pull the legends up towards the plots to eliminate wasted space. ggplot's
+# default unit is half a line height, and a line height is 11 pt, so work in
+# multiples of this.
+legend_top_margin <- -11 * 3 / 2
+
 a <- ggplot(g1, aes(x = week, y = value, col = SVI_cat, group = SVI_cat)) +
   geom_line() +
   facet_wrap(. ~ var_cat, scales = "free", ncol = 4) +
   scale_color_discrete(name = "SVI") +
+  scale_y_continuous(minor_breaks = NULL, limits = c(0, NA)) +
   scale_x_date(date_breaks = "3 months", date_labels = "%b %Y",
                date_minor_breaks = "1 month") +
   labs(x = "", y = "") +
-  ylim(0,  NA) +
-  theme_bw()
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.margin = margin(legend_top_margin, 0, 11 / 2, 0),
+        plot.margin = margin(11 / 2, 11 / 2, 0, 11 / 2),
+        strip.background = element_rect(color = "black", fill = "white"))
 
 b <- ggplot(g2, aes(x = week, y = value, col = age_cat, group = age_cat)) +
   geom_line() +
   facet_wrap(. ~ var_cat, scales = "free", ncol = 4) +
   scale_color_discrete(name = "Age") +
+  scale_y_continuous(minor_breaks = NULL, limits = c(0, NA)) +
   scale_x_date(date_breaks = "3 months", date_labels = "%b %Y",
                date_minor_breaks = "1 month") +
   labs(x = "", y = "") +
-  ylim(0, NA) +
-  theme_bw()
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.margin = margin(legend_top_margin, 0, 11 / 2, 0),
+        plot.margin = margin(11 / 2, 11 / 2, 0, 11 / 2),
+        strip.background = element_rect(color = "black", fill = "white"))
 
 c <- ggplot(g3, aes(x = week, y = value, col = region, group = region)) +
   geom_line() +
-  facet_wrap(.~var_cat, scales = "free", ncol = 4) +
+  facet_wrap(. ~ var_cat, scales = "free", ncol = 4) +
   scale_color_discrete(name = "Region")  +
+  scale_y_continuous(minor_breaks = NULL, limits = c(0, NA)) +
   scale_x_date(date_breaks = "3 months", date_labels = "%b %Y",
                date_minor_breaks = "1 month") +
   labs(x = "", y = "") +
-  ylim(0, NA) +
-  theme_bw()
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.margin = margin(legend_top_margin, 0, 11 / 2, 0),
+        plot.margin = margin(11 / 2, 11 / 2, 0, 11 / 2),
+        strip.background = element_rect(color = "black", fill = "white"))
 
 g <- arrangeGrob(a, b, c, nrow = 3)
 
-ggsave("figures/contacts-masks-transport.pdf", g, width = 8, height = 5)
+ggsave("../paper/fig/contacts-masks-transport.pdf", g, width = 7, height = 6)
 ```
 
 ## Vaccine acceptance and hesitancy
 
-Based on code from Marissa Reitsma.
+Figure 5B. Based on code from Marissa Reitsma.
 
 ```{r vaccine-hesitancy-map}
 # Get data into the form Marissa's code expects
@@ -769,12 +882,10 @@ df <- data %>%
   filter(!is.na(fips),
          date >= as.Date("2021-03-01"),
          date <= as.Date("2021-04-05")) %>%
-  mutate(
-    hesitant = case_when(
-      V1 == 1 ~ FALSE,
-      V3 %in% 1:2 ~ FALSE,
-      V3 %in% 3:4 ~ TRUE),
-    fips = sprintf("%05d", fips))
+  mutate(hesitant = case_when(
+             V1 == 1 ~ FALSE,
+             V3 %in% 1:2 ~ FALSE,
+             V3 %in% 3:4 ~ TRUE))
 
 # Get all FIPSen
 fips <- as.data.table(tidycensus::fips_codes)
@@ -827,7 +938,7 @@ g <- ggplot(data = plot_data, aes(fill = plot_var)) +
   theme_void() +
   labs(fill = "% hesitant", title = "")
 
-ggsave("figures/hesitancy-county-map.pdf", g, width = 6, height = 4)
+ggsave("../paper/fig/hesitancy-county-map.pdf", g, width = 6, height = 4)
 
 g
 ```
