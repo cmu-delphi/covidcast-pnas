@@ -2,3 +2,13 @@
 .Rproj.user
 .Rhistory
 common/auto/
+
+*.aux
+*.log
+*.out
+*.dvi
+*.blg
+*.bbl
+*.fdb_latexmk
+*.fls
+*.synctex.gz
