@@ -1,3 +1,6 @@
+# Count the unique signals in the COVIDcast API so the paper can quote an
+# approximate number of signals.
+
 library(covidcast)
 library(dplyr)
 
