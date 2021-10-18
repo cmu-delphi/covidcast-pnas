@@ -1,0 +1,465 @@
+\documentclass{article}
+\input{ryantibs}
+
+\title{Epidemic Tracking and Forecasting: Lessons Learned from a Tumultuous Year}
+\author{Roni Rosenfeld \and Ryan J. Tibshirani}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+Epidemic forecasting has garnered increasing interest in the last decade,
+nurtured and scaffolded by various forecasting challenges organized by groups
+within the U.S. federal government, including the CDC \citep{Biggerstaff:2016,
+  Biggerstaff:2018, Reich:2019}, OSTP \citep{Johansson:2019}, DARPA
+\citep{DelValle:2018}, and elsewhere \citep{Ajelli:2018, Viboud:2018}.  In 2017,
+after several years of experimentation with flu forecasting in academic groups,
+the CDC decided to incorporate influenza forecasting into its normal operations,
+including weekly public communications citep{FluSight} and briefing to
+higher-ups.  To provide more reliable infrastructure and support for its
+forecasting needs, the CDC in 2019 designated two national Centers of Excellence
+for Influenza Forecasting, one at the University of Massachusetts at
+Amherst\footnote{\url{https://reichlab.io/people}} and one at Carnegie Mellon
+University\footnote{\url{https://delphi.cmu.edu/about/center-of-excellence/}}. 
+
+Not unrelatedly, the last decade has also seen a rise in the importance of
+\emph{digital surveillance} streams in public health, with improving epidemic
+tracking and forecasting models being a key application of these data.  Digital
+streams, such as search and social media trends, have constituted a large part
+of the focus \citep{Ginsberg:2009, Brownstein:2009, Salathe:2012,
+Kass-Hout:2013, Santillana:2015, Paul:2017}; however, even more broadly, data
+from \emph{auxiliary} streams that operate outside of traditional public health
+reporting, such as online surveys, medical devices, or electronic medical
+records, have received considerable attention as well \citep{Kass-Hout:2011,
+Carlson:2013, Viboud:2014, Smolinski:2015, Santillana:2016, Charu:2017,
+Koppeschaar:2017, Yang:2019, Leuba:2020, Radin:2020, Ackley:2020}.
+
+The Carnegie Mellon Delphi group, which the two of us co-lead, has worked in
+both of these emerging disciplines---epidemic forecasting, and building relevant
+auxiliary signals to aid such forecasting models---since 2012.  In 2020, as the
+pandemic broke out, we struggled like many other groups to find ways to
+contribute to the national efforts to respond to the pandemic.  We ended up
+shifting our focus to lie nearly entirely on the data end of the spectrum,
+pursuing several different directions in order to build and make available to
+the public a variety of new indicators that reflect real-time COVID-19 activity
+in the U.S.  Three papers in this collection describe this work from three
+different perspectives.  A fourth describes international work by some of our
+collaborators that parallels our group's work on online surveys in the U.S.  
+
+\section{Papers in This Collection}
+
+Here is a very brief summary of the papers in this collection.
+
+\begin{enumerate}
+\item \citet{Reinhart:2021} describes our group's (ongoing) effort in building
+  and maintaining COVIDcast: an open repository of real-time, geographically
+  detailed COVID-19 indicators in the U.S.  These indicators (a term we use
+  interchangeably with signals) are derived from a diverse set of data sources:
+  medical testing devices, medical insurance claims, internet search trends,
+  app-based mobility data, and online surveys, among others.  Many indicators
+  are demonstrated to have meaningful statistical relationships with what have
+  become the pandemic's ``topline'' numbers (reported cases, hospitalizations,
+  deaths), whereas others uniquely reflect certain activity (not available in
+  other publicly-available data sources) that may drive or affect the spread of
+  COVID-19.  The paper demonstrates through a number of examples that the
+  indicators in the COVIDcast repository can improve on the timeliness,
+  robustness, and scope of traditional public health reporting streams.   
+
+\item \citet{McDonald:2021} provides a detailed analysis of whether a core set
+  of the indicators in the COVIDcast repository can be used to improve the
+  accuracy of COVID-19 short-term forecasting and hotspot detection models.
+  This speaks to the quantitative utility of the indicators in a way that is
+  directly tied to the benefits observed in relevant downstream modeling tasks.
+  The paper finds that time series models (that are already competitive with top
+  forecasters from the COVID-19 Forecast Hub \citep{ForecastHub}) improve in
+  predictive accuracy when they are supplemented with any of the five indicators
+  under consideration.  However, the magnitude of these improvements varies with
+  the pandemic's local dynamics at prediction time, and only one indicator
+  appears to offer a nontrivial improvement during upswings.  
+
+\item \citet{Salomon:2021} focuses on the U.S. COVID-19 Trends and Impact Survey
+  (CTIS), an (ongoing) online survey operated by our group, in partnership with
+  Facebook.  This is a very rich source of data about the pandemic and its
+  effect on people, only partially reflected by the indicators (derived from the
+  survey) in the COVIDcast repository; the full data set of individual,
+  anonymized survey responses is available to researchers under a data use
+  agreement.  The paper presents descriptive analyses that reflect the unique
+  value of CTIS as an important supplement to public health reporting, in
+  particular, as an instrument to measure key information about behaviors,
+  attitudes, economic impacts, and other topics not covered in traditional
+  public health streams. 
+
+\item \emph{Authors' note to the Editor: this is to be filled out later.  The
+    Astley et al. paper is still undergoing a significant revision and its main
+    messages may change as a result.}
+\end{enumerate}
+
+\section{Lessons Learned}
+
+We now take the opportunity to reflect on some ``lessons learned'' from our work
+over the past year and a half.  Some of the observations below are described in
+more depth in the papers in the collection, and others extend beyond the papers
+in the collection (but we give references to relevant articles with more details
+in the discussion below). 
+
+\paragraph{Deceptively simple data labels often belie the data's true meaning
+  and complexity.}
+
+Labels such as ``COVID-19 cases'' or ``COVID-19 hospitalizations'' hide an
+enormous amount of complexity and potential ambiguity, especially when applied
+to data at fine geographic and temporal resolutions.  We elaborate on this and
+several other examples in what follows. 
+
+\begin{itemize}
+\item Cases may be lab-confirmed only or also suspected (with the definition of
+  ``suspected'' varying across jurisdictions and time); they may be listed by
+  date reported on the jurisdiction's website, by date reported to the public
+  health authority, by date tested, by specimen collection date, or occasionally
+  by symptom onset date (most informative but often unavailable or
+  inapplicable). A casual review of many websites of local and state health
+  departments suggests there is great heterogeneity in what is being reported
+  \citep{Simon:2021}.  
+
+\item The term ``hospitalizations'' is used ambiguously, sometimes referring to
+  incidence (hospital admissions) and sometimes to prevalence (hospital bed
+  occupancy).  These two quantities cannot easily be mapped to one another, 
+  because COVID-19 hospital discharges are rarely if ever reported.
+  Furthermore, people admitted without a COVID-19 diagnosis may acquire the
+  infection and/or the diagnosis at any time during their hospital stay.   
+
+\item Hospitalizations may be reported by the location (typically county) of the
+  patient's residence, but are more often reported by the county of the
+  reporting hospital.  This is an important distinction, as many rural COVID-19
+  patients in need of advanced care travel to the nearest secondary or tertiary
+  hospital, often at a nearby urban county.  For example, the hospitals in
+  Pittsburgh, located in Allegheny County, Pennsylvania (population 1.2
+  million), treat patients from throughout a 13 county region in Southwestern
+  Pennsylvania (population over 4 million).  For tracking and forecasting
+  hospitalization burden then, the geographic units of hospital referral regions
+  (HRRs, \citep{DartmouthHRR}) may be most appropriate.  Alas, these units do
+  not conform to county boundaries, which complicates the projection of cases to
+  hospitalizations.  
+
+\item Deaths are usually reported by county where they occurred, which for
+  hospitalized patients may differ from their county of residence \citep{NCHS}.
+
+\item Hospitalization or deaths with COVID-19 are significantly different from
+  hospitalization or deaths due to COVID-19 (as captured by e.g., a
+  COVID-related chief complaint or primary ICD-10 code).  The proportion of the
+  two varies significantly by age groups and across time \citep{Fillmore:2021}.
+
+\item Test positivity rates are most often reported by lumping together all
+  tests performed regardless of the reason for performing them.  Tests taken
+  following positive diagnosis, due to symptoms, or due to being a contact of a
+  confirmed case, are all likely to have a much higher positivity rate than that
+  of the general population.  Screening tests are most likely to reflect the
+  true prevalence in the screened population.  Sadly, very few jurisdictions
+  report or even retain the breakdown of the test results by reason for testing,
+  thereby losing forever valuable information. 
+
+\item Medical insurance claims offer rich, detailed information about COVID-19
+  and other health conditions, but are not without their weaknesses.  Claims are
+  often not filed until weeks and months after the medical encounter.  As such,
+  signals derived from claims are usually subject to regular and considerable
+  revisions up to 60 days after a given date of service, because signals must be
+  updated each time new claims for that day of service are received (specific
+  statistics on how this affects signal values are given below).  This tends to
+  make projections challenging, especially at finer geographic units such as
+  counties, since there tends to be a high degree of heterogeneity across
+  locations.  
+
+\item Medical claims contain information about lab tests taken, but not their
+  results.  More generally, for understandable HIPAA reasons, medical claims
+  contain only information necessary for adjudicating and auditing claims.   
+\end{itemize}
+
+Data definitions must be disambiguated, clarified, and made consistent to the
+greatest extent possible, and remaining inconsistencies must be documented and
+saliently communicated.  
+
+\paragraph{Understanding the data generation process is critical for downstream
+  applications.}
+
+Both traditional public health surveillance data streams and newer digital
+surveillance streams are the result of often complex processes, some having to
+do with the underlying health status or activities being monitored, others with
+the reporting process itself.  Understanding the entire ``data generation
+process'' for each data source can be challenging, but is absolutely essential
+for proper modeling and effective use of the data.  Some examples are as
+follows.
+
+\begin{itemize}
+\item In medical claims, relevant diagnoses and comorbidities may not be
+  reflected if they are not directly relevant to the charges incurred.  On the
+  other hand, because medical claim coding determines reimbursement levels, some
+  codes may be over-represented relative to their medical significance. 
+
+\item Some populations and some healthcare settings are not reflected in the
+  commercial claims stream.  These include the healthcare systems of the
+  Department of Defense, Indian Health Services, Veterans Affairs, prison
+  systems, and other systems that do not reimburse by procedure or service, as
+  well as Medicare fee-for-service and Medicaid.  This can cause significant
+  bias in the signals relative to the prevalence in the general population. 
+
+\item Public health reporting data are often subject to backlogs and reporting
+  delays, and estimates for any particular date can be revised over time as
+  errors are found or additional data becomes available.  During the pandemic,
+  audits, corrections, and the clearing of backlogs has frequently resulted in
+  huge artificial spikes and drops \citep{ArvisaisAnhalt:2021}.  Data
+  aggregators like Johns Hopkins CSSE \citep{Dong:2020} have worked tirelessly
+  to correct such anomalies after first publication (they attempt to
+  back-distribute a spike or dip, by working with a local authority to figure
+  out how this should best be done). 
+
+\item Data revisioning (also known as ``backfill'') is pervasive not only in
+  traditional public health reporting, but also in many (though not all) digital
+  surveillance sources.  As already alluded to above, signals based on medical
+  claims typically undergo regular revisions because many claims (on which these 
+  signals are based) get submitted and processed late; for many COVID-related
+  claims-based signals, the median relative error between initial reports and
+  final values is over 10\%, and only after 30 days or so do estimates typically
+  match finalized values within 5\% \citep{Reinhart:2021}.  However, the
+  systematic nature of these revisions suggests that, with suitable historical
+  data, statistical models could be fit to estimate the final values from
+  preliminary reports.  By comparison, revisions to public health reports during
+  the pandemic (the spikes and dips just described) have been much less
+  systematic and much less predictable.
+
+\item Traditionally, public health agencies do not publish provisional data
+  until it meets a level of stability.  For example, NCHS data on the percentage
+  of deaths due to pneumonia, influenza and COVID-19 is not released until at
+  least 20\% of the expected deaths in a jurisdiction have been reported
+  \citep{PIMortality}, a process that may take several weeks.  However, for
+  modeling and forecasting purposes, even highly provisional data can be very 
+  informative, as long as sufficient historical provisional data is collected so
+  that the statistical relationships between provisional values and finalized
+  values can be modeled. 
+
+\item Calendar effects permeate not only the reporting process but also
+  health-seeking behavior and the epidemic process itself, with the effects on
+  these three processes not easy to disentangle.  Major holidays and other
+  national or regional events are associated with significant travel, social
+  mixing, and other distinct behaviors affecting disease transmission.  However,
+  holidays and weekends also affect health-seeking behavior via reduced
+  non-emergency healthcare capacity (doctors' offices and labs being partially
+  or fully closed).  Perhaps the strongest calendar effects are on reporting,
+  including claim filing and hospital reporting.  Using 1- or 2-week trailing
+  averages eliminates weekend effects, but at a cost of reduced temporal
+  resolution, and it leaves unsolved the effects of holidays.  A better approach
+  might be to explicitly model and correct for calendar effects. 
+\end{itemize}
+
+\paragraph{Mandated reporting in a time of emergency can be burdensome and
+  inflexible.}
+
+COVID-19 reporting by hospitals, as mandated by HHS during the pandemic,
+consisted of many dozens of data elements and imposed a significant burden on
+the nation's 6,000 or so hospitals at a time that they were already stretched to
+their limits.  It also took a huge effort to formulate, communicate,
+disambiguate, and monitor for quality assurance and uniformity of
+interpretation.  In light of this, it is not surprising that it took a long
+time, and pressure, for most hospitals to comply (near universal compliance was
+not achieved until December 2020).  When changes needed to be made to the
+collected statistics, an arduous and time consuming process of approvals,
+re-formulation, re-communication, re-implementation, and re-assessment had to be
+followed.  
+
+While some aspects of mandated reporting are likely to remain irreplaceable,
+effective alternative surveillance sources can be of great use: they can improve
+on the timeliness, scope, robustness, and utility of mandated reporting data,
+while being less burdensome to collect.  This is a common theme that runs
+through all four papers in the collection, but is perhaps most directly
+addressed in \citet{Reinhart:2021} (which focuses on the ecosystem of signals
+broadly).  That said, we have far from saturated the utility of auxiliary
+surveillance.  Much more needs to be developed in this area in order to usher
+epidemic tracking into its next phase of reliability, accuracy, and
+transparency.  To us, electronic medical records hold a great promise for
+surveillance streams, and we elaborate on this in the next section.
+
+\paragraph{Human behavior and its impact on the progression of epidemics is hard
+  to measure and hard to model.}
+
+In the nearly 10 years of government-organized epidemic forecasting exercises in
+the U.S., efforts were focused on modeling the natural history and likely
+evolution of the pathogen, with adaptation of human behavior playing a secondary
+role (if any role at all).  The pandemic demonstrated that our forecasting
+models must pay closer attention to reactive human behavior, even more so if we
+are to consider interventions.  Unfortunately, many highly relevant aspects of
+human behavior are not measured by publicly available data streams, like
+compliance with policies and recommendations (with perhaps surveys and mobility
+reports providing our best glimpse into these hard-to-observe aspects of
+behavior \citep{Bilinski:2021}), and even the very process of promulgating these 
+policies and recommendations.  Furthermore, even if we had these data in hand,
+incorporating their effects will require significant and new cognitive and
+behavioral modeling, with uncertain success.  The tragic breakdown and
+fragmentation of trust in governments, public health officials, and healthcare
+professionals are perhaps the hardest factors to measure and model, yet they
+played an undeniable role in the progression of the current pandemic in the
+U.S. and other countries. 
+
+\section{The Road Ahead}
+
+The focus of the Delphi group during the initial, critical period of the
+pandemic (February 2020 -- March 2021) was on short-term goals: trying to
+provide signals, analysis, and decision support to federal, state and local
+public health officials, as well as to fellow researchers, data journalists, and
+the general public.  In spring of 2021, equipped with the hard lessons learned
+during this tumultuous year, we turned our attention back to the original vision
+of the Delphi group, and asked ourselves: given where we are and what we know
+now, what is needed to be able to take a major step forward in epidemic tracking
+and forecasting?  In this section, we list some ideas which we hope will elicit
+further public discussion and, most importantly, experimentation. Because our
+expertise lies in modeling and forecasting, not in public health surveillance,
+our perspective and recommendations are necessarily limited to those aspects of
+surveillance that are needed to realize our vision. 
+
+\paragraph{EMR as a key missing component for epidemic tracking and
+  forecasting.}  
+
+The success of nowcasting, analytics and forecasting depends crucially on the
+availability of rich, real-time data sources.  In light of the limitations of
+mandated reporting discussed above, we must consider the complementary value of
+other data sources.  Chief among these are electronic medical records (EMR), as
+are being created and used daily by inpatient and outpatient healthcare
+providers, medical laboratories, and pharmacies.  The advantage of these data
+resources: they are rich, real-time, and already being generated (found ``in the
+wild'').  The challenges: they are highly fragmented in the U.S., with its
+approximately 6,000 hospitals and 100,000 outpatient care facilities.  One
+promising avenue for countering this fragmentation are Health Information
+Exchanges (HIEs), which were set up in the early 2000s with the support of the
+federal government to coordinate the sharing of healthcare information among
+healthcare providers in a given region, and eventually nationally.  The primary
+goal of the HIEs has been patient continuity of care, but public health
+surveillance is recognized as an additional worthy goal.  In the context of
+health surveillance, HIEs hold the promise of reducing fragmentation from a
+hundred thousand partners to only a few hundred.
+
+Other formidable challenges to using EMR are legal, ethical, commercial, and
+operational.  Who owns the data, who has access to it, and who has use rights
+are all complex and often open questions.  An overriding concern is of course
+patient privacy.  We must find a way to use this highly promising data for the
+common good without compromising the privacy of individuals.  Fortunately, a
+technological solution appears feasible, in the form of \emph{federated
+  surveillance}. An outline is as follows.
+
+\begin{itemize}
+\item A common API is developed for querying all participating EMR custodians. 
+
+\item EMR databases are queried daily with an agreed upon set of queries, and
+  return aggregated counts.   
+
+\item These counts are further aggregated across multiple providers and
+  localities, and then fused with all other available data sources to provide
+  alerts, nowcasts, and forecasts. 
+
+\item These model outputs are then shared back to the contributing EMR
+  custodians, as well as to CDC and other federal and state agencies.   
+
+\item Done in this way, no personal health information (PHI) ever leaves the
+  custodians' premises, while aggregated statistics can be combined to increase
+  statistical power, thereby shortening alert latency and improving detection
+  and prediction capabilities.
+\end{itemize}
+
+A successful example of federated querying (albeit designed for research rather
+than real-time tracking and forecasting) has been recently demonstrated in the
+UK \citep{Williamson:2020}.
+
+One advantage of this approach to health surveillance is that when a new
+emerging health crisis is identified, or when specific syndromic signatures are
+discovered (e.g., ageusia and anosmia for COVID-19), a new query can be
+developed, approved, and deployed literally overnight, allowing us to ``shine a
+light'' on it on very short notice.  This can be contrasted with traditional,
+legally-mandated public health reporting, which could take weeks and months to
+develop, approve, negotiate, disseminate, implement, monitor, and assure quality
+of, as has happened during the current pandemic.  In the slightly longer term,
+demonstrating the effectiveness and superiority of federated surveillance could
+obviate the need for crisis-time mandated reporting, alleviating the reporting
+burden on hospitals and other healthcare providers during these difficult
+times. 
+
+In an interpandemic period, an important use case for federated surveillance is
+detection of trends and anomalies.  A set of queries can be designed to
+continuously test for unusual recent spikes or trends in any number of
+diagnoses, symptoms, lab tests, or prescriptions.  The aggregation of evidence
+across many systems, localities, and data streams will make detection both more
+sensitive and more robust.  Such a system would likely have detected the opioid
+epidemic years before it was actually noticed.
+
+One open technical challenge with the federated surveillance approach is
+semantic heterogeneity: the use of emerging Health IT standards like HL7's FHIR
+\citep{HL7FHIR} can enable a unified view of EMR data elements, but different 
+healthcare systems often have different operational definitions for supposedly
+universal concepts like ``high blood pressure'' or ``low blood oxygenation''.
+Combining counts of such events across different healthcare systems may be a bit
+like adding apples to oranges.  It will take some work to harmonize semantics
+across so many diverse data custodians, but this is both doable and well worth
+doing.  Note that this problem is less severe for the many surveillance and
+anomaly detection tasks where the focus is on changes in a signal (in a given
+location) over time, rather than on its absolute meaning. 
+
+\paragraph{Different phases of epidemic surveillance call for different analytic
+  tools.}
+
+It is important to discuss analytic needs separately for each of three different 
+phases of epidemic surveillance and tracking, since each poses different
+technical challenges and requires different analytical tools.
+
+In the \emph{interpandemic phase}, the main activity is threat scanning for
+threats, namely monitoring data streams and events throughout the world for
+disconcerting developments.  Relevant statistical tools include anomaly
+detection and scan statistics to help decide when an epidemiological
+investigation is warranted.  While it may be possible to rank the risks of
+different outbreak triggering events (like species jumping or point mutations)
+in different locations, which could in turn be used to inform surveillance
+resource allocation, conventional forecasting has a limited role to play in this
+phase, as such events have large inherent uncertainty.  
+
+In the \emph{containment phase}, a discovered threat must be intensely
+monitored, continuously assessed, and ultimately contained.  The analytical,
+data-driven tools required in this phase include real-time estimation of
+critical epidemiological parameters such as R0, infection fatality rates, the
+incubation period, the serial interval, and so on.  These real-time estimates
+are necessarily based on provisional data, highlighting the value of modeling
+the data generation process discussed above.  In this phase, forecasting still
+has a limited role, since the outbreak is still local, its fundamental dynamics
+unclear, and point events can have large consequences down the road. 
+
+If containment fails, during the \emph{mitigation phase} the goals of analytics
+expand significantly to include informing mitigation policies and planning.
+Real-time tracking (nowcasting) and short term-forecasting (a few weeks
+ahead) can play critical roles in these activities, and indeed have been the
+focus of our group's work since its inception.  While there is still important
+work to be done and advances to be made in this area, we believe that these
+advances are likely to be incremental until we see major progress in either (1)
+supporting data streams (e.g., better standardization and cleaning of public
+health reporting data, identification of leading indicators from, say, EMR); or
+(2) our collective scientific understanding of the real-world geotemporal
+dynamics of epidemics (discussed next).
+
+\paragraph{Useful, reliable longer-term forecasting remains an aspiration.}
+
+Influenza forecasting exercises in the last several years demonstrated that it
+is often possible to usefully quantify uncertainty over the remainder of an
+ongoing flu season \citep{Reich:2019}.  But this success was based mostly on
+observing the behavior of seasonable epidemics over several decades.  To
+reliably forecast the progression of pandemics, where relevant historical data
+is almost nonexistent, we must have a detailed quantitative understanding of how
+different, diverse factors affect disease transmissibility.  Such an 
+understanding is currently grossly lacking, as evidenced by our collective
+failure to predict \citep{Reich:2021} (or even understand, post-hoc
+\citep{Hawre:2021}) the high-level temporal and geographic contours of the main
+pandemic waves in the U.S.  Yet this very pandemic, the most instrumented in
+human history, is also a rare opportunity to attempt this vital scientific and
+technological goal.
+
+\subsection*{Acknowledgements} 
+
+\emph{Authors' note: to be filled out later.}
+
+\newpage
+\bibliographystyle{plainnat}
+\bibliography{../common/covidcast}
+
+\end{document}
