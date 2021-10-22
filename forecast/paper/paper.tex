@@ -81,7 +81,10 @@ acquired funding.}
 
 \begin{abstract}
   Reliable, short-term forecasts of traditional public health reporting streams
-  (such as cases, hospitalizations, and deaths) are a key ingredient in
+  (such as cases, hospitalizations, and deaths)
+  ought to be a key
+  % are a key
+  ingredient in
   effective public health decision-making during a pandemic. Since April 2020,
   our research group has worked with data partners to collect, curate, and make
   publicly available numerous real-time COVID-19 indicators, providing multiple
@@ -114,8 +117,8 @@ acquired funding.}
 
 \dropcap{T}racking and forecasting indicators from public health reporting
 streams---such as confirmed cases and deaths in the COVID-19 pandemic---is
-crucial for understanding disease spread, formulating public policy responses,
-and anticipating future public health resource needs.  A companion paper
+crucial for understanding disease spread, correctly formulating public policy responses,
+and rationally planning future public health resource needs.  A companion paper
 \cite{Reinhart:2021} describes our research group's (Delphi's) efforts in
 curating and maintaining a database of real-time indicators that track COVID-19
 activity and other relevant phenomena. The signals (a term we use synonomously
@@ -388,9 +391,8 @@ of signals for features, as we will detail shortly) June 9, 2020 for
 forecasting, and June 16, 2020 for hotspot prediction. (The bottleneck here is
 the CTIS-CLI-in-community signal, which does not exist before early April 2020,
 when the survey was first launched). The end date was chosen again with a 
-consideration to align both tasks as best as possible, and because very few
-hotspots exist for the several few months of 2021, due to the general and
-gradual decline of the pandemic during this period.  
+consideration to align both tasks as best as possible and to coincide with the
+introduction of widely available vaccines.  
 
 \paragraph{Forecasting Models}
 
@@ -646,7 +648,7 @@ We begin with a summary of the high-level conclusions.
   a decreasing period, this tends to co-occur with instances in which the
   indicator ``leads'' case rates (meaning, roughly, on a short-time scale in a
   given location, its behavior mimics that of future case rates).  On
-  the other hand, if an an indicator model does better in periods of
+  the other hand, if an indicator model does better in periods of
   increase, or worse in periods of increase or decrease, its performance is
   not as related to leadingness.   
 \end{itemize}
@@ -738,12 +740,12 @@ variable might, when we include them as lagged features in
 \eqref{eq:forecast_ar_x} and \eqref{eq:hotspot_ar_x}. 
 
 To test this hypothesis, we reran all of the prediction experiments but with
-$X_{\ell,t}$ in the each indicator models replaced with suitable random noise
+$X_{\ell,t}$ in each indicator model replaced with suitable random noise
 (bootstrap samples from a signal's history).  The results, shown and explained
 more precisely in the Supplementary Materials, are vastly different (worse) than
 the original set of results.  In both forecasting and hotspot prediction, the
 ``fake'' indicator models offered essentially no improvement over the pure AR
-model, which strongly rejects (informally speaking) the implicit regularization
+model, which---informally speaking---strongly rejects the implicit regularization
 hypothesis.
 
 On the topic of regularization, it is also worth noting that the use of 
