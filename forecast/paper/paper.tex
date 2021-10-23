@@ -125,15 +125,15 @@ activity and other relevant phenomena. The signals (a term we use synonomously
 with ``indicators'') in this database are accessible through the COVIDcast API
 \cite{CovidcastAPI}, with associated R \cite{CovidcastR} and Python
 \cite{CovidcastPy} packages for convenient data fetching and processing
-tools. In the current paper, we aim to quantify the utility provided by a core
+tools. In the current paper, we quantify the utility provided by a core
 set of these indicators for two fundamental prediction tasks: probabilistic
 forecasting of COVID-19 case rates and prediction of future COVID-19 case
 hotspots (defined by the event that a relative increase in COVID-19 cases
 exceeds a certain threshold).
 
- At the outset, we should be clear that our intent in this paper is \textit{not}
+At the outset, we should be clear that our intent in this paper is \textit{not}
 to provide an authoritative take on cutting-edge COVID-19 forecasting methods.
-Instead, our purpose here is to provide a rigorous, quantitative assessment of
+Instead, we provide a rigorous, quantitative assessment of
 the utility that several auxiliary indicators---such as those derived from
 internet surveys or medical insurance claims---provide in tasks that involve
 predicting future trends in confirmed COVID-19 cases. To assess such utility in
@@ -144,7 +144,9 @@ inclusion of an auxiliary indicator as an additional feature in such a model
 improves its predictions. 
 
 While forecasting carries a rich literature that offers a wide range of
-techniques, see, e.g., \cite{Hyndman:2018}, we purposely constrain ourselves to 
+techniques, see, e.g., \cite{Hyndman:2018},
+% put Ioannidis ref here
+we purposely constrain ourselves to 
 very simple models, avoiding common enhancements such as order selection,
 correction of outliers/anomalies in the data, and inclusion of regularization or
 nonlinearities. For the same reason, we do not account for other factors that
@@ -154,8 +156,13 @@ to the COVID-19 Forecast Hub \cite{ForecastHub} by a large community of modelers
 have shown that simple, robust models have consistently been among the
 best-performing over the pandemic, including time series models similar the ones
 we use in this paper. See, e.g., \cite{Cramer:2021}, for a detailed study
-of death forecasting. Our internal evaluations suggest that the same is true (at
-least, if not to a greater extent) for case forecasting.   
+of death forecasting. 
+% added
+Similarly, the simple autoregressive models used here for case forecasting
+are competitive with top models submitted to the Forecast Hub over the same
+period of time (see the Supplement for this analysis).
+% Our internal evaluations suggest that the same is true (at
+% least, if not to a greater extent) for case forecasting.   
 
 In the companion paper \cite{Reinhart:2021}, we analyze correlations between
 various indicators and COVID case rates. These correlations are natural
@@ -188,7 +195,10 @@ we build predictive models using only the data that would have been available
 \textit{as of} the prediction date, and compare the ensuing predictions in terms 
 of accuracy. To do so, we leverage Delphi's \texttt{evalcast} R package 
 \cite{EvalcastR}, which plugs into the COVIDcast API's data versioning system,  
-and facilitates honest backtesting. 
+and facilitates honest backtesting.
+%
+TODO: Here we cite many refs
+\cite{faust2009a,diebold1991a,patterson1995a,croushore2011a,croushore2006a,harvey1983a,mankiw1986a,trivellato1986a,clark2009a,koenig2003a,howrey1978a} 
 
 Finally, it is worth noting that examining the importance of additional features
 for prediction is a core question in inferential statistics and econometrics,
@@ -362,7 +372,7 @@ change of $Y_{\ell,t+a}$ (relative to its value one week prior,
 $Y_{\ell,t+a-7}$), again for each $a=7,\ldots,21$.   
 
 Why do we define the response variables via 7-day averaging? The short answer 
-is robustness: averaging stabilizes the case time series, and accounts for 
+is robustness: averaging stabilizes the case time series, and moderates
 uninteresting artifacts like day-of-the-week effects in the series.  Note that
 we can also equivalently view this (equivalent up to a constant factor) as
 predicting the HRR-level case incidence rate \textit{summed} over some 7-day
@@ -832,7 +842,12 @@ for the decreased performance in up periods noted above.
 In the supplement, we show how to define a quantitative score to measure the
 leadingness of an indicator, at any time $t$ and any location $\ell$, based on
 cross correlations to case rates over a short time window around $t$.
-The higher this score, the greater it ``leads'' case activity.  Figure 
+The higher this score, the greater it ``leads'' case activity.
+%
+TODO: Here we cite many refs.
+\cite{yeats1972a,emerson1996a,koch1988a,sargent1977a,engle1987a,shiskin1968a,granger1969a,lahiri1991a,koopmans1947a,StockWatson1989,diebold1989a,mitchell1938a,auerbach1982a,hamilton1996a}
+%
+Figure 
 \ref{fig:leading} displays correlations between the leadingness score of an 
 indicator and the WIS difference (AR model minus an indicator model), stratified
 by whether the target is classified as up, down, or flat.  One would naturally
@@ -850,8 +865,7 @@ models?  Our answer, based on analyzing five auxiliary indicators from the
 COVIDcast API (defined using from medical insurance claims, internet-based
 surveys, and internet search trends) is undoubtedly ``yes''. However, there are
 levels of nuance to such an answer that must be explained.  None of the
-indicators that we have investigated appear to be the ``silver bullet'' that one
-might have hoped for, revolutionizing the tractability of the prediction
+indicators that we have investigated revolutionize the tractability of the prediction
 problem, rendering it easy when it was once hard (in the absence of auxiliary
 information).  Rather, the gains in accuracy from the indicator models (over an
 autoregressive model based only on past case rates) appear to be nontrivial, and

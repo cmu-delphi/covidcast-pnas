@@ -1,3 +1,7 @@
+
+# Import from the Hub -----------------------------------------------------
+
+library(tidyverse)
 library(aws.s3)
 Sys.setenv("AWS_DEFAULT_REGION" = "us-east-2")
 s3bucket <- get_bucket("forecast-eval")
@@ -5,7 +9,9 @@ n_keeper_weeks <- 6L
 n_keeper_locs <- 50L
 case_scores <- s3readRDS("score_cards_state_cases.rds", s3bucket)
 case_scores <- case_scores %>% 
-  mutate(forecast_date = target_end_date - ahead * 7) %>% 
+  mutate(
+    ahead = ahead * 7 - 2, # forecast on a Monday
+    forecast_date = target_end_date - ahead) %>% 
   # fix weirdnesses about submission dates
   filter(forecast_date < "2021-01-01") %>%
   select(ahead, geo_value, forecaster, target_end_date, wis, forecast_date)
@@ -19,8 +25,9 @@ case_scores <- left_join(
   )
 case_scores <- case_scores %>% 
   filter(forecaster != "COVIDhub-baseline")
+aheads <- case_scores %>% distinct(ahead) %>% pull()
 n_submitted <- case_scores %>% 
-  filter(ahead == 2) %>% 
+  filter(ahead == aheads[2]) %>% 
   group_by(forecaster) %>% 
   summarise(nfcasts = n())
 keepers <- n_submitted %>% 
@@ -29,7 +36,32 @@ keepers <- n_submitted %>%
   pull(forecaster)
 
 case_scores <- case_scores %>% filter(forecaster %in% keepers)
-all_time_performance <- case_scores %>%
+
+
+# Load our models ---------------------------------------------------------
+
+ours <- readRDS("~/Downloads/results_no_october_honest.RDS")
+pop <- covidcast::state_census %>% select(ABBR, POPESTIMATE2019) %>%
+  mutate(geo_value = tolower(ABBR)) %>% select(-ABBR)
+# scale from prop to num
+ours <- left_join(ours, pop) %>% mutate(wis = wis * POPESTIMATE2019 / 1e5) %>%
+  select(-ae, -POPESTIMATE2019)
+
+common_fd <- as.Date(intersect(
+  case_scores %>% select(forecast_date) %>% distinct() %>% pull(),
+  ours %>% select(forecast_date) %>% distinct() %>% pull()),
+  "1970-01-01")
+
+
+our_models <- ours %>% filter(forecaster != "Baseline")
+baseline <- ours %>% filter(forecaster == "Baseline") %>%
+  select(-forecaster) %>% rename(strawman_wis = wis)
+our_models <- left_join(our_models, baseline)
+all_models <- case_scores %>% bind_rows(our_models) 
+
+
+all_time_performance <- all_models %>%
+  filter(forecast_date %in% common_fd) %>%
   group_by(forecaster, ahead) %>%
   summarise(rel_wis = Mean(wis) / Mean(strawman_wis),
             geo_wis1 = GeoMean((wis + 1) / (strawman_wis + 1)),
@@ -37,10 +69,10 @@ all_time_performance <- case_scores %>%
 
 all_time_performance %>%
   pivot_longer(contains("wis")) %>%
-  ggplot(aes(ahead, value, color = forecaster)) +
+  ggplot(aes(ahead, value, group = forecaster)) +
   theme_bw() +
-  geom_point() +
-  geom_line() +
+  geom_line(color = "grey20") +
+  geom_point(color = "grey20") +
   scale_color_viridis_d() +
   facet_wrap(~name) +
   geom_hline(yintercept = 1, color = "red") +
