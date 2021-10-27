@@ -145,13 +145,25 @@ improves its predictions.
 
 While forecasting carries a rich literature that offers a wide range of
 techniques, see, e.g., \cite{Hyndman:2018},
-% put Ioannidis ref here
 we purposely constrain ourselves to 
 very simple models, avoiding common enhancements such as order selection,
 correction of outliers/anomalies in the data, and inclusion of regularization or
 nonlinearities. For the same reason, we do not account for other factors that
 may well aid in forecasting, such as age-specific effects, holiday adjustments,
-public health mandates, and so on. That said, analyses of forecasts submitted
+public health mandates, and so on.
+% Paragraph from Rob
+Work in \cite{ioannidis2020a} points out many additional difficulties when it
+comes to
+forecasting COVID-19 case rates and deaths. These include bad data, wrong
+assumptions, lack of incorporation of epidemiological features, etc.  We agree
+with most of these 
+and our group has found that COVID-19 forecasting to be extremely challenging.
+However the point of our  paper is to demonstrate the utility of  auxiliary
+indicators for improving COVID-19 forecasting, and to suggest that these
+indicators might be useful for future pandemics. We are not suggesting that
+these indicators make COVID-19 forecasting  easy. 
+Despite these obstacles, analyses of forecasts submitted
+%
 to the COVID-19 Forecast Hub \cite{ForecastHub} by a large community of modelers 
 have shown that simple, robust models have consistently been among the
 best-performing over the pandemic, including time series models similar the ones
@@ -197,8 +209,10 @@ of accuracy. To do so, we leverage Delphi's \texttt{evalcast} R package
 \cite{EvalcastR}, which plugs into the COVIDcast API's data versioning system,  
 and facilitates honest backtesting.
 %
-TODO: Here we cite many refs
-\cite{faust2009a,diebold1991a,patterson1995a,croushore2011a,croushore2006a,harvey1983a,mankiw1986a,trivellato1986a,clark2009a,koenig2003a,howrey1978a} 
+The necessity of real-time data for honest forecast evaluations has a long history in econometrics,
+\cite[see,
+e.g.,][]{faust2009a,diebold1991a,patterson1995a,croushore2011a,croushore2006a,harvey1983a,mankiw1986a,trivellato1986a,clark2009a,koenig2003a,howrey1978a}
+but it is far less acknowledged in public health despite its demonstrable importance. 
 
 Finally, it is worth noting that examining the importance of additional features
 for prediction is a core question in inferential statistics and econometrics,
@@ -839,13 +853,14 @@ of an indicator (degree to which it leads case activity) tends to be more
 pronounced in down or flat periods than in up periods, a plausible explanation 
 for the decreased performance in up periods noted above.
 
-In the supplement, we show how to define a quantitative score to measure the
+In the supplement, we define a quantitative score to measure the
 leadingness of an indicator, at any time $t$ and any location $\ell$, based on
 cross correlations to case rates over a short time window around $t$.
 The higher this score, the greater it ``leads'' case activity.
 %
-TODO: Here we cite many refs.
-\cite{yeats1972a,emerson1996a,koch1988a,sargent1977a,engle1987a,shiskin1968a,granger1969a,lahiri1991a,koopmans1947a,StockWatson1989,diebold1989a,mitchell1938a,auerbach1982a,hamilton1996a}
+This analysis is closely related to Granger Causality \cite{engle1987a} and
+draws on a large body of prior work that measures leadingness in economic time-series 
+\cite[e.g.,][]{yeats1972a,emerson1996a,koch1988a,sargent1977a,engle1987a,shiskin1968a,granger1969a,lahiri1991a,koopmans1947a,StockWatson1989,diebold1989a,mitchell1938a,auerbach1982a,hamilton1996a}.
 %
 Figure 
 \ref{fig:leading} displays correlations between the leadingness score of an 

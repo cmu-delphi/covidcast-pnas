@@ -44,7 +44,7 @@ ours <- readRDS("~/Downloads/results_no_october_honest.RDS")
 pop <- covidcast::state_census %>% select(ABBR, POPESTIMATE2019) %>%
   mutate(geo_value = tolower(ABBR)) %>% select(-ABBR)
 # scale from prop to num
-ours <- left_join(ours, pop) %>% mutate(wis = wis * POPESTIMATE2019 / 1e5) %>%
+ours <- left_join(ours, pop) %>% mutate(wis = wis * POPESTIMATE2019 / 1e5 * 7) %>%
   select(-ae, -POPESTIMATE2019)
 
 common_fd <- as.Date(intersect(
