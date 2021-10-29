@@ -1,0 +1,51 @@
+---
+title: Build the mapping from HRRs to states
+---
+
+```{r, message = FALSE}
+library(covidcast)
+library(dplyr)
+library(tidyr)
+
+start_day <- "2020-03-01"
+end_day <- "2021-10-15"
+
+y <- covidcast_signal(data_source = "jhu-csse", 
+                      signal = "confirmed_incidence_prop",
+                      start_day = start_day, 
+                      end_day = end_day,
+                      geo_type = "state") %>%
+  select(geo_value, time_value, value) %>%
+  pivot_wider(names_from = geo_value)
+
+dim(y)
+head(y)
+
+x <- covidcast_signal(data_source = "jhu-csse", 
+                      signal = "confirmed_incidence_prop",
+                      start_day = start_day, 
+                      end_day = end_day,
+                      geo_type = "hrr") %>%
+  select(geo_value, time_value, value) %>%
+  pivot_wider(names_from = geo_value)
+
+dim(x)
+head(x)
+
+# Check we have the same time values
+all(y$time_value == x$time_value)
+
+# Convert to matrices, compute regression coefficients
+library(MASS) # Using ginv() because I got singularity errors with solve()
+x_mat = as.matrix(x[,-1])
+y_mat = as.matrix(y[,-1])
+b = t(cov(y_mat, x_mat) %*% ginv(cov(x_mat)))
+
+# Sanity check: check against first 4 individual regressions
+par(mfrow = c(2, 2))
+for (i in 1:4) plot(b[,i], coef(lm(y_mat[,i] ~ x_mat + 0)))
+
+# Sanity check: look at reconstruction error by state
+err = colMeans((y_mat - x_mat %*% b)^2)
+barplot(err)
+```
