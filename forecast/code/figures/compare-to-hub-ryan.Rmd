@@ -129,12 +129,12 @@ ours3 <- readRDS(here::here("data", "results_honest_states.RDS")) %>%
 
 unique(ours3$forecaster)[!(unique(ours3$forecaster) %in% names(fcast_colors))]
 
-p1 <- plotter(ours3,
+p1 <- plotter(ours3 %>% filter(ahead <= 21), 
         "wis", Mean, scaler = "strawman_wis", 
         order_of_operations = c("aggr","scale")) +
   ylab("Mean WIS (relative to baseline)")
 
-p2 <- plotter(ours3,
+p2 <- plotter(ours3 %>% filter(ahead <= 21), 
         "wis", GeoMean, scaler = "strawman_wis", 
         order_of_operations = c("aggr","scale")) +
   ylab("Geometric mean WIS (relative to baseline)")
@@ -152,8 +152,7 @@ fcasts_honest <- readRDS(here::here("data", "results_honest.RDS")) %>%
   process_res_cases(actuals) %>%
   filter(forecaster != "gs_inherit") 
 
-
-fig3 <- plotter(fcasts_honest, 
+fig3 <- plotter(fcasts_honest %>% filter(ahead <= 21), 
         "wis", Mean, scaler = "strawman_wis", 
         order_of_operations = c("aggr","scale")) +
   ylab("Mean WIS (relative to baseline)")
