@@ -51,7 +51,7 @@
   element in the public health response to any fast-moving epidemic or 
   pandemic. A widely-used model for predicting the future spread of a temporal
   process, based on past data, is an autoregressive (AR) model. While basic,
-  such an AR model (properly trained) can already be competitive with top models
+  such an AR model (properly trained) is already competitive with top models
   in operational use for COVID-19 forecasting. In this paper, we 
   exhibit five auxiliary indicators---based on de-identified medical insurance
   claims, self-reported symptoms via online surveys, and COVID-related Google
@@ -161,14 +161,18 @@ various indicators and COVID case rates. These correlations are natural
 summaries of the contemporaneous association between an indicator and COVID
 cases, but they fall short of delivering a satisfactory answer to the question
 that motivates the current article: is the information contained in an indicator
-demonstrably useful for the prediction tasks we care about? For such a question,
-lagged correlations (e.g., measuring the correlation between an indicator and
-COVID case rates several days in the future) move us in the right direction, but
-still do not move us all the way there. The question about \textit{utility for
-  prediction} is focused on a much higher standard than simply asking about 
+demonstrably useful for the prediction tasks we care about?
+% For such a question,
+% lagged correlations (e.g., measuring the correlation between an indicator and
+% COVID case rates several days in the future) move us in the right direction, but
+% still do not move us all the way there.
+Demonstrating \textit{utility for
+  prediction} is a much higher standard than simply asking about 
 correlations; to be useful in forecast or hotspot models, an indicator must
 provide relevant information that is not otherwise contained in past values of
-the case rate series itself. We assess this by inspecting the difference in
+the case rate series itself (see the pioneering work on Granger Causality
+\cite{engle1987a,Granger:1969} as well as detailed discussion below). We
+assess this directly by inspecting the difference in  
 predictive performance of simple autoregressive models trained with and without
 access to past values of a particular indicator.
 
@@ -820,6 +824,7 @@ periods when CHNG-CLI, CHNG-COVID, and DV-CLI, in particular, lead to decreased
 performance.
 
 \subsection{Effects of Leading or Lagging Behavior}
+\label{sec:leading-lagging}
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/leading-only-1.pdf}
@@ -867,9 +872,15 @@ models?  Our answer, based on analyzing five auxiliary indicators from the
 COVIDcast API (defined using from medical insurance claims, internet-based
 surveys, and internet search trends) is undoubtedly ``yes''. However, there are
 levels of nuance to such an answer that must be explained.  None of the
-indicators that we have investigated revolutionize the tractability of the prediction
-problem, rendering it easy when it was once hard (in the absence of auxiliary
-information).  Rather, the gains in accuracy from the indicator models (over an
+indicators that we have investigated are transformative, rendering the
+prediction problem  easy when it was once hard (in the absence of auxiliary
+information).
+% This seems like a place to reference Superforecasters (or related) if we're
+% going to do it. ``The expectation should never be
+% that there is a silver bullet. Too much solid work refutes that. Again lack of
+% prior art citations to some very solid prior empirical work, and repetition of
+% a long discredited Hedgehog/Silver bullet strawman.''  
+Rather, the gains in accuracy from the indicator models (over an
 autoregressive model based only on past case rates) appear to be nontrivial, and
 consistent across modes of analysis, but modest.  In forecasting, the indicator
 models are found to be most useful in periods in which case rates are flat or
@@ -906,13 +917,22 @@ are suboptimal for true test-time performance.
 
 In this paper, we have chosen to consider only very simple forecasting models,
 while devoting most of our effort to accounting for as much of the complexity of
-the underlying data and evaluation as possible.  In fact, our paper is as much
-about demonstrating how one might address questions about model comparisons and
-evaluation in forecasting and hotspot prediction in general, as it is about
-providing rigorous answers to such questions in the context of COVID-19 case
-rates in particular.  We hope that others will leverage our framework, and build
-on it, so that it can be used to guide work that advances the frontier of
-predictive modeling for epidemics and pandemics.
+the underlying data and evaluation as possible.
+% The below was held out as particularly anathema to the PNAS ethos.
+%
+% In fact, our paper is as much
+% about demonstrating how one might address questions about model comparisons and
+% evaluation in forecasting and hotspot prediction in general, as it is about
+% providing rigorous answers to such questions in the context of COVID-19 case
+% rates in particular.  We hope that others will leverage our framework, and build
+% on it, so that it can be used to guide work that advances the frontier of
+% predictive modeling for epidemics and pandemics.
+%
+% Added by DJM
+Despite their simplicity, these models are competitive with top forecasting
+models submitted to the COVID-19 Forecast Hub in real time, and they are
+demonstrably robust to the careful scrutiny undertaken here.  
+
 
 \acknow{We thank Matthew Biggerstaff, Logan Brooks, Johannes Bracher, Michael 
   Johansson, Evan Ray, Nicholas Reich, and Roni Rosenfeld for several
