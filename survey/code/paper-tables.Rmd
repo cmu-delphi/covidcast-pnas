@@ -381,7 +381,7 @@ to_plot <- to_plot %>%
 ggplot(to_plot, aes(x = time_value, y = value, color = REGION)) +
   geom_line() +
   facet_wrap(vars(signal), nrow = 2, ncol = 3, scales = "free_y") +
-  labs(x = "Date", y = "", color = "Census Region") +
+  labs(x = "Date", y = "", color = "Census region") +
   scale_x_date(date_breaks = "3 months",
                date_labels = "%b %Y",
                date_minor_breaks = "1 month",
@@ -687,7 +687,7 @@ g <- ggplot(state_case_compare) +
             linetype = 1, size = 0.5) +
   geom_line(aes(x = week, y = ever_pos, color = "CTIS"),
             linetype = 1, size = 0.5) +
-  scale_color_manual(values = c("lightblue", "gray50")) +
+  scale_color_manual(values = c("steelblue", "black")) +
   scale_y_continuous(limits = c(0, 20), breaks = c(0, 10, 20),
                      minor_breaks = c(5, 15),
                      labels = label_percent(scale = 1,
