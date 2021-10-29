@@ -234,9 +234,14 @@ plotter(fcasts_honest,
 
 <!-- Comparison to the Hub -->
 
-```{r compare-to-hub, fig.cap="Performance of our models re-estimated for state-level, epiweek case incidence. Our models are colored the same as before. The solid light-blue line is the COVIDhub Ensemble forecast. The thin grey lines are the forecasts of other teams."}
-
+```{r compare-to-hub, fig.cap="Performance of the AR model re-estimated for state-level, epiweek case incidence. The thin grey lines are the forecasts of other teams."}
 knitr::include_graphics("fig/compare-states-to-hub.pdf")
+```
+
+\clearpage
+
+```{r state-level-performance, fig.cap="Performance of our models re-estimated for state-level, epiweek case incidence."}
+knitr::include_graphics("fig/state-level-performance.pdf")
 ```
 
 
