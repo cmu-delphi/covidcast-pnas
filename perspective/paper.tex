@@ -1,5 +1,22 @@
 \documentclass{article}
-\input{ryantibs}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{newtxtext}             % times font
+
+\usepackage[numbers]{natbib}
+\usepackage{amssymb,amsmath,amsthm,bbm}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{verbatim,float,url,dsfont}
+\usepackage{graphicx,subfigure,psfrag}
+\usepackage{algorithm,algorithmic}
+\usepackage{mathtools,enumitem}
+\usepackage[colorlinks=true,citecolor=blue,urlcolor=blue,linkcolor=blue]{hyperref}
+\usepackage{multirow}
 
 \title{Epidemic Tracking and Forecasting: Lessons Learned from a Tumultuous Year}
 \author{Roni Rosenfeld \and Ryan J. Tibshirani}
@@ -459,7 +476,7 @@ technological goal.
 \emph{Authors' note: to be filled out later.}
 
 \newpage
-\bibliographystyle{plainnat}
+\bibliographystyle{unsrtnat}
 \bibliography{../common/covidcast}
 
 \end{document}
