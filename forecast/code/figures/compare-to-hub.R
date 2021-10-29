@@ -7,10 +7,27 @@ Sys.setenv("AWS_DEFAULT_REGION" = "us-east-2")
 s3bucket <- get_bucket("forecast-eval")
 n_keeper_weeks <- 6L
 n_keeper_locs <- 50L
-case_scores <- s3readRDS("score_cards_state_cases.rds", s3bucket)
+# case_scores <- s3readRDS("score_cards_state_cases.rds", s3bucket) 
+case_preds <- s3readRDS("predictions_cards.rds", s3bucket) %>%
+  filter(signal == "confirmed_incidence_num",
+         forecast_date < "2021-01-01",
+         !(geo_value %in% c("as", "gu", "pr", "vi", "mp", "us"))) %>%
+  select(-data_source, -signal, -incidence_period)
+actuals <- covidcast::covidcast_signal("jhu-csse", "confirmed_7dav_incidence_num",
+                                       geo_type = "state", as_of = "2021-05-18",
+                                       end_day = "2021-03-01") %>%
+  select(geo_value, time_value, value) %>%
+  mutate(value = value * 7) %>%
+  rename(target_end_date = time_value, actual = value)
+case_scores <- evalcast::evaluate_predictions(
+  case_preds, actuals, 
+  err_measures = list(wis = evalcast::weighted_interval_score),
+  grp_vars = c("ahead", "forecaster", "forecast_date", "geo_value")
+)
+rm(case_preds)
 case_scores <- case_scores %>% 
   mutate(
-    ahead = ahead * 7 - 2, # forecast on a Monday
+    ahead = ahead * 7 - 2, # forecast on a Tuesday
     forecast_date = target_end_date - ahead) %>% 
   # fix weirdnesses about submission dates
   filter(forecast_date < "2021-01-01") %>%
@@ -40,7 +57,7 @@ case_scores <- case_scores %>% filter(forecaster %in% keepers)
 
 # Load our models ---------------------------------------------------------
 
-ours <- readRDS("~/Downloads/results_honest.RDS")
+ours <- readRDS(here::here("data", "results_honest_states.RDS"))
 pop <- covidcast::state_census %>% select(ABBR, POPESTIMATE2019) %>%
   mutate(geo_value = tolower(ABBR)) %>% select(-ABBR)
 # scale from prop to num
@@ -69,6 +86,9 @@ baseline <- ours %>% filter(forecaster == "Baseline") %>%
 our_models <- left_join(our_models, baseline)
 all_models <- bind_rows(hub = case_scores, ours = our_models, .id = "source") 
 
+Mean <- function(x) mean(x, na.rm = TRUE)
+GeoMean <- function(x) exp(mean(log(x), na.rm = TRUE))
+
 
 all_time_performance <- all_models %>%
   filter(forecast_date %in% common_fd) %>%
@@ -94,9 +114,10 @@ ggplot(all_time_performance %>% filter(source == "ours"),
   geom_point(aes(ahead, value, color = forecaster)) +
   scale_color_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
   theme_bw() +
-  ylab("relative to baseline") +
+  ylab("Score relative to baseline") +
   geom_hline(yintercept = 1, size = 1.5) +
   xlab("Days ahead") +
   facet_wrap(~ name, labeller = labeller(name = facet_labs)) +
   theme(legend.position = "bottom", legend.title = element_blank())
 
+ggsave("paper/fig/compare-states-to-hub.pdf", width = 6.5, height = 4.5)

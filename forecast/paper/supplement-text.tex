@@ -78,6 +78,34 @@ relatively small number of large errors (as opposed to a large number of
 moderate errors).  Indeed, Figure 5 of the main paper further corroborates this,
 in which we see the heaviest left tails occuring for \chngcli.
 
+\section{Comparing with the COVID-19 Forecast Hub}
+
+Since July of 2020, a number of teams have been submitting real time forecasts
+to the COVID-19 Forecast Hub \cite{ForecastHub}. While a number of forecast
+targets can be submitted, the most related to that used in this paper---the
+7-day trailing average of COVID-19 case incidence rates at the Hospital Referral
+Region---are state-level forecasts for total case incidence over an epiweek.
+Essentially, for each state, teams are asked to predict the total number of
+cases that will be recorded over the week from Monday to Sunday. Forecasts must
+be submitted by Tuesday for the current Sunday as well as the next three
+Sundays. This corresponds to producing forecasts for 5, 12, 19, and 26 days
+ahead. Some teams choose to submit their forecasts a few days earlier, but
+always for the same targets.
+
+To properly compare the models presented in this paper with those submitted to
+the Hub, we limit ourselves to the same set of forecast dates and states, and
+we predict case incidence over a week by: (1) predicting the 7-day trailing
+average case rate (as in the manuscript);
+(2) multiplying by 7 to give the total over a week; (3) multiplying by the state
+population as reported in the 2019 US Census Population Estimate (available in
+the Covidcast R package \cite{CovidcastR}). Finally, we perform the same
+evaluations as in the manuscript Figure 3 and also using geometric mean as
+described above. The result is shown in Figure \ref{fig:compare-to-hub}. Since
+not all teams submitted forecasts to the Forecast Hub for the entire period, we
+only display those which submitted for at least 6 weeks. By both metrics,
+the models examined in this paper are competitive with the top teams, even
+beating the Ensemble for large target horizons.
+
 \section{Statistical Significance}
 
 In the Introduction of the main paper, we give some reasons that we avoid making
