@@ -47,18 +47,18 @@
 \leadauthor{McDonald} 
 
 % Please add a significance statement to explain the relevance of your work
-\significancestatement{Forecasting is a critical element in the public health
-  response to any fast-moving epidemic or pandemic.  Predicting the future
-  spread of some disease process, based on disease activity in the recent
-  past---say, using autoregressive modeling from the time series literature---is 
-  a basic and widely-used method.  In this paper we study whether including
-  auxiliary indicators as additional features in such an autoregressive model
-  can be useful in COVID-19 case forecasting and hotspot prediction.  We find
-  that indicators based on de-identified medical insurance claims, self-reported
-  symptoms through online surveys, and COVID-related internet search activity
-  all provide a nontrivial improvement in forecast accuracy, though their
-  utility depends on the pandemic's local dynamics (upswing, downswing, or flat
-  period) at prediction time. 
+\significancestatement{Validated forecasting methodology should be a key 
+  element in the public health response to any fast-moving epidemic or 
+  pandemic. A widely-used model for predicting the future spread of a temporal
+  process, based on past data, is an autoregressive (AR) model. While basic,
+  such an AR model (properly trained) can already be competitive with top models
+  in operational use for COVID-19 forecasting. In this paper, we 
+  exhibit five auxiliary indicators---based on de-identified medical insurance
+  claims, self-reported symptoms via online surveys, and COVID-related Google
+  searches---that further improve the predictive accuracy of an AR model in
+  COVID-19 forecasting. The most substantial gains appear to be in quiescent  
+  times; but the Google search indicator appears to also offer improvements
+  during upswings in pandemic activity.   
 }
 
 % Please include corresponding author, author contribution and author
@@ -80,30 +80,24 @@ acquired funding.}
   digital surveillance} 
 
 \begin{abstract}
-  Reliable, short-term forecasts of traditional public health reporting streams
-  (such as cases, hospitalizations, and deaths)
-  ought to be a key
-  % are a key
-  ingredient in
-  effective public health decision-making during a pandemic. Since April 2020,
-  our research group has worked with data partners to collect, curate, and make
-  publicly available numerous real-time COVID-19 indicators, providing multiple
-  views of pandemic activity.  This paper studies the utility of these
-  indicators from a forecasting perspective. We focus on five indicators,
-  derived from medical insurance claims data, web search queries, and online
-  survey responses. For each indicator, we ask whether its inclusion in a simple
-  model leads to improved predictive accuracy relative to a similar model
-  excluding it. We consider both probabilistic forecasting of confirmed COVID-19 
-  case rates and binary prediction of case ``hotspots''.  Since the values of 
-  indicators (and case rates) are commonly revised over time, we take special
-  care to ensure that the data provided to a forecaster is the version that
-  would have been available at the time the forecast was made.   
-  % We demonstrate how less careful backtesting can lead to misleading
-  % retrospective evaluations.   
-  Our  analysis shows that consistent but modest gains in predictive accuracy 
-  are obtained by using these indicators, and furthermore, these gains are
-  related to periods in which the auxiliary indicators behave as ``leading
-  indicators'' of case rates.     
+  Short-term forecasts of traditional public health reporting streams (such as
+  cases, hospitalizations, and deaths) are a key input to public health
+  decision-making during a pandemic. Since early 2020, our research group has
+  worked with data partners to collect, curate, and make publicly available
+  numerous real-time COVID-19 indicators, providing multiple views of pandemic
+  activity in the U.S.  This paper studies the utility of five such
+  indicators---derived from de-identified medical insurance claims,
+  self-reported symptoms from online surveys, and COVID-related Google search
+  activity---from a forecasting perspective. For each indicator, we ask whether
+  its inclusion in an autoregressive (AR) model leads to improved predictive
+  accuracy relative to the same model excluding it. Such an AR model, without
+  external features, is already competitive with many top COVID-19 forecasting
+  models in use today. Our analysis reveals that (a) inclusion of each of these
+  five indicators improves on the overall predictive accuracy of the AR model;
+  (b) predictive gains are in general most pronounced during times in which
+  COVID cases are trending in ``flat'' or ``down'' directions; (c) one
+  indicator, based on Google searches, seems to be particularly helpful
+  during ``up''  trends.      
 \end{abstract}
 
 \dates{This manuscript was compiled on \today}
@@ -117,64 +111,50 @@ acquired funding.}
 
 \dropcap{T}racking and forecasting indicators from public health reporting
 streams---such as confirmed cases and deaths in the COVID-19 pandemic---is
-crucial for understanding disease spread, correctly formulating public policy responses,
-and rationally planning future public health resource needs.  A companion paper
-\cite{Reinhart:2021} describes our research group's (Delphi's) efforts in
-curating and maintaining a database of real-time indicators that track COVID-19
-activity and other relevant phenomena. The signals (a term we use synonomously
-with ``indicators'') in this database are accessible through the COVIDcast API
-\cite{CovidcastAPI}, with associated R \cite{CovidcastR} and Python
-\cite{CovidcastPy} packages for convenient data fetching and processing
-tools. In the current paper, we quantify the utility provided by a core
-set of these indicators for two fundamental prediction tasks: probabilistic
-forecasting of COVID-19 case rates and prediction of future COVID-19 case
-hotspots (defined by the event that a relative increase in COVID-19 cases
-exceeds a certain threshold).
+crucial for understanding disease spread, correctly formulating public policy
+responses, and rationally planning future public health resource needs.  A
+companion paper \cite{Reinhart:2021} describes our research group's efforts,
+beginning in April 2020, in curating, and maintaining a database of real-time
+indicators that track COVID-19 activity and other relevant phenomena. The
+signals (a term we use synonomously with ``indicators'') in this database are
+accessible through the COVIDcast API \cite{CovidcastAPI}, as well as associated
+R \cite{CovidcastR} and Python \cite{CovidcastPy} packages, for convenient data  
+fetching and processing. In the current paper, we quantify the utility provided
+by a core set of these indicators for two fundamental prediction tasks:
+probabilistic forecasting of COVID-19 case rates and prediction of future
+COVID-19 case hotspots (defined by the event that a relative increase in
+COVID-19 cases exceeds a certain threshold).  
 
 At the outset, we should be clear that our intent in this paper is \textit{not}
 to provide an authoritative take on cutting-edge COVID-19 forecasting methods.
-Instead, we provide a rigorous, quantitative assessment of
-the utility that several auxiliary indicators---such as those derived from
-internet surveys or medical insurance claims---provide in tasks that involve
-predicting future trends in confirmed COVID-19 cases. To assess such utility in
-as simple terms as possible, we center our study in the framework of a basic
-autoregressive model (in which COVID cases in the near future are predicted from  
-a linear combination of COVID cases in the near past), and ask whether the 
-inclusion of an auxiliary indicator as an additional feature in such a model
-improves its predictions. 
+Similarly, some authors, e.g., \cite{ioannidis2020a}, have pointed out numerous
+mishaps of forecasting during the pandemic and it is not our general intent to
+fix them here. Instead, we start with a basic and yet reasonably effective
+predictive model for predicting future trends in COVID-19 cases, and present a
+rigorous, quantitative assessment of the added value provided by auxiliary
+indicators, that are derived from data sources that operate outside of 
+traditional public health streams. In particular, we consider five indicators
+derived from de-identified medical insurance claims, self-reported symptoms from
+online surveys, and COVID-related Google searches.
 
-While forecasting carries a rich literature that offers a wide range of
-techniques, see, e.g., \cite{Hyndman:2018},
-we purposely constrain ourselves to 
-very simple models, avoiding common enhancements such as order selection,
-correction of outliers/anomalies in the data, and inclusion of regularization or
-nonlinearities. For the same reason, we do not account for other factors that
-may well aid in forecasting, such as age-specific effects, holiday adjustments,
-public health mandates, and so on.
-% Paragraph from Rob
-Work in \cite{ioannidis2020a} points out many additional difficulties when it
-comes to
-forecasting COVID-19 case rates and deaths. These include bad data, wrong
-assumptions, lack of incorporation of epidemiological features, etc.  We agree
-with most of these 
-and our group has found that COVID-19 forecasting to be extremely challenging.
-However the point of our  paper is to demonstrate the utility of  auxiliary
-indicators for improving COVID-19 forecasting, and to suggest that these
-indicators might be useful for future pandemics. We are not suggesting that
-these indicators make COVID-19 forecasting  easy. 
-Despite these obstacles, analyses of forecasts submitted
-%
-to the COVID-19 Forecast Hub \cite{ForecastHub} by a large community of modelers 
-have shown that simple, robust models have consistently been among the
-best-performing over the pandemic, including time series models similar the ones
-we use in this paper. See, e.g., \cite{Cramer:2021}, for a detailed study
-of death forecasting. 
-% added
-Similarly, the simple autoregressive models used here for case forecasting
-are competitive with top models submitted to the Forecast Hub over the same
-period of time (see the Supplement for this analysis).
-% Our internal evaluations suggest that the same is true (at
-% least, if not to a greater extent) for case forecasting.   
+To assess this value in as direct terms as possible, we base our study around a
+very simple basic model: an autoregressive model, in which COVID cases in the
+near future are predicted using a linear combination of COVID cases in the near
+past. Forecasting carries a rich literature, offering a wide range of
+sophisticated techniques, see, e.g., \cite{Hyndman:2018} for a review; however,
+we purposely avoid enhancements such as order selection, correction of
+outliers/anomalies in the data, and inclusion of regularization or
+nonlinearities. Similarly, we do not account for other factors that may well aid
+in forecasting, such as age-specific effects, holiday adjustments, and the
+effects of public health mandates. All that said, despite its simplicity, the
+basic autoregressive model that we consider in this paper exhibits competitive
+performance (see the Supplementary Materials for details) with many of the top
+COVID-19 case forecasters submitted to the U.S.\ COVID-19 Forecast Hub
+\cite{ForecastHub}, which is the official source of forecasts used in public
+communications by the U.S. CDC. The strong performance of the autoregressive
+model here is in line with the fact that simple, robust models have also
+consistently been among the best-performing ones for COVID-19 death
+forecasting \cite{Cramer:2021}. 
 
 In the companion paper \cite{Reinhart:2021}, we analyze correlations between
 various indicators and COVID case rates. These correlations are natural
@@ -188,31 +168,38 @@ still do not move us all the way there. The question about \textit{utility for
   prediction} is focused on a much higher standard than simply asking about 
 correlations; to be useful in forecast or hotspot models, an indicator must
 provide relevant information that is not otherwise contained in past values of
-the case rate series itself. We will assess this in the most direct way
-possible: by inspecting the difference in predictive performance of simple
-autoregressive models trained with and without access to past values of a
-particular indicator.
+the case rate series itself. We assess this by inspecting the difference in
+predictive performance of simple autoregressive models trained with and without
+access to past values of a particular indicator.
 
-There is another, more subtle issue in evaluating predictive utility that 
-deserves explicit mention, as it will play a key role in our analysis.
-Signals computed from surveillance streams will often be subject to  
-latency and/or revision. For example, a signal based on aggregated medical
-insurance claims may be available after just a few days, but it can then be
-substantially revised over the next several weeks as additional claims are
-submitted and/or processed late. Correlations between such a signal and case
-rates calculated ``after the fact'' (i.e., computed retrospectively, using the
-finalized values of this signal) will not deliver an honest answer to the    
-question of whether this signal would have been useful in real time. Instead,
-we build predictive models using only the data that would have been available
-\textit{as of} the prediction date, and compare the ensuing predictions in terms 
-of accuracy. To do so, we leverage Delphi's \texttt{evalcast} R package 
-\cite{EvalcastR}, which plugs into the COVIDcast API's data versioning system,  
-and facilitates honest backtesting.
-%
-The necessity of real-time data for honest forecast evaluations has a long history in econometrics,
-\cite[see,
-e.g.,][]{faust2009a,diebold1991a,patterson1995a,croushore2011a,croushore2006a,harvey1983a,mankiw1986a,trivellato1986a,clark2009a,koenig2003a,howrey1978a}
-but it is far less acknowledged in public health despite its demonstrable importance. 
+We find that each of the five indicators we consider--- two based on
+COVID-related outpatient visits from medical insurance claims, one on
+self-reported symptoms from online surveys, and one on Google searches for
+anosmia or ageusia---provide an overall improvement in accuracy when
+incorporated into the autorgressive model. This is true both for COVID-19 case 
+forecasting and hotspot prediction. Further analysis reveals that the gains in
+accuracy depend on the pandemic's dynamics at prediction time: the biggest  
+gains in accuracy appear during times in which cases are ``flat'' or trending
+``down''; but the indicator based on Google searches offers a most notable
+improvement when cases are trending ``up''.  
+
+Careful handling of data revisions plays a key role in our analysis. Signals 
+computed from surveillance streams are often subject to latency and/or 
+revision. For example, a signal based on aggregated medical insurance claims may
+be available after just a few days, but it can then be substantially revised
+over the next several weeks as additional claims are submitted and/or processed
+late. Correlations between such a signal and case rates calculated ``after the
+fact'' (i.e., computed retrospectively, using the finalized values of this
+signal) will not deliver an honest answer to the question of whether this signal
+would have been useful in real time. Instead, we build predictive models using
+only the data that would have been available \textit{as of} the prediction date,
+and compare the ensuing predictions in terms of accuracy. The necessity of
+real-time data for honest forecast evaluations has been recognized in
+econometrics for a long time, see
+\cite{howrey1978a, harvey1983a, mankiw1986a, trivellato1986a, diebold1991a,
+  patterson1995a, koenig2003a, croushore2006a, clark2009a, faust2009a,
+  croushore2011a}; but it appears to be far less acknowledged in public health,
+despite its demonstrable importance.  
 
 Finally, it is worth noting that examining the importance of additional features
 for prediction is a core question in inferential statistics and econometrics,
@@ -221,10 +208,10 @@ rigorous inference based on predictions, without (or with lean) assumptions, is
 an active field of research from both the applied and theoretical angles;
 see, e.g., \cite{Diebold:2002, McCraken:2007, Diebold:2015, Stokes:2017,
   Lei:2018, Rinaldo:2019, Williamsom:2020, Zhang:2020, Dai:2021, Fryer:2021}.
-Our take on this problem is in line with much of this literature; however, in
-order to avoid making any explicit assumptions, we do not attempt to make formal 
-significance statements, and instead, broadly examine the stability of our
-conclusions with respect to numerous modes of analysis.
+Our take in the current work is in line with much of this literature; however,
+in order to avoid making any explicit assumptions, we do not attempt to make
+formal  significance statements, and instead, broadly examine the stability of
+our conclusions with respect to numerous modes of analysis.
 
 \section{Methods}
 

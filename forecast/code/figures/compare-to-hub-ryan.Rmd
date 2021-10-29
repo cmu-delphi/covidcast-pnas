@@ -64,7 +64,7 @@ pop <- covidcast::state_census %>% select(ABBR, POPESTIMATE2019) %>%
   mutate(geo_value = tolower(ABBR)) %>% select(-ABBR)
 # scale from prop to num
 ours2 <- left_join(ours, pop, by = "geo_value") %>%
-  mutate(wis = wis * POPESTIMATE2019, #/ 1e5 * 7,
+  mutate(wis = wis, #* POPESTIMATE2019, #/ 1e5 * 7,
          forecaster = recode(forecaster,
                              AR3 = "AR",
                              AR3CHCLI3 = "CHNG-CLI",
@@ -77,14 +77,23 @@ ours2 <- left_join(ours, pop, by = "geo_value") %>%
 # Join sanity check
 nrow(ours) == nrow(ours2)
 ours = ours2
+```
 
+```{r}
 our_models <- ours %>% filter(forecaster != "Baseline")
 baseline <- ours %>% filter(forecaster == "Baseline") %>%
   select(-forecaster) %>% rename(strawman_wis = wis)
 our_models <- left_join(our_models, baseline)
 
-# Join sanity check
+# Sanity check: left join
 nrow(our_models) == nrow(ours) - sum(ours$forecaster == "Baseline")
+
+# Sanity check: missingness
+our_models %>%
+  group_by(forecaster) %>%
+  summarize(sum(is.na(wis)))
+
+our_models %>% summarize(sum(is.na(strawman_wis)))
 
 Mean <- function(x) mean(x, na.rm = TRUE)
 GeoMean <- function(x) exp(mean(log(x), na.rm = TRUE))
@@ -102,6 +111,7 @@ fcast_colors <- c(RColorBrewer::brewer.pal(5, "Set1"), "#000000")
 names(fcast_colors) <- c("CHNG-CLI", "CHNG-COVID", "CTIS-CLIIC", "DV-CLI",
                          "Google-AA", "AR")
 
+
 ggplot(all_time_performance %>% filter(ahead <= 21), 
        aes(ahead, value, color = forecaster)) +
   geom_line(aes(ahead, value, color = forecaster)) + 
@@ -113,6 +123,30 @@ ggplot(all_time_performance %>% filter(ahead <= 21),
   xlab("Days ahead") +
   facet_wrap(~ name, labeller = labeller(name = facet_labs), scales = "free_y") +
   theme(legend.position = "bottom", legend.title = element_blank())
+```
+
+```{r}
+p1 <- ours %>% 
+  group_by(forecaster, ahead) %>%
+  summarize(mean_wis = Mean(wis)) %>%
+  ggplot(aes(x = ahead, y = mean_wis, color = forecaster)) + 
+  geom_line() + geom_point() +   
+  xlab("Days ahead") + ylab("Mean WIS") + 
+  scale_color_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
+  theme_bw() +
+  theme(legend.position = "bottom", legend.title = element_blank())
+  
+p2 <- ours %>% 
+  group_by(forecaster, ahead) %>%
+  summarize(geomean_wis = GeoMean(wis)) %>%
+  ggplot(aes(x = ahead, y = geomean_wis, color = forecaster)) + 
+  geom_line() + geom_point() +   
+  xlab("Days ahead") + ylab("Geo mean WIS") + 
+  scale_color_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
+  theme_bw() +
+  theme(legend.position = "bottom", legend.title = element_blank())
+
+gridExtra::grid.arrange(p2, p1, nrow = 1)
 ```
 
 # Try with other code
