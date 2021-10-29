@@ -94,7 +94,13 @@ all_time_performance <- all_models %>%
   filter(forecast_date %in% common_fd) %>%
   group_by(forecaster, ahead, source) %>%
   summarise(rel_wis = Mean(wis) / Mean(strawman_wis),
-            geo_wis = GeoMean((wis + 1) / (strawman_wis + 1))) %>%
+            geo_wis = GeoMean((wis) / (strawman_wis))) %>%
+  pivot_longer(contains("wis"))
+
+our_performance <- our_models %>% 
+  group_by(forecaster, ahead) %>%
+  summarise(rel_wis = Mean(wis) / Mean(strawman_wis),
+            geo_wis = GeoMean((wis) / (strawman_wis))) %>%
   pivot_longer(contains("wis"))
 
 facet_labs <- c(geo_wis = "Geometric mean of WIS", rel_wis = "Mean of WIS")
@@ -102,14 +108,8 @@ fcast_colors <- c(RColorBrewer::brewer.pal(5, "Set1"), "#000000")
 names(fcast_colors) <- c("CHNG-CLI", "CHNG-COVID", "CTIS-CLIIC", "DV-CLI",
                          "Google-AA", "AR")
 
-
-ggplot(all_time_performance %>% filter(source == "ours"),
+ggplot(our_performance %>% filter(ahead > 6, ahead < 22),
        aes(ahead, value, color = forecaster)) +
-  geom_line(data = all_time_performance %>% filter(forecaster != "COVIDhub-ensemble"), 
-            aes(group = forecaster),
-            color = "grey80") +
-  geom_line(data = all_time_performance %>% filter(forecaster == "COVIDhub-ensemble"),
-            color = "lightblue", size = 1.5) +
   geom_line(aes(ahead, value, color = forecaster)) + 
   geom_point(aes(ahead, value, color = forecaster)) +
   scale_color_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
@@ -120,4 +120,47 @@ ggplot(all_time_performance %>% filter(source == "ours"),
   facet_wrap(~ name, labeller = labeller(name = facet_labs)) +
   theme(legend.position = "bottom", legend.title = element_blank())
 
-ggsave("paper/fig/compare-states-to-hub.pdf", width = 6.5, height = 4.5)
+ggsave(here::here("paper", "fig", "state-level-performance.pdf"),
+       width = 6.5, height = 4.5)
+
+
+ggplot(all_time_performance %>% 
+         filter(source == "hub", 
+                ! (forecaster %in% c("COVIDhub-ensemble", "OliverWyman-Navigator"))),
+       aes(ahead, value, group = forecaster)) +
+  geom_line(color = "grey80") +
+  geom_line(data = all_time_performance %>% 
+              filter(forecaster %in% c("COVIDhub-ensemble", "AR")),
+            aes(color = forecaster), size = 1) +
+  geom_point(data = all_time_performance %>% 
+              filter(forecaster %in% c("COVIDhub-ensemble", "AR")),
+            aes(color = forecaster), size = 2) +
+  theme_bw() +
+  scale_color_manual(values = c("AR" = "#d95f02", "COVIDhub-ensemble" = "#7570b3")) +
+  ylab("Score relative to baseline") +
+  geom_hline(yintercept = 1, size = 1.5) +
+  xlab("Days ahead") +
+  facet_wrap(~ name, labeller = labeller(name = facet_labs)) +
+  theme(legend.position = "bottom", legend.title = element_blank())
+
+ggsave(here::here("paper", "fig", "compare-states-to-hub.pdf"), 
+                  width = 6.5, height = 4.5)
+
+       
+# ggplot(all_time_performance %>% filter(source == "ours"),
+#        aes(ahead, value, color = forecaster)) +
+#   geom_line(data = all_time_performance %>% 
+#               filter(! (forecaster %in% c("COVIDhub-ensemble", "OliverWyman-Navigator"))), 
+#             aes(group = forecaster),
+#             color = "grey80") +
+#   geom_line(data = all_time_performance %>% filter(forecaster == "COVIDhub-ensemble"),
+#             color = "lightblue", size = 1.5) +
+#   geom_line(aes(ahead, value, color = forecaster)) + 
+#   geom_point(aes(ahead, value, color = forecaster)) +
+#   scale_color_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
+#   theme_bw() +
+#   ylab("Score relative to baseline") +
+#   geom_hline(yintercept = 1, size = 1.5) +
+#   xlab("Days ahead") +
+#   facet_wrap(~ name, labeller = labeller(name = facet_labs)) +
+#   theme(legend.position = "bottom", legend.title = element_blank())

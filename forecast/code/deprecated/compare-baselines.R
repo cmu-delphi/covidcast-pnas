@@ -7,7 +7,7 @@ s3bucket <- get_bucket("forecast-eval")
 
 
 # Point to the data Addison sent
-ours <- readRDS("~/Downloads/results_no_october_honest.RDS")
+ours <- readRDS(here::here("data", "results_honest_states.RDS"))
 baseline <- ours %>% filter(forecaster == "Baseline") %>%
   select(-forecaster) %>% rename(strawman_wis = wis)
 
@@ -51,6 +51,9 @@ comb <- left_join(bscores %>%
                   by = c("geo_value", "forecast_date", "target_end_date")) %>%
   filter(!is.na(strawman_wis), !is.na(wis))
 
+
+
+
 ggplot(comb, aes(wis, strawman_wis, color = geo_value)) + 
   geom_point() + 
   theme_bw() +
@@ -61,3 +64,15 @@ ggplot(comb, aes(wis, strawman_wis, color = geo_value)) +
   xlab("WIS of COVIDhub-baseline") + 
   ylab("WIS or our baseline") + 
   coord_equal()
+
+ncomb <- comb %>%
+  mutate(ahead = target_end_date - forecast_date) %>%
+  pivot_longer(contains("wis"), names_to = "forecaster") %>%
+  group_by(forecaster, ahead) %>%
+  summarise(wis  = Mean(value), geo_wis = GeoMean(value)) %>%
+  mutate(forecaster = recode(forecaster, wis = "Hub", strawman_wis = "Ours")) %>%
+  pivot_longer(contains("wis"))
+ggplot(ncomb, aes(as.character(ahead), value, fill = forecaster)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~name)
+  
