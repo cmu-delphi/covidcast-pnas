@@ -9,18 +9,14 @@ params:
   flag_jumps: 15
 ---
 
-
 <!-- PNAS materials -->
 
 <!-- Comment out or remove this line before generating final copy for submission; this will also remove the warning re: "Consecutive odd pages found". -->
-
-
 
 <!-- we need this -->
 \maketitle
 
 <!-- Adds the main heading for the SI text. Comment out this line if you do not have any supporting information text. -->
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, fig.width = 6.5, fig.height = 4.5,
