@@ -89,13 +89,18 @@ SIGNALS <- c("confirmed_7dav_incidence_prop",
 colors <- c("black", scales::hue_pal()(5))
 names <- c("Cases", "CHNG-CLI", "CHNG-COVID", "CTIS-CLI-in-community")
 
+Min <- function(x) min(x, na.rm = TRUE)
+Max <- function(x) max(x, na.rm = TRUE)
+
 # geo_labeler is a function from geo_value to human-readable name
 get_trend_grid <- function(trends, geo_labeler) {
-  case_max <- max(trends[[1]]$value)
+  case_min <- Min(trends[[1]]$value)
+  case_max <- Max(trends[[1]]$value)
 
   trends <- aggregate_signals(trends, format = "long") %>%
     group_by(signal) %>%
-    mutate(value = value / max(value, na.rm = TRUE) * case_max) %>%
+    mutate(value = (value - Min(value)) / (Max(value) - Min(value)) * 
+             case_max + case_min) %>%
     ungroup() %>%
     mutate(signal = factor(signal, levels = SIGNALS, labels = names),
            geo_value = geo_labeler(geo_value))
@@ -122,7 +127,7 @@ state_trends <- covidcast_signals(
 g <- get_trend_grid(state_trends, function(val) { abbr_to_name(toupper(val)) })
 ```
 
-```{r state-trend-grids-1, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for U.S. states and territories. Cases are displayed on the rate scale: counts per 100,000 people. Other signals are scaled to have the same global maximum across all counties and times, so they can be presented in the same range. (Part 1 of 4.)", fig.height=8}
+```{r state-trend-grids-1, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for U.S. states and territories. Cases are displayed on the rate scale: counts per 100,000 people. Other signals are scaled to have the same global range across all counties and times. (Part 1 of 4.)", fig.height=8}
 g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 1)
 ```
 
@@ -181,7 +186,7 @@ county_trends <- append(county_trends_nochng, county_trends_chng[1])
 county_trends <- append(county_trends, county_trends_chng[2])
 ```
 
-```{r county-trend-grids-1, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for the 50 most populous U.S. counties. Cases are displayed on the rate scale: counts per 100,000 people. Other signals are scaled to have the same global maximum across all counties and times, so they can be presented in the same range. (Part 1 of 4.)", fig.height=8}
+```{r county-trend-grids-1, fig.cap="Trends of cases, CHNG-CLI, CHNG-COVID, and CTIS-CLI-in-community for the 50 most populous U.S. counties. Cases are displayed on the rate scale: counts per 100,000 people. Other signals are scaled to have the same global range across all counties and times. (Part 1 of 4.)", fig.height=8}
 g <- get_trend_grid(
   county_trends,
   function(fipsen) {
@@ -212,7 +217,7 @@ g + facet_wrap_paginate(vars(geo_value), ncol = 3, nrow = 5, page = 4)
 
 \clearpage
 
-```{r hospitalization_time_trends_national, fig.cap="National trends, from August 2020 to August 2021, of HHS-reported confirmed COVID-19 hospital admissions, along with several signals from the COVIDcast API. (HHS data was not consistently reported before August 2020; furthermore, as with cases in the previous trend plots, the HHS data has been smoothed using a 7-day trailing average.) Hospitalizations are displayed on the rate scale: counts per 100,000 people. Other signals are scaled to have the same maximum value. HSP-Hosp is the percentage of new hospital admissions with COVID-associated diagnoses, based on claims data from health system partners (smoothed in time and adjusted for systematic day-of-week effects)."}
+```{r hospitalization_time_trends_national, fig.cap="National trends, from August 2020 to August 2021, of HHS-reported confirmed COVID-19 hospital admissions, along with several signals from the COVIDcast API. (HHS data was not consistently reported before August 2020; furthermore, as with cases in the previous trend plots, the HHS data has been smoothed using a 7-day trailing average.) Hospitalizations are displayed on the rate scale: counts per 100,000 people. Other signals are scaled to have the same range. HSP-Hosp is the percentage of new hospital admissions with COVID-associated diagnoses, based on claims data from health system partners (smoothed in time and adjusted for systematic day-of-week effects)."}
 start_day = "2020-08-15"
 end_day = "2021-08-15"
 as_of_day = "2021-09-01"
@@ -257,11 +262,13 @@ hosp_signal_data[[1]] <- postprocess_hhs_hosp_df(
   state_census %>% transmute(geo_value=tolower(ABBR), population=POPESTIMATE2019)
 )
 
-hosp_main_signal_max <- max(hosp_signal_data[[1]]$value, na.rm=TRUE)
+hosp_main_signal_min <- Min(hosp_signal_data[[1]]$value)
+hosp_main_signal_max <- Max(hosp_signal_data[[1]]$value)
 
 hosp_rescaled <- aggregate_signals(hosp_signal_data, format = "long") %>%
   group_by(signal) %>%
-  mutate(value = value / max(value, na.rm=TRUE) * hosp_main_signal_max) %>%
+    mutate(value = (value - Min(value)) / (Max(value) - Min(value)) * 
+             hosp_main_signal_max + hosp_main_signal_min) %>%
   ungroup()
 
 hosp_rescaled$signal <- factor(hosp_rescaled$signal, levels=HOSP_SIGNALS, labels=hosp_names)
