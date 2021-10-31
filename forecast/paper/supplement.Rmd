@@ -212,7 +212,7 @@ plotter(fcasts_honest,
 
 <!-- Comparison to the Hub -->
 
-```{r compare-to-hub, fig.cap="Forecast performance for AR and indicators models, each retrained at the state level, compared to models submitted to the COVID-19 Forecast Hub over the same period. The thin grey lines individual models from the Hub; the blue line is the Hub ensemble model. (Note that, to align prediction dates as best as possible, we look at the AR and indicator model forecasts for 5, 12, 19, and 26 days ahead; this roughly corresponds to 1, 2, 3, and 4 weeks ahead, respectively, since in the Hub, models typically submit forecasts on a Tuesday for the epiweeks aligned to end on each of the following 4 Saturdays.)"}
+```{r compare-to-hub, fig.cap="Forecast performance for AR and indicator models, each retrained at the state level, compared to models submitted to the COVID-19 Forecast Hub over the same period. The thin grey lines are individual models from the Hub; the blue line is the Hub ensemble model. (To align prediction dates as best as possible, we look at the AR and indicator model forecasts for 5, 12, 19, and 26 days ahead; this roughly corresponds to 1, 2, 3, and 4 weeks ahead, respectively, since in the Hub, models typically submit forecasts on a Tuesday for the epiweeks aligned to end on each of the following 4 Saturdays.)"}
 knitr::include_graphics("fig/compare-states-to-hub.pdf")
 ```
 

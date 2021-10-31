@@ -22,7 +22,7 @@ retrospective evaluations of forecasters.
 
 \chngcli~(and, to a lesser extent, the other claims-based signals) is the most
 affected by this distinction, reflecting the latency in claims-based reporting.
-This underscores the importance of efforts to provide ``nowcasts'' for claims
+This highlights the importance of efforts to provide ``nowcasts'' for claims
 signals (which corresponds to a 0-ahead forecast of what the claims signal's
 value will be once all data has been collected). Looking at the \chngcli~and
 \dv~curves in Figure \ref{fig:fcast-finalized}, we can see that they perform
@@ -30,7 +30,7 @@ very similarly when trained on the finalized data.  This is reassuring because
 they are, in principle, measuring the same thing (namely, the percentage of
 outpatient visits that are primarily about COVID-related symptoms), but based on
 data from different providers.  The substantial difference in their curves in
-Figure 3 of the main paper must therefore reflect their having very different
+Figure 3 of the main paper must, therefore, reflect their having very different
 backfill profiles. 
   
 While using finalized rather than vintage data affects \dv~the least for
@@ -104,8 +104,8 @@ trained---using a quantile loss to directly estimate multiple conditional
 quantiles, a trailing training window of 21 days, pooling across all locations
 jointly, and fitting to case rates rather than counts (as we do in all our
 models in the main paper)---can be robust and effective, performing
-competitively many of the top models from COVID-19 Forecast Hub, including the
-Hub ensemble model.
+competitively to the top models submitted to the COVID-19 Forecast Hub,
+including the Hub's ensemble model.
 
 The closest forecast target in the Hub to that used in the main paper is 
 state-level case incidence over an epiweek---defined by the sum of new case
@@ -128,11 +128,12 @@ difference is not easy to adjust post hoc due to nonlinearity of the quantiles
 combination of their quantiles, but rather, depends intricately on the
 correlations between the random variables).    
 
-Therefore, to make a comparison to models in the Hub as direct as possible, we
+Therefore, to make the comparison to models in the Hub as direct as possible, we
 retrained our models over the same forecast period as in the main paper, and
 with the same general setup entirely, except at the state rather than HRR level.
 We then rescaled them post hoc to account for the different temporal resolution
-and the rate versus count scale (first and third points in the above list).  The
+and the rate-versus-count scaling (first and third points in the above list).
+The 
 results are given in Figure \ref{fig:compare-to-hub}.  The evaluation was
 carried out exactly as in the main paper, and the figure displays both mean WIS
 and geometric mean WIS, as a function of ahead, relative to the baseline model.
@@ -146,7 +147,7 @@ By either metric, mean or geometric mean WIS relative to baseline, we can see
 in Figure \ref{fig:compare-to-hub} that the AR model examined in this paper is 
 competitive with top models in the Hub, even outperforming the Hub ensemble
 model for smaller ahead values.  The same general conclusion can be drawn for
-the indicators models as well.  However, interestingly, a close inspection
+the indicator-assisted models as well.  However, interestingly, a close inspection
 reveals that the AR model here is for the most part in the ``middle of the
 pack'' when compared to the indicator models, and only the Google-AA model
 offers clear improvement over AR for all aheads.  This is likely due to the fact
