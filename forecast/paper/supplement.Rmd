@@ -384,7 +384,7 @@ up_down_df <- left_join(corr_df %>%
   inner_join(up_down, by = c("geo_value","target_end_date"))
 ```
 
-```{r upswing-summary, fig.cap="Average difference between the WIS of the AR model and of the indicator models. The indicator models generally do best during down and flat periods."}
+```{r upswing-summary, fig.cap="Average difference between the WIS of the AR model and of the indicator models, separated into up, down, and flat periods. The indicator models generally do best during down and flat periods."}
 up_down_df_summary <- up_down_df %>%
   group_by(forecaster, udf) %>%
   summarise(mean = Mean(AR_wis - wis))
@@ -396,7 +396,7 @@ up_down_df_summary %>%
   scale_y_continuous() +
   theme_bw() +
   geom_hline(yintercept = 0, linetype = "dashed") +
-  ylab("Mean of WIS(AR) - WIS(F)") +
+  ylab("Mean of AR WIS - forecaster WIS") +
   xlab("") +
   theme(legend.position = "bottom", legend.title = element_blank())
 ```  
@@ -421,7 +421,7 @@ up_down_df %>%
 
 \clearpage
 
-```{r hotspots-upswing-downswing, fig.cap="Classification and loglikelihood separated into periods of upswing, downswing, and flat cases. Like the analysis of the forecasting task in the main paper (see Figure 7), relative performance is better during down and flat periods."}
+```{r hotspots-upswing-downswing, fig.cap="Percentage change in classification error and log likelihood, relative that of the AR model, separated into up, down, and flat periods. Like the analogous forecasting analysis, the indicator models generally do better during down and flat periods."}
 hot_udf <- inner_join(
   hotspots_honest,
   up_down %>% select(geo_value, target_end_date, udf))
@@ -470,7 +470,7 @@ bind_rows(con_tab %>% mutate(err = "Classification error"),
   theme_bw() +
   geom_hline(yintercept = 0, linetype = "dashed") +
   facet_wrap(~err) +
-  ylab("Change relative to AR") +
+  ylab("% change relative to AR") +
   xlab("") +
   theme(legend.position = "bottom", legend.title = element_blank())
 ```
@@ -506,7 +506,7 @@ pct_chng_df <- comparison_df %>%
       abs(wis_ratio - 1), pct_change,method = "spearman"), .groups = "drop")
 ```
 
-```{r cor-wis-ratio, fig.cap="Histograms of the Spearman correlation between the ratio of AR to AR WIS with the percent change in smoothed case rates relative to 7 days earlier."}
+```{r cor-wis-ratio, fig.cap="Histograms of the Spearman correlation between the ratio of forecaster WIS to AR WIS with the % change in case rates, relative to case rates 7 days earlier."}
 ggplot(pct_chng_df %>% 
          group_by(forecaster) %>% 
          mutate(median = median(cor_wisratio_pctchange)), 
@@ -518,13 +518,13 @@ ggplot(pct_chng_df %>%
   geom_vline(aes(xintercept = median), linetype = "dotted") + 
   geom_vline(xintercept = 0) +
   facet_wrap(~forecaster) + 
-  xlab("Spearman correlation") + ylab("Relative frequency") +
+  xlab("Spearman correlation") + ylab("Frequency") +
   scale_y_continuous(labels = scales::label_percent(accuracy = .1))
 ```
 
 \clearpage
 
-```{r upswing-corr-table, fig.cap="Correlation of the difference in WIS with the difference in median predictions for the AR model relative to the indicator-assisted forecaster. In down periods, improvements in forecast risk are highlycorrelated with lower median predictions. The opposite is true in up periods. This suggests, as one might expect that improved performance of the indicator-assisted model is attributable to being closer to the truth then the AR model. This conclusion is stronger in down periods then in up periods."}
+```{r upswing-corr-table, fig.cap="Correlation of the difference in WIS with the difference in median predictions (each difference being between the AR model and an indicator model), separated into up, down, and flat periods. In down periods, improvements in forecast error are highly correlated with lower median predictions. The opposite is true in up periods, but the conclusion here appears to be weaker."}
 up_down_df %>% 
   group_by(forecaster, udf) %>%
   summarise(cor = cor(AR_wis - wis, AR_med - med)) %>%
@@ -532,31 +532,14 @@ up_down_df %>%
   geom_bar(width = 0.6, position = position_dodge(width=0.6),
            stat = "identity") +
   scale_fill_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
-  theme_bw() +
+  theme_bw() + ylab("Correlation") + xlab("") +
   geom_hline(yintercept = 0, linetype = "dashed") +
   theme(legend.position = "bottom", legend.title = element_blank())
-
-# up_down_df %>% 
-#   filter(period != "jm") %>% 
-#   group_by(forecaster, udf) %>%
-#   summarise(cor = cor(AR_wis - wis, AR_med - med)) %>%
-#   pivot_wider(names_from = forecaster, values_from = cor) %>%
-#   kableExtra::kbl(
-#     booktabs = TRUE, digits = 2, centering = TRUE,
-#     caption = paste("Correlation of the difference in WIS between the AR",
-#                    "model with the difference in median predictions. In down",
- #                   "periods, improvements in forecast risk are highly",
-#                    "correlated with lower median predictions. The opposite",
-#                    "is true in up periods. This suggests, as one might expect",
-#                    "that improved performance of the indicator-assisted",
-#                    "model is attributable to being closer to the truth then",
-#                    "the AR model. This conclusion is stronger in down",
-#                    "periods then in up periods."))
 ```
 
 \clearpage
 
-```{r upswing-summary-remake, fig.cap="Percent change in average WIS of the forecaster (AR or indicator assisted) relative to the baseline. All models perform poorly durning down periods, but the indicators help. During flat periods, the indicators improve slightly over the AR. During up periods, all forecasters do much better than the baseline, but only some do as well as AR."}
+```{r upswing-summary-remake, fig.cap="Percentage change in average WIS of the forecaster (AR or indicator assisted), relative to the baseline. All models perform poorly durning down periods, but the indicators help. During flat periods, the indicators improve slightly over the AR. During up periods, all forecasters do much better than the baseline, but only some do as well as AR."}
 up_down_df_summary <- inner_join(
   left_join(
     corr_df, 
@@ -572,7 +555,7 @@ up_down_df_summary %>%
   theme_bw() +
   scale_y_continuous(labels = scales::percent_format()) +
   geom_hline(yintercept = 0, linetype = "dashed") +
-  ylab("% change in Forecaster WIS\n relative to Baseline") +
+  ylab("% change in WIS relative to baseline") +
   xlab("") +
   theme(legend.position = "bottom", legend.title = element_blank())
 ```  
@@ -674,7 +657,7 @@ df2 %>%
         legend.background = element_rect(fill = "transparent"))
 ```
 
-```{r ccf-dv-finalized, eval=TRUE, fig.cap="Illustration of the cross-correlation function between DV-CLI and cases. The left panel shows the standardized signals over the period from August 1 to September 28 (as of May 15, 2021). The right panel shows $\\CCF_{\\ell}(a)$ for different values of $a$ as vertical blue bars. The orange dashed lines indicate the 95\\% significance threshold. By our leadingness/laggingness metric, DV-CLI is leading (but notlagging) cases over this period."}
+```{r ccf-dv-finalized, fig.cap="Illustration of the cross-correlation function between DV-CLI and cases. The left panel shows the standardized signals over the period from August 1 to September 28 (as of May 15, 2021). The right panel shows $\\CCF_{\\ell}(a)$ for different values of $a$ as vertical blue bars. The orange dashed lines indicate the 95\\% significance threshold. By our leadingness/laggingness metric, DV-CLI is leading (but not lagging) cases over this period."}
 source(here("code", "figures", "ccf-dv-finalized.R"))
 gg
 ```
@@ -734,7 +717,7 @@ source(here("code", "figures", "trajectory.R"))
 
 <!-- Cumulative Mean -->
 
-```{r cumulative-mean, fig.cap="This figure shows the cumulative sum of WIS for each forecaster divided by the cumulative sum of WIS for the baseline model. The shaded background shows total U.S. cases as reported by JHU-CSSE for the 14-day ahead target. Hashes along the $x$-axis denote weeks." }
+```{r cumulative-mean, fig.cap="Cumulative sum of WIS for each forecaster divided by the cumulative sum of WIS for the baseline model. The shaded background shows national case incidence for the 14-day ahead target. Hashes along the x-axis denote weeks." }
 cumulatives <- fcasts_honest %>%
   group_by(forecaster, forecast_date) %>%
   summarise(mw = Mean(wis),
@@ -757,13 +740,13 @@ ticks <- seq(min(us_cases$time_value), max(us_cases$time_value), by = 7) - 14
 
 
 ggplot(cumulatives %>% filter(forecast_date < "2021-01-01")) + 
-  geom_line(aes(forecast_date, y = `Cumulative Sum`, color = forecaster)) +
+  geom_line(aes(forecast_date, y = `Cumulative sum`, color = forecaster)) +
   annotate(x = us_cases$time_value - 14, ymax = us_cases$value, ymin = -Inf,
            geom = "ribbon", alpha = .1) +
   annotate("segment", x=ticks, y=-Inf, xend = ticks, yend = .77, 
                color = "grey70") +
   geom_hline(yintercept = 1, linetype = "dashed") +
-  xlab("forecast date") +
+  xlab("Forecast date") + ylab("Cumulative sum") +
   coord_cartesian(#ylim = c(.76, 1), 
                   xlim = ymd(c("2020-06-01", "2021-01-01"))) +
   scale_x_date(date_breaks = "2 months", date_minor_breaks = "1 week",
@@ -776,7 +759,7 @@ ggplot(cumulatives %>% filter(forecast_date < "2021-01-01")) +
 
 \clearpage
 
-```{r cumulative-geo-mean, fig.cap="This figure shows the cumulative geometric mean of WIS for each forecaster divided by the WIS for the baseline model. The shaded background shows total U.S. cases as reported by JHU-CSSE for the 14-day ahead target. Hashes along the $x$-axis denote weeks." }
+```{r cumulative-geo-mean, fig.cap="Cumulative geometric mean of WIS for each forecaster divided by WIS for the baseline model. The shaded background shows national case incidence for the 14-day ahead target. Hashes along the x-axis denote weeks." , eval=FALSE}
 ggplot(cumulatives %>% filter(forecast_date < "2021-01-01")) + 
   geom_line(aes(forecast_date, y = `Cumulative Geo Mean`, color = forecaster)) +
   annotate(x = us_cases$time_value - 14, ymax = us_cases$value, ymin = -Inf,
@@ -784,7 +767,7 @@ ggplot(cumulatives %>% filter(forecast_date < "2021-01-01")) +
   annotate("segment", x=ticks, y=-Inf, xend = ticks, yend = .77, 
                color = "grey70") +
   geom_hline(yintercept = 1, linetype = "dashed") +
-  xlab("forecast date") + ylab("Cumulative Geometric Mean") +
+  xlab("Forecast date") + ylab("Cumulative geo mean") +
   coord_cartesian(#ylim = c(.76, 1), 
                   xlim = ymd(c("2020-06-01", "2021-01-01"))) +
   scale_x_date(date_breaks = "2 months", date_minor_breaks = "1 week",
@@ -797,7 +780,7 @@ ggplot(cumulatives %>% filter(forecast_date < "2021-01-01")) +
 
 \clearpage
 
-```{r errs-in-space, fig.cap="Percent improvement in WIS relative to the AR forecaster by region (negative numbers indicate improved performance, positives indicate worsening)."}
+```{r errs-in-space, fig.cap="Percentage improvement in WIS, relative to the AR forecaster, by HRR (negative numbers indicate improved performance, positives indicate worsening)."}
 # fig.height = 9.6, fig.width = 6, out.width = "5in", out.height="8in", 
 by_hrr <- fcasts_honest %>% 
   group_by(forecaster, geo_value) %>% 

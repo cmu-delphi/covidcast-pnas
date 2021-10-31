@@ -210,8 +210,8 @@ indicator model uses 6 features, corresponding to the 3 autoregressive terms and
 the 3 lagged indicator values.  To form noise indicator features, we replace
 their values with those from a randomly chosen time-space pair (while keeping
 the autoregressive features fixed).  In particular, at each location $\ell$ and
-time $t$, for the forecasting task we replace the triplet \smash{$(X_{\ell,t},
-X_{\ell,t-7}, X_{\ell,t-14})$} in Eq.\ (3) of the main
+time $t$, for the forecasting task we replace the triplet $(X_{\ell,t},
+X_{\ell,t-7}, X_{\ell,t-14})$ in Eq.\ (3) of the main
 paper with the triplet \smash{$(X_{\ell^*,t^*}, X_{\ell^*,t^*-7},
   X_{\ell^*,t^*-14})$}, where $(\ell^*,t^*)$ is a location-time pair sampled with
 replacement from the 6,426 total location-time pairs.  Likewise in the hotspot 
@@ -225,41 +225,42 @@ dismiss the implicit regularization hypothesis.
 
 \section{Upswings and Downswings}
 
-In this section, we provide extra details about the up/down/flat analysis
-described in the main manuscript. Figure \ref{fig:upswing-summary} shows the
-overall results, examining the average difference $\WIS(AR) - \WIS(F)$ in
-period. Figure \ref{fig:hotspots-upswing-downswing} shows the same information
-for the hotspot task. On average, during downswings and flat periods, the
-indicator models have lower classification error and higher log likelihood than
-the AR model. For hotspots, both Google-AA and CTIS-CLIIC perform better than
-the AR model during upswings, in contrast to the forecasting task, where only
-Google-AA improves. For a related analysis, Figure \ref{fig:cor-wis-ratio} shows
-histograms of the Spearman correlation (Spearman's $\rho$, a rank-based measure
-of association) between the $\WIS(F)/\WIS(AR)$ and the magnitude of the
-swing. Again we see that case rate increases are positively related to
-diminished performance of the indicator models.
+In this section, we provide extra details about the upswing/downswing analysis
+described in the main manuscript, Section 2.C. Figure \ref{fig:upswing-summary}
+shows the overall results, examining the average difference $\WIS(\mathrm{AR}) - 
+\WIS(F)$ for each forecaster $F$, in each in each period.  Figure
+\ref{fig:hotspots-upswing-downswing} shows the same information for the hotspot 
+task.  On average, during downswings and flat periods, the indicator models have
+lower classification error and higher log likelihood than the AR model.  For
+hotspots, both Google-AA and CTIS-CLIIC perform better than the AR model during
+upswings, in contrast to the forecasting task, where only Google-AA improves.
+In a related analysis, Figure \ref{fig:cor-wis-ratio} shows histograms of the
+Spearman correlation (Spearman's $\rho$, a rank-based measure of association)
+between the ratio $\WIS(F)/\WIS(\mathrm{AR})$ and the magnitude of the swing.
+Again we see that case rate increases are positively related to diminished
+performance of the indicator models.
 
 One hypothesis for diminished relative performance during upswings is that the
-AR model tends to overpredict downswings and underpredict upswings. Adding
+AR model tends to overpredict downswings and underpredict upswings.  Adding
 indicators appears to help avoid this behavior on the downswing but not as much
-on upswings. Figure \ref{fig:upswing-corr-table} shows the correlation between
-between $\WIS(AR) - \WIS(F)$ and the difference of their median forecasts.
-During downswings, this correlation is large, implying that improved relative
-performance of $F$ is related to making lower forecasts than the AR model. The
-opposite is true during upswings. This is largely to be expected. However, the
-relationship attenuates in flat periods and during upswings. That is, when
-performance is better in those cases, it may be due to other factors than simply
-making predictions in the correct direction, for example, narrower confidence
-intervals.
+on upswings.  Figure \ref{fig:upswing-corr-table} shows the correlation between
+between $\WIS(\mathrm{AR}) - \WIS(F)$ and the difference of their median
+forecasts.  During downswings, this correlation is large, implying that improved
+relative performance of $F$ is related to making lower forecasts than the AR
+model.  The opposite is true during upswings.  This is largely to be expected.
+However, the relationship attenuates in flat periods and during upswings. That
+is, when performance is better in those cases, it may be due to other factors
+than simply making predictions in the correct direction, for example, narrower
+confidence intervals.
 
-It is important to note, that even though some indicators, notably CHNG-COVID 
-and CHNG-CLI underperform relative to the AR model during upswings, all models 
-dramatically outperform the baseline in such periods. Figure 
-\ref{fig:upswing-summary-remake} shows the performance of all forecasters relative
-to the null model. All forecasters suffer relative to the baseline during down 
-periods, but the AR is the worst. In contrast, all models beat the baseline
-during up periods, even CHNG-COVID and CHNG-CLI, though not by quite as much as the
-AR does.
+It is important to note that, even though some indicators---notably CHNG-COVID
+and CHNG-CLI---underperform relative to the AR model during upswings, all models
+dramatically outperform the baseline in such periods.  Furthermore, Figure
+\ref{fig:upswing-summary-remake} shows the performance of all forecasters
+relative to the baseline model.  All forecasters suffer relative to the baseline
+during down periods, but the AR is the worst. In contrast, all models beat the
+baseline during up periods, even CHNG-COVID and CHNG-CLI, though not by quite as
+much as the AR does.
 
 \section{Leadingness and Laggingness}
 
@@ -267,26 +268,17 @@ In Section 2.D of the main text, we discuss the extent to which the indicators
 are leading or lagging case rates during different periods. To define the amount
 of leadingness or laggingness at location $\ell$, we use the cross correlation
 function (CCF) between the two time series. The $\CCF_\ell(a)$ of an indicator
-$X_{\ell}$ and case rates $Y_{\ell}$ is defined as
-% \[
-% \CCF_{\ell,t}(a) = \frac{1}{n_a} \sum_{i=1}^{n_a} \left( ( X_{\ell,t,i+a} -
-%   \overline{X}_{\ell,t}) / s^{X}_{\ell,t}\right) \left( ( Y_{\ell,t,i} -
-%   \overline{Y}_{\ell,t}) / s^{Y}_{\ell,t}\right), 
-% \]
-% where $n_a$ is the number of available time points when $X_{\ell,t}$ has been
-% shifted in time by $a$ days, and $\overline{X}_{\ell,t}$, $s^X_{\ell,t}$
-% are the sample mean and
-% standard deviation of $X_{\ell,t}$ (respectively $Y_{\ell,t}$). The result is a
-their Pearson correlation where $X_\ell$ has been aligned with the values of
-$Y_{\ell}$ that occurred $a$ days earlier.  Thus, for any $a>0$,
-$\CCF_{\ell}(a)>0$ indicates that $Y_{\ell,t}$ is moving together with
-$X_{\ell,t+a}$.  In this case we say that $X_{\ell}$ is lagging $Y_{\ell}$. For
-$a<0$, $\CCF_{\ell}(a)>0$ means that $Y_{\ell,t}$ is positively correlated with
-$X_{\ell,t-a}$, so we say that $X_{\ell}$ leads $Y_{\ell}$.
+series $X_{\ell}$ and case rate series $Y_{\ell}$ is defined as their Pearson 
+correlation where $X_\ell$ has been aligned with the values of $Y_{\ell}$ that
+occurred $a$ days earlier.  Thus, for any $a>0$, $\CCF_{\ell}(a)>0$ indicates
+that $Y_{\ell,t}$ is moving together with $X_{\ell,t+a}$.  In this case we say
+that $X_{\ell}$ is lagging $Y_{\ell}$. For $a<0$, $\CCF_{\ell}(a)>0$ means that
+$Y_{\ell,t}$ is positively correlated with $X_{\ell,t-a}$, so we say that
+$X_{\ell}$ leads $Y_{\ell}$.
 
 Figure \ref{fig:ccf-dv-finalized} shows the standardized signals for the HRR
 containing Charlotte, North Carolina, from August 1, 2020 until the end of
-September. These are the same signals shown in Figure 1 in the manuscript but
+September. These are the same signals shown in Figure 1 in the manuscript, but 
 using finalized data. To define ``leadingness'' we compute $\CCF_{\ell}(a)$ (as
 implemented with the R function {\tt ccf()}) for each $a\in \{-15,\ldots,15\}$
 using the 56 days leading up to the target date. This is the same amount of data
@@ -303,12 +295,12 @@ leadingness will be the sum of those values while laggingness is 0: on September
 28 in Charlotte, \dv~is leading cases leading but not lagging.
 
 Figure \ref{fig:lagging-only} shows the correlation between laggingness and the
-difference in indicator WIS and AR WIS. Unlike leadingness (Figure 5 in the
+difference in forecaster WIS and AR WIS. Unlike leadingness (Figure 5 in the
 manuscript) there is no obvious relationship that holds consistently across
-indicators. This is heartening as laggingness should not aid forecasting
+indicators. This is encouraging as laggingness should not aid forecasting 
 performance. On the other hand, if an indicator is more lagging than it is
 leading, this may suggest diminished performance.
-Figure~\ref{fig:diff-in-lead-lag} shows the correlation of the difference in
+Figure \ref{fig:diff-in-lead-lag} shows the correlation of the difference in
 leadingness and laggingness with the difference in WIS. The pattern here is
 largely similar to the pattern in leadingness described in the manuscript: the
 relationship is strongest in down periods and weakest in up periods with the
@@ -319,51 +311,35 @@ have used the finalized data, and we look at the behavior at the target date of
 the forecast. That is we are using the same data to evaluate predictive accuracy
 as to determine leadingness and laggingness. It should be noted that the
 leadingness of the indicator at the time the model is trained may also be
-important. Thus, we could calculate separate leadingness and laggingness scores
+important.  Thus, we could calculate separate leadingness and laggingness scores
 for the trained model and for the evaluation data and examine their combination
-in some way. We do not pursue this combination further and leave this
-investigation for future work.
+in some way.  However, we do not pursue this further.
 
-% \section{Examining data in 2021}
-
-% In this section, we investigate the sensitivity of the results to the
-% period over which we train and evaluate the models.  In the main
-% paper, we end all evaluation on December 31, 2020.  Figures
-% \ref{fig:fcast-alldates}--\ref{fig:hot-alldates} show how the
-% results would differ if we extended this analysis through March
-%   31, 2021. Comparing Figure \ref{fig:fcast-alldates} to Figure 3 of
-% the main paper, one sees that as ahead increases most methods now improve
-% relative to the baseline forecaster. When compared to other methods, 
-% \chngcli~appears much better than
-% it had previously; however, all forecasters other than \chngcov~and
-% \dv~are performing less well relative to the baseline than before.
-% These changes are likely due to the differing nature of the pandemic
-% in 2021, with flat and downward trends much more common than upward
-% trajectories.  Indeed, the nature of the hotspot prediction problem is
-% quite different in this period.  With a 21-day training window, it is
-% common for there to be many fewer hotspots in training.
-
-\section{Aggregation Over Time and Space}
+\section{Disaggregation Over Time and Space}
 
 Following the suggestion of an anonymous reviewer, we investigate two
 other disaggregated versions of the main forecasting result shown in Figure 3 on the
-manuscript. The first (Figure \ref{fig:cumulative-mean}) displays the cumulative
-error (summed over all horizons) of each forecaster divided by the cumulative
-error of the baseline.  This perspective should illustrate how the models
-perform over time, drawing attention to any nonstationary behavior.  During the
-initial increase in cases in July 2020, CTIS-CLIIC and Google-AA gain a lot
-relative to the AR model. All the indicators do much better than the AR model
-during the following downturn (the ebb of the second wave). The AR model
-actually improves over the indicators in October 2020, before losing a bit in
-late November. The second (Figure \ref{fig:cumulative-geo-mean}) repeats this 
-analysis but aggregating by Geometric mean as described above and displays a
-similar pattern.
+manuscript. Below we use the term ``error'' to refer to the WIS summed over all
+ahead values.  The first (Figure \ref{fig:cumulative-mean}) displays the
+cumulative error, up through any point in time, of each forecaster divided by
+the cumulative error of the baseline.  This perspective should illustrate how
+the models perform over time, drawing attention to any nonstationary behavior.
+During the initial increase in cases in July 2020, CTIS-CLIIC and Google-AA gain
+quite a bit acurracy compared to the AR model.  All the indicators do much
+better than the AR model during the following downturn (the ebb of the second 
+wave). The AR model actually improves over the indicators in October 2020,
+before losing a bit in late November. % The second (Figure
+% \ref{fig:cumulative-geo-mean}) repeats this analysis but aggregating by 
+% geometric mean, and presents a similar message.  
 
-Figure \ref{fig:errs-in-space} examines the spatial behavior over the entire
-period of the indicator models relative to the AR. For ease of
-comparison, we show the percent improvement in each HRR. Negative numbers (blue)
-mean that the indicator helped while positives (red) mean that the indicator
-hurt forecasting performance. The clear pattern is that in most HRRs, the
-indicators improved performance, though usually by small amounts (2.5\%--10\%).
-In some isolated HRRs, performance was markedly worse, though there does not
-appear to be any particular pattern to these locations.
+Figure \ref{fig:errs-in-space} examines the spatial behavior of errors over the
+entire period of the indicator models relative to the AR.  For ease of
+comparison, we show the percent improvement in each HRR.  Negative numbers
+(blue) mean that the indicator helped while positives (red) mean that the
+indicator hurt forecasting performance.  The clear pattern is that in most HRRs,
+the indicators improved performance, though usually by small amounts
+(2.5\%--10\%).  In some isolated HRRs, performance was markedly worse, though
+there does not appear to be any particular pattern to these locations.
+Interestingly, the geographic patterns of improvement differ quite a lot in
+between the indicators.  This suggests that a forecasting model that carefully
+combines all of indicators could be a considerable improvement. 
