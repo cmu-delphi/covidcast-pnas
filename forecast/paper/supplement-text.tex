@@ -46,52 +46,121 @@ indicators and by revisions to the case rates.  And in the case of the
 \gs~model, in which we only used finalized values for the \gs~indicator, the
 difference in performance can be wholly attributed to revisions of case rates. 
 
-\section{Aggregation with Geometric Mean}
+\section{Aggregation With Geometric Mean}
 
-In this section, we consider using the geometric mean instead of the arithmetic
-mean when aggregating the weighted interval score (WIS) across location-time
-pairs.  There are three reasons why using the geometric mean may be desirable.
+In this section, we consider using the geometric mean instead of the usual
+(arithmetic) mean when aggregating the weighted interval score (WIS) across
+location-time pairs.  There are two reasons why using the geometric mean may be
+desirable.
+
 \begin{enumerate}
 \item WIS is right-skewed, being bounded below by zero and having occasional 
   very large values.  Figure \ref{fig:wis-densities} illustrates that the
-  densities appear roughly log-Gaussian.  The geometric mean is a natural choice  
-  in such a context since the relative ordering of forecasters is determined by
-  the arithmetic mean of the {\em logarithm} of their WIS values.
+  densities appear roughly log-Gaussian.  The geometric mean is a natural choice   
+  in such a context since it can be viewed as a measure of centrality on the log
+  scale (it is the exponential of the arithmetic mean of log values).
 \item In the main paper, we report the ratio of the mean WIS of a forecaster to
   the mean WIS of the baseline forecaster. Another choice could be to take the
   mean of the ratio of WIS values for the two methods. This latter choice would
   penalize a method less for doing poorly where the baseline forecaster also
-  does poorly.  Using instead the geometric mean makes the order of aggregation
-  and scaling immaterial since the ratio of geometric means is the same as the 
-  geometric mean of ratios.
-\item If one imagines that a forecaster's WIS is composed of multiplicative
-  space-time effects $S_{\ell,t}$ shared across all forecasters,
-  i.e., $\WIS(F_{\ell,t,f},Y_{\ell,t})=S_{\ell,t}E_{f,t}$ with $E_{f,t}$ a
-  forecaster-specific error, then taking the ratio of two forecasters' geometric
-  mean WIS values will effectively cancel these space-time effects. 
+  does poorly.\footnote{In a sense, this is implicitly estimating a
+    nonparametric space-time effect for forecaster error, and assuming that has
+    a shared, multiplicative contribution to forecaster errors.  That is, if one
+    imagines that a forecaster's WIS is composed of multiplicative space-time
+    effects $S_{\ell,t}$ shared across all forecasters,
+    $\WIS(F_{\ell,t,f},Y_{\ell,t}) = S_{\ell,t} E_{f,t}$ with $E_{f,t}$ a 
+    forecaster-specific error, then taking the ratio of individual WIS values
+    cancels these space-time effects.}  Using instead the geometric
+  mean makes the order of aggregation and scaling immaterial since the ratio of
+  geometric means is the same as the geometric mean of ratios.
 \end{enumerate}
 
 Figure \ref{fig:fcast-adjusted} uses the geometric mean for aggregation.
-Comparing this with Figure 3 of the main paper, we see that the main conclusions
+Comparing this with Figure 3 in the main paper, we see that the main conclusions
 are largely unchanged; however, \chngcli~now appears better than \ar.  This
 behavior would be expected if \chngcli's poor performance is attributable to a
 relatively small number of large errors (as opposed to a large number of
 moderate errors).  Indeed, Figure 5 of the main paper further corroborates this,
-in which we see the heaviest left tails occuring for \chngcli.
+in which we see the heaviest left tails occur for \chngcli.
 
-\section{Comparing with the COVID-19 Forecast Hub}
+\section{Comparing With the COVID-19 Forecast Hub}
 
-Since July of 2020, teams have been submitting real time forecasts
-to the COVID-19 Forecast Hub \cite{ForecastHub}. While a number of forecast
-targets can be submitted, the most related to that used in this paper---the
-7-day trailing average of COVID-19 case incidence rates at the Hospital Referral
-Region---are state-level forecasts for total case incidence over an epiweek.
-Essentially, for each state, teams are asked to predict the total number of
-cases that will be recorded over the week from Monday to Sunday. Forecasts must
-be submitted by Tuesday for the current Sunday as well as the next three
-Sundays. This corresponds to producing forecasts for 5, 12, 19, and 26 days
-ahead. Some teams choose to submit their forecasts a few days earlier, but
-always for the same targets.
+Since July of 2020, modelers have been submitting real-time forecasts of
+COVID-19 case incidence to the COVID-19 Forecast Hub \cite{ForecastHub}. This 
+(along with forecasts of hospitalizations and deaths collected in the same Hub)
+serves as the source of the CDC's official communications on COVID forecasting. 
+
+Our goal in this section is to compare the AR model and indicator models to
+those in the Hub, in terms of forecast errors aggregated over the same forecast
+tasks, to give a clear sense for how robust and effective the models we choose
+to investigate in the paper are relative to those in common operational use.
+This was prompted by a question from an anonymous reviewer of this paper, who
+asked why we chose to build our analysis of indicator utility around the AR
+model in the first place, and why we did not investigate others (say, the SIR
+model or more complex mechanistic models of disease transmission) that have
+occupied more of the spotlight over the course of the pandemic.  The analysis
+presented here corroborates the claim that an AR model is simple, and yet,
+properly trained---using a quantile loss to directly estimate multiple
+conditional quantiles, a trailing training window of 21 days, pooling across all
+locations jointly, and fitting to case rates rather than counts---all as we do
+in the models in the main paper, it can be robust and effective, performing 
+competitively with the top models from COVID-19 Forecast Hub.
+
+The closest forecast target in the Hub to that used in this paper are
+state-level case incidence over an epiweek---defined by the sum of new case
+counts reported between a Sunday and the following Saturday (inclusive). Our
+target is 7-day trailing average of COVID-19 case incidence rates at the HRR
+level, which is different in three regards:
+
+\begin{enumerate}
+\item temporal resolution (daily versus weekly);
+\item geographic resolution (HRRs versus states); and 
+\item scale (rates versus counts).
+\end{enumerate}
+
+While the first and third of these differences can be easily addressed post 
+hoc---meaning, we can take always take our model's outputs and multiply them by
+7 in order to track the incidence over any given trailing week, and rescale them
+per-location by population to put them on the count scale---the second
+difference is not easy to adjust post hoc, because a quantile is not linear
+operator (a quantile of a linear combination of random variables is not simply
+the linear combination of their quantiles, but rather, depends intricately on
+the correlations between random variables).
+
+Therefore, to make a comparison to models in the Hub in as direct a way as
+possible, we retrained our models over the same forecast period as in the main
+paper, and with the same general setup entirely, except at the state rather than 
+HRR level.  We then rescaled them post hoc to account for the different temporal
+resolution and the rate versus count scale (first and third items on the above
+list).  The results are given in Figure \ref{fig:compare-to-hub}.  The
+evaluation was carried out exactly as in the main paper, and the figure displays
+both mean WIS and geometric mean WIS, as a function of ahead.  Furthermore, to
+account for missingness (not all teams submitted forecasts to the Hub for all
+locations and ahead values for the entire period), we first dropped any
+forecaster than submitted for less than 6 weeks, and then restricted the
+aggregation metrics (mean or geometric mean) to errors from commonly available
+forecast tasks.   
+
+By either metric, mean and geometric mean WIS, relative to baseline, we can see
+in Figure \ref{fig:compare-to-hub} that the AR model examined in this paper is 
+competitive with top models in the Hub, even outperforming the Forecast Hub
+ensemble model for smaller ahead values.  The same general conclusion can be
+drawn for the indicators models as well.  However, interestingly, a close
+inspection reveals that the AR model here is for the most part in the ``middle
+of the pack'' when compared to the indicator models, and only the Google-AA
+model offers clear improvement over AR for all aheads.  This is likely due to
+the fact that at the state level, the signal-to-noise ratio (SNR) is generally
+higher, and AR model provides a higher standard (on which to expect improvement
+using an auxiliary indicator).  At the HRR level, with lower SNR, using
+indicators as simple additional linear features in the AR model provides an
+important enough variance reduction 
+
+% Essentially, for each state, teams are asked to predict the total number of
+% cases that will be recorded over the week from Monday to Sunday. Forecasts must
+% be submitted by Tuesday for the current Sunday as well as the next three
+% Sundays. This corresponds to producing forecasts for 5, 12, 19, and 26 days
+% ahead. Some teams choose to submit their forecasts a few days earlier, but
+% always for the same targets.
 
 To properly compare the models presented in this paper with those submitted to
 the Hub, we limit ourselves to the same set of forecast dates and states, and
@@ -105,9 +174,7 @@ described above.
 For the purpose of the comparison, we show only the AR model along with
 submissions collected by the Forecast Hub in Figure \ref{fig:compare-to-hub}.
 Since not all teams submitted forecasts for the entire period, we
-only display those which submitted for at least 6 weeks. By both metrics,
-the AR model examined in this paper is competitive with the submitted by top teams, even
-beating the Ensemble for smaller target horizons.
+only display those which submitted for at least 6 weeks. 
 
 
 
