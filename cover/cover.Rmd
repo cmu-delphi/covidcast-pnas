@@ -1,0 +1,170 @@
+---
+title: Playground for PNAS cover graphic 
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.path = "fig/", cache = TRUE, 
+                      autodep = TRUE, cache.comments = TRUE,
+                      message = FALSE, warning = FALSE)
+
+library(covidcast)
+library(epitools)
+library(ggplot2)
+library(dplyr)
+library(purrr)
+```
+
+```{r get-us, eval = FALSE}
+sources <- c("jhu-csse", 
+             "doctor-visits", 
+             "chng", 
+             "fb-survey", 
+             "safegraph",
+             "safegraph")
+
+signals <- c("confirmed_7dav_incidence_prop",
+             "smoothed_adj_cli",
+             "smoothed_adj_outpatient_covid",
+             "smoothed_whh_cmnty_cli",
+             "bars_visit_prop",
+             "restaurants_visit_prop")
+
+start <- "2020-04-15"
+end <- "2021-04-15"
+
+Select <- function(x, ...) { 
+  if (nrow(x) == 0) x
+  else select(x, ...) 
+}
+
+us <- covidcast_signals(
+  sources, signals,
+  start, end, 
+  geo_type = "nation",
+) %>% map(function(df) df %>% 
+            Select(data_source, signal, geo_value, time_value, value))
+```
+
+```{r get-states, eval = FALSE}
+state <- covidcast_signals(
+  sources, signals,
+  start, end, 
+  geo_type = "state"
+) %>% map(function(df) df %>% 
+            Select(data_source, signal, geo_value, time_value, value))
+```
+
+```{r get-counties, eval = FALSE}
+top_counties <- county_census %>%
+  filter(COUNTY != 0) %>% # these are states
+  arrange(desc(POPESTIMATE2019)) %>%
+  head(n = 50) %>%
+  pull(FIPS)
+
+# Work around for an API problem: specifying geo_values in the API call fails on
+# the CHNG data. So we filter after the fact instead. DANGER: Very slow.
+county_nochng <- covidcast_signals(
+  sources[sources != "chng"], signals[sources != "chng"],
+  start, end, 
+  geo_type = "county", geo_values = top_counties
+) %>% map(function(df) df %>% 
+            Select(data_source, signal, geo_value, time_value, value))
+
+county_chng <- covidcast_signals(
+  sources[sources == "chng"], signals[sources == "chng"],
+  start, end, 
+  geo_type = "county", 
+) %>% map(function(df) df %>% 
+            Select(data_source, signal, geo_value, time_value, value) %>%
+            filter(geo_value %in% top_counties))
+
+county <- append(county_nochng, county_chng)
+```
+
+```{r save-all, eval = FALSE}
+save(list = ls(), file = "all.rda")
+```
+
+```{r load-all}
+load(file = "all.rda")
+```
+
+```{r build-sg}
+# SafeGraph national signals don't exist for all time, so build them from states
+y = state_census %>% 
+  mutate(geo_value = tolower(ABBR)) %>% 
+  rename(w = POPESTIMATE2019) %>%
+  select(geo_value, w) 
+
+for (i in which(sources == "safegraph")) {  
+  us[[i]] <- state[[i]] %>% 
+    left_join(y, by = "geo_value") %>% 
+    group_by(data_source, signal, time_value) %>%
+    summarize(value = Sum(w * value) / Sum(w)) %>%
+    mutate(geo_value = "us") %>%
+    ungroup()
+} 
+```
+
+```{r smooth-sg}
+# SafeGraph signals at all levels aren't smoothed, so we use 7-day averaging
+for (i in which(sources == "safegraph")) {  
+  us[[i]] <- us[[i]] %>% 
+    as.epi_tibble() %>% 
+    group_by(geo_value) %>%
+    epi_slide(~ Mean(.x$value), n = 7, new_col_name = "value") %>%
+    ungroup() 
+  
+  state[[i]] <- state[[i]] %>% 
+    as.epi_tibble() %>% 
+    group_by(geo_value) %>%
+    epi_slide(~ Mean(.x$value), n = 7, new_col_name = "value") %>%
+    ungroup() 
+  
+  county[[i]] <- county[[i]] %>% 
+    as.epi_tibble() %>% 
+    group_by(geo_value) %>%
+    epi_slide(~ Mean(.x$value), n = 7, new_col_name = "value") %>%
+    ungroup() 
+}
+```
+
+```{r aggregate-data}
+all <- do.call(rbind, c(us, state, county))
+```
+
+```{r plotting-functions}
+names <- c("Cases", 
+           "DV-CLI", 
+           "CHNG-COVID", 
+           "CTIS-CLI-in-community",
+           "SG-Bars", 
+           "SG-Restaurants")
+
+colors <- c("black", scales::hue_pal()(length(signals)-1))
+
+get_trend_plot <- function(df) {
+  case_min <- Min(df %>% filter(signal == signals[1]) %>% pull(value))
+  case_max <- Max(df %>% filter(signal == signals[1]) %>% pull(value))
+  
+  df %>%
+    group_by(signal, geo_value) %>%
+    mutate(value = (value - Min(value)) / (Max(value) - Min(value)) * 
+             case_max + case_min) %>%
+    ungroup() %>%
+    mutate(signal = factor(signal, levels = signals, labels = names)) %>%
+    ggplot(aes(x = time_value, y = value, color = signal)) +
+    geom_line() + scale_color_manual(breaks = names, values = colors) +
+    facet_wrap(vars(geo_value), scales = "free_y") + 
+    labs(x = "Date", y = "Signal value (scaled)") +
+    theme_bw() + theme(legend.pos = "bottom", legend.title = element_blank())
+}
+```
+
+```{r plot-it, fig.width = 10, fig.height = 4}
+all %>%
+  filter(signal != signals[5]) %>%
+  filter(geo_value %in% c("us", "tx", "48113")) %>%
+  filter(between(time_value, as.Date("2020-06-01"), as.Date("2020-07-15"))) %>%
+  get_trend_plot()
+```
