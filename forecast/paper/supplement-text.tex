@@ -205,13 +205,13 @@ acting as a sort of ``implicit regularization,'' leading to shrinkage on the
 autoregressive coefficients and therefore to less volatile predictions.  To
 investigate this hypothesis, we consider fitting ``noise features'' that in
 truth have zero relationship to the response.  Recall (from the main paper) that
-at each forecast date, we train a model on 6,426 location-time pairs.  Indicator
-models are based on six features, corresponding to the three autoregressive
-terms and the three lagged indicator values.  To form noise indicator features,
-we replace their values with those from a randomly chosen time-space pair (while
-keeping the autoregressive features fixed).  In particular, at each location
-$\ell$ and time $t$, for the forecasting task we replace the triplet
-\smash{$(X_{\ell,t}, X_{\ell,t-7}, X_{\ell,t-14})$} in Eq.\ (3) of the main
+at each forecast date, we train a model on 6,426 location-time pairs.  Each
+indicator model uses 6 features, corresponding to the 3 autoregressive terms and
+the 3 lagged indicator values.  To form noise indicator features, we replace
+their values with those from a randomly chosen time-space pair (while keeping
+the autoregressive features fixed).  In particular, at each location $\ell$ and
+time $t$, for the forecasting task we replace the triplet \smash{$(X_{\ell,t},
+X_{\ell,t-7}, X_{\ell,t-14})$} in Eq.\ (3) of the main
 paper with the triplet \smash{$(X_{\ell^*,t^*}, X_{\ell^*,t^*-7},
   X_{\ell^*,t^*-14})$}, where $(\ell^*,t^*)$ is a location-time pair sampled with
 replacement from the 6,426 total location-time pairs.  Likewise in the hotspot 
@@ -226,14 +226,14 @@ dismiss the implicit regularization hypothesis.
 \section{Upswings and Downswings}
 
 In this section, we provide extra details about the up/down/flat analysis
-described in the main text. Figure \ref{fig:upswing-summary} shows the overall
-results, examining the average difference $\WIS(AR) - \WIS(F)$ in period. Figure
-\ref{fig:hotspots-upswing-downswing} shows the same information for the hotspot
-task. On average, during downswings and flat periods, the indicator models have
-lower classification error and higher log likelihood than the AR model. For
-hotspots, both Google-AA and CTIS-CLIIC perform better than the AR model during
-upswings, in contrast to the forecasting task, where only Google-AA
-improves. For a related analysis, Figure \ref{fig:cor-wis-ratio} shows
+described in the main manuscript. Figure \ref{fig:upswing-summary} shows the
+overall results, examining the average difference $\WIS(AR) - \WIS(F)$ in
+period. Figure \ref{fig:hotspots-upswing-downswing} shows the same information
+for the hotspot task. On average, during downswings and flat periods, the
+indicator models have lower classification error and higher log likelihood than
+the AR model. For hotspots, both Google-AA and CTIS-CLIIC perform better than
+the AR model during upswings, in contrast to the forecasting task, where only
+Google-AA improves. For a related analysis, Figure \ref{fig:cor-wis-ratio} shows
 histograms of the Spearman correlation (Spearman's $\rho$, a rank-based measure
 of association) between the $\WIS(F)/\WIS(AR)$ and the magnitude of the
 swing. Again we see that case rate increases are positively related to

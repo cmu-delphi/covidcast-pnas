@@ -682,7 +682,6 @@ gg
 \clearpage
 
 ```{r lagging-only, fig.cap="Correlation of the difference in WIS with the laggingness of the indicator at the target date, stratified by up, down, or flat period. Compare to Figure 5 in the manuscript."}
-# Deprecated
 df2 %>%
   group_by(forecaster, udf) %>%
   summarise(
@@ -702,7 +701,6 @@ df2 %>%
 \clearpage
 
 ```{r diff-in-lead-lag, fig.cap = "Correlation of the difference between leadingness and laggingness with the difference in WIS. The relationship is essentially the same as described in the manuscript and shown in Figure 5."}
-# Deprecated
 df2 %>%
   group_by(forecaster, udf) %>%
   summarise(cor = cor(AR_wis - wis, leading - lagging, 
