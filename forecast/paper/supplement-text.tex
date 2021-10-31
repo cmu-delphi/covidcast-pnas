@@ -46,12 +46,12 @@ indicators and by revisions to the case rates.  And in the case of the
 \gs~model, in which we only used finalized values for the \gs~indicator, the
 difference in performance can be wholly attributed to revisions of case rates. 
 
-\section{Aggregation With Geometric Mean}
+\section{Robust Aggregation}
 
 In this section, we consider using the geometric mean instead of the usual
 (arithmetic) mean when aggregating the weighted interval score (WIS) across
-location-time pairs.  There are two reasons why using the geometric mean may be
-desirable.
+location-time pairs.  Aside from the geometric mean being generally more robust
+to large values, there are two reasons why using it may be desirable.  
 
 \begin{enumerate}
 \item WIS is right-skewed, being bounded below by zero and having occasional 
@@ -68,11 +68,11 @@ desirable.
     a shared, multiplicative contribution to forecaster errors.  That is, if one
     imagines that a forecaster's WIS is composed of multiplicative space-time
     effects $S_{\ell,t}$ shared across all forecasters,
-    $\WIS(F_{\ell,t,f},Y_{\ell,t}) = S_{\ell,t} E_{f,t}$ with $E_{f,t}$ a 
-    forecaster-specific error, then taking the ratio of individual WIS values
-    cancels these space-time effects.}  Using instead the geometric
-  mean makes the order of aggregation and scaling immaterial since the ratio of
-  geometric means is the same as the geometric mean of ratios.
+    \smash{$\WIS(F_{\ell,t,f},Y_{\ell,t}) = S_{\ell,t} E_{f,t}$} with
+    \smash{$E_{f,t}$} a forecaster-specific error, then taking the ratio of
+    individual WIS values cancels these space-time effects.}  Using instead the
+  geometric mean makes the order of aggregation and scaling immaterial since the
+  ratio of geometric means is the same as the geometric mean of ratios.
 \end{enumerate}
 
 Figure \ref{fig:fcast-adjusted} uses the geometric mean for aggregation.
@@ -83,7 +83,7 @@ relatively small number of large errors (as opposed to a large number of
 moderate errors).  Indeed, Figure 5 of the main paper further corroborates this,
 in which we see the heaviest left tails occur for \chngcli.
 
-\section{Comparing With the COVID-19 Forecast Hub}
+\section{Comparing COVID-19 Forecast Hub Models}
 
 Since July of 2020, modelers have been submitting real-time forecasts of
 COVID-19 case incidence to the COVID-19 Forecast Hub \cite{ForecastHub}. This 
@@ -96,174 +96,148 @@ tasks, to give a clear sense for how robust and effective the models we choose
 to investigate in the paper are relative to those in common operational use.
 This was prompted by a question from an anonymous reviewer of this paper, who
 asked why we chose to build our analysis of indicator utility around the AR
-model in the first place, and why we did not investigate others (say, the SIR
-model or more complex mechanistic models of disease transmission) that have
+model in the first place, and why we did not build it around others (say, the
+SIR model or more complex mechanistic models of disease transmission) that have 
 occupied more of the spotlight over the course of the pandemic.  The analysis
-presented here corroborates the claim that an AR model is simple, and yet,
-properly trained---using a quantile loss to directly estimate multiple
-conditional quantiles, a trailing training window of 21 days, pooling across all
-locations jointly, and fitting to case rates rather than counts---all as we do
-in the models in the main paper, it can be robust and effective, performing 
-competitively with the top models from COVID-19 Forecast Hub.
+presented here corroborates the claim that, while simple, the AR model, properly
+trained---using a quantile loss to directly estimate multiple conditional
+quantiles, a trailing training window of 21 days, pooling across all locations
+jointly, and fitting to case rates rather than counts (as we do in all our
+models in the main paper)---can be robust and effective, performing
+competitively many of the top models from COVID-19 Forecast Hub, including the
+Hub ensemble model.
 
-The closest forecast target in the Hub to that used in this paper are
+The closest forecast target in the Hub to that used in the main paper is 
 state-level case incidence over an epiweek---defined by the sum of new case
 counts reported between a Sunday and the following Saturday (inclusive). Our
-target is 7-day trailing average of COVID-19 case incidence rates at the HRR
-level, which is different in three regards:
+forecast target, recall, is a 7-day trailing average of COVID-19 case incidence
+rates at the HRR level, which is different in three regards:
 
 \begin{enumerate}
 \item temporal resolution (daily versus weekly);
-\item geographic resolution (HRRs versus states); and 
+\item geographic resolution (HRRs versus states); 
 \item scale (rates versus counts).
 \end{enumerate}
 
-While the first and third of these differences can be easily addressed post 
-hoc---meaning, we can take always take our model's outputs and multiply them by
-7 in order to track the incidence over any given trailing week, and rescale them
-per-location by population to put them on the count scale---the second
-difference is not easy to adjust post hoc, because a quantile is not linear
-operator (a quantile of a linear combination of random variables is not simply
-the linear combination of their quantiles, but rather, depends intricately on
-the correlations between random variables).
+While the first and third of these differences could be easily addressed post 
+hoc---meaning, we can take always take our model's output and multiply it by 
+7 in order to track the incidence over any given trailing week, and rescale it
+per location by population to bring it to the count scale---the second
+difference is not easy to adjust post hoc due to nonlinearity of the quantiles
+(a quantile of a linear combination of random variables is not simply the linear
+combination of their quantiles, but rather, depends intricately on the
+correlations between the random variables).    
 
-Therefore, to make a comparison to models in the Hub in as direct a way as
-possible, we retrained our models over the same forecast period as in the main
-paper, and with the same general setup entirely, except at the state rather than 
-HRR level.  We then rescaled them post hoc to account for the different temporal
-resolution and the rate versus count scale (first and third items on the above
-list).  The results are given in Figure \ref{fig:compare-to-hub}.  The
-evaluation was carried out exactly as in the main paper, and the figure displays
-both mean WIS and geometric mean WIS, as a function of ahead.  Furthermore, to
-account for missingness (not all teams submitted forecasts to the Hub for all
-locations and ahead values for the entire period), we first dropped any
-forecaster than submitted for less than 6 weeks, and then restricted the
-aggregation metrics (mean or geometric mean) to errors from commonly available
-forecast tasks.   
+Therefore, to make a comparison to models in the Hub as direct as possible, we
+retrained our models over the same forecast period as in the main paper, and
+with the same general setup entirely, except at the state rather than HRR level.
+We then rescaled them post hoc to account for the different temporal resolution
+and the rate versus count scale (first and third points in the above list).  The
+results are given in Figure \ref{fig:compare-to-hub}.  The evaluation was
+carried out exactly as in the main paper, and the figure displays both mean WIS
+and geometric mean WIS, as a function of ahead, relative to the baseline model.
+Furthermore, to account for missingness (not all teams submitted forecasts to
+the Hub for all locations and ahead values for the entire period), we first
+dropped any forecaster than submitted for less than 6 weeks, and then restricted
+the aggregation metrics (mean or geometric mean) to errors from commonly
+available forecast tasks.
 
-By either metric, mean and geometric mean WIS, relative to baseline, we can see
+By either metric, mean or geometric mean WIS relative to baseline, we can see  
 in Figure \ref{fig:compare-to-hub} that the AR model examined in this paper is 
-competitive with top models in the Hub, even outperforming the Forecast Hub
-ensemble model for smaller ahead values.  The same general conclusion can be
-drawn for the indicators models as well.  However, interestingly, a close
-inspection reveals that the AR model here is for the most part in the ``middle
-of the pack'' when compared to the indicator models, and only the Google-AA
-model offers clear improvement over AR for all aheads.  This is likely due to
-the fact that at the state level, the signal-to-noise ratio (SNR) is generally
-higher, and AR model provides a higher standard (on which to expect improvement
-using an auxiliary indicator).  At the HRR level, with lower SNR, using
-indicators as simple additional linear features in the AR model provides an
-important enough variance reduction 
-
-% Essentially, for each state, teams are asked to predict the total number of
-% cases that will be recorded over the week from Monday to Sunday. Forecasts must
-% be submitted by Tuesday for the current Sunday as well as the next three
-% Sundays. This corresponds to producing forecasts for 5, 12, 19, and 26 days
-% ahead. Some teams choose to submit their forecasts a few days earlier, but
-% always for the same targets.
-
-To properly compare the models presented in this paper with those submitted to
-the Hub, we limit ourselves to the same set of forecast dates and states, and
-we predict case incidence over a week by: (1) predicting the 7-day trailing
-average case rate (as in the manuscript);
-(2) multiplying by 7 to give the total over a week; (3) multiplying by the state
-population as reported in the 2019 US Census Population Estimate (available in
-the Covidcast R package \cite{CovidcastR}). Finally, we perform the same
-evaluations as in the manuscript Figure 3 and also using geometric mean as
-described above.
-For the purpose of the comparison, we show only the AR model along with
-submissions collected by the Forecast Hub in Figure \ref{fig:compare-to-hub}.
-Since not all teams submitted forecasts for the entire period, we
-only display those which submitted for at least 6 weeks. 
-
-
-
-We also are undertook the same analysis shown in Figure 3 in the manuscript and Figure
-\ref{fig:fcast-adjusted} above for all models
-(the AR, as well as the indicator-assisted models). This comparison is shown in Figure
-\ref{fig:state-level-performance}. 
-%
-TODO: some text about why indicators don't help as much.
-
+competitive with top models in the Hub, even outperforming the Hub ensemble
+model for smaller ahead values.  The same general conclusion can be drawn for
+the indicators models as well.  However, interestingly, a close inspection
+reveals that the AR model here is for the most part in the ``middle of the
+pack'' when compared to the indicator models, and only the Google-AA model
+offers clear improvement over AR for all aheads.  This is likely due to the fact
+that at the state level, the signal-to-noise ratio (SNR) is generally higher,
+and AR model provides a higher standard (on which to expect improvement using an 
+auxiliary indicator), since it is able to extract a clearer signal from past
+lags of case rates.  At the HRR level, with lower SNR, using indicators as
+simple additional linear features in the AR model probably leads to a variance
+reduction that is enough to boost accuracy, but at the state level, perhaps more
+sophisticated modeling techniques are needed to extract comparable value from
+some of the indicators.
 
 \section{Statistical Significance}
 
-In the Introduction of the main paper, we give some reasons that we avoid making
-formal statements about statistical significance, preferring instead to examine
-the stability of our results in different contexts. There are strong reasons to
-avoid model-based significance tests because the necessary assumptions about
-stationarity, independence, and the  model being true (or at least approximately
-true) are certainly violated. With those caveats in mind, we undertake two
-relatively assumption-lean investigations in this section. The first is a
-sign-test for whether the difference between the AR model’s relative WIS  and
-each other model’s relative WIS is centered at zero. By ``relative WIS'' we mean
-scaled by the strawman as displayed in Figure 3. To mitigate the dependence
+In the introduction of the main manuscript, we gave some reasons that we avoid
+making formal statements about statistical significance, preferring instead to
+examine the stability of our results in different contexts.  There are strong
+reasons to avoid model-based significance tests because the necessary
+assumptions about stationarity, independence, and the model being true (or at
+least approximately true) are certainly violated.  With those caveats in mind,
+we undertake two relatively assumption-lean investigations in this section.  The
+first is a sign test for whether the difference between the AR model’s relative
+WIS and each other model’s relative WIS is centered at zero.  (Relative WIS here
+means scaled by the WIS of the baseline model.)  To mitigate the dependence 
 across time (which intuitively seems to matter more than that across space), we
 computed these tests in a stratified way, where for each forecast date we run a
-sign test on the scaled errors between two models over all 440 counties. The
-results are plotted as histograms in Figure \ref{fig:sign-test}. In this case,
-we use the total relative WIS over all aheads, but the histograms are largely
-similar for individual target horizons. If there were no difference, we would
-expect to see a uniform distribution. However, for all indicator-assisted
-models, we see many more small p-values than would be expected if the null
-hypothesis (that the AR model is better) were true.
+sign test on the scaled errors between two models over all 306 HRRs.  The
+results are plotted as histograms in Figure \ref{fig:sign-test}.  For this
+figure, we use the total relative WIS over all aheads, but the histograms are
+largely similar for individual target horizons. If there were no difference, we
+would expect to see a uniform distribution. However, for each indicator model, 
+we see many more small p-values than would be expected if the null hypothesis
+(that the AR model is better) were true. 
 
 Another relatively assumption-lean method of testing for differences in forecast
-accuracy is the Diebold-Mariano test \cite{Diebold:2002, Diebold:2015,
-Harvey:1997}. Essentially, the differences between forecast losses are assumed
-to have a constant mean and a covariance that depends on time. Under these
+accuracy is the Diebold-Mariano (DM) test \cite{Diebold:2002, Diebold:2015,
+Harvey:1997}. Essentially, the differences between forecast errors are assumed
+to have a constant mean and a covariance that depends on time.  Under these
 conditions, the asymptotic distribution for the standardized mean of the
 differences is limiting normal provided that a heteroskedasticity and
-autocorrelation robust estimate of the variance is used. Using the loss as
-weighted interval score across all HRRs and horizons (7 to 21 days ahead), we
-perform the DM test using both the mean relative to the strawman (as reported in
-the manuscript) and the geometric mean relative to the strawman as described
-above. The first two rows of Table \ref{tab:dm-test} displays p-values for the
-test that the indicator-assisted model is no-better than the AR model. Only the
-CHNG-CLI model's p-value exceeds conventional statistical significance
-thresholds.
+autocorrelation robust estimate of the variance is used.  Using the error as WIS
+across all HRRs and horizons (7 to 21 days ahead), we perform the DM test using
+both the mean relative to the baseline (as reported in the manuscript) and the
+geometric mean relative to the baseline as described above.  The first two rows
+of Table \ref{tab:dm-test} displays p-values for the test that each indicator
+model is no better than the AR model.  In only a few instances---geometric mean
+and mean for the CHNG-CLI model, and mean for the CHNG-COVID model---do the
+p-values exceed conventional statistical significance thresholds. 
 
 \section{Bootstrap Results}
 
-As explained in Section 2.B. of the main paper, a (somewhat cynical) hypothesis
+As explained in Section 2.B of the main paper, a (somewhat cynical) hypothesis
 for why we see benefits in forecasting and hotspot prediction is that the
 indicators are not actually providing useful information but they are instead
 acting as a sort of ``implicit regularization,'' leading to shrinkage on the
 autoregressive coefficients and therefore to less volatile predictions.  To
 investigate this hypothesis, we consider fitting ``noise features'' that in
-truth should have zero coefficients.  Recall (from the main paper) that at each
-forecast date, we train a model on 6,426 location-time pairs.  Indicator models
-are based on six features, corresponding to the three autoregressive terms and
-the three lagged indicator values.  To form noise indicator features, we replace
-their values with those from a randomly chosen time-space pair (while keeping
-the autoregressive features fixed).  In particular, at each location $\ell$ and
-time $t$, for the forecasting task we replace the triplet $(X_{\ell,t},
-X_{\ell,t-7}, X_{\ell,t-14})$ in Eq. (3) of the main paper with the triplet
-$(X_{\ell^*,t^*}, X_{\ell^*,t^*-7}, X_{\ell^*,t^*-14})$, where $(\ell^*,t^*)$ is
-a location-time pair sampled with replacement from the 6,426 location-time
-pairs.  Likewise in the hotspot prediction task, we replace the triplet
-$(X_{\ell,t}^\Delta, X_{\ell,t-7}^\Delta, X_{\ell,t-14}^\Delta)$ in Eq. (5) of
-the main paper with $(X_{\ell^*,t^*}^\Delta, X_{\ell^*,t^*-7}^\Delta,
-X_{\ell^*,t^*-14}^\Delta)$.  Figures
+truth have zero relationship to the response.  Recall (from the main paper) that
+at each forecast date, we train a model on 6,426 location-time pairs.  Indicator
+models are based on six features, corresponding to the three autoregressive
+terms and the three lagged indicator values.  To form noise indicator features,
+we replace their values with those from a randomly chosen time-space pair (while
+keeping the autoregressive features fixed).  In particular, at each location
+$\ell$ and time $t$, for the forecasting task we replace the triplet
+\smash{$(X_{\ell,t}, X_{\ell,t-7}, X_{\ell,t-14})$} in Eq.\ (3) of the main
+paper with the triplet \smash{$(X_{\ell^*,t^*}, X_{\ell^*,t^*-7},
+  X_{\ell^*,t^*-14})$}, where $(\ell^*,t^*)$ is a location-time pair sampled with
+replacement from the 6,426 total location-time pairs.  Likewise in the hotspot 
+prediction task, we replace the triplet \smash{$(X_{\ell,t}^\Delta,
+  X_{\ell,t-7}^\Delta, X_{\ell,t-14}^\Delta)$} in Eq.\ (5) of the main paper with
+\smash{$(X_{\ell^*,t^*}^\Delta, X_{\ell^*,t^*-7}^\Delta,
+  X_{\ell^*,t^*-14}^\Delta)$}.  Figures
 \ref{fig:fcast-booted}--\ref{fig:hot-booted} show the results.  No method
 exhibits a noticeable performance gain over the \ar~method, leading us to
-dismiss the implicit regularization hypothesis.
+dismiss the implicit regularization hypothesis. 
 
 \section{Upswings and Downswings}
 
-In this section we provide extra details about the upswing / flat / downswing
-analysis described in the main text. Figure \ref{fig:upswing-summary} shows the
-overall results, examining the average difference $\WIS(AR) - \WIS(F)$ in
-period. Figure \ref{fig:hotspots-upswing-downswing} shows the same information
-for the hotspot task. On average, during downswings and flat periods, the
-indicator-assisted models have lower classification error and higher log
-likelihood than the AR model. For hotspots, both Google-AA and CTIS-CLIIC
-perform better than the AR model during upswings, in contrast to the forecasting
-task, where only Google-AA improves. For a related analysis, Figure
-\ref{fig:cor-wis-ratio} shows histograms of the Spearman correlation (Spearman's
-$\rho$, a rank-based measure of association) between the $\WIS(F)/\WIS(AR)$ and
-the magnitude of the swing. Again we see that case rate increases are positively
-related to diminished performance of the indicator models.
+In this section, we provide extra details about the up/down/flat analysis
+described in the main text. Figure \ref{fig:upswing-summary} shows the overall
+results, examining the average difference $\WIS(AR) - \WIS(F)$ in period. Figure
+\ref{fig:hotspots-upswing-downswing} shows the same information for the hotspot
+task. On average, during downswings and flat periods, the indicator models have
+lower classification error and higher log likelihood than the AR model. For
+hotspots, both Google-AA and CTIS-CLIIC perform better than the AR model during
+upswings, in contrast to the forecasting task, where only Google-AA
+improves. For a related analysis, Figure \ref{fig:cor-wis-ratio} shows
+histograms of the Spearman correlation (Spearman's $\rho$, a rank-based measure
+of association) between the $\WIS(F)/\WIS(AR)$ and the magnitude of the
+swing. Again we see that case rate increases are positively related to
+diminished performance of the indicator models.
 
 One hypothesis for diminished relative performance during upswings is that the
 AR model tends to overpredict downswings and underpredict upswings. Adding
@@ -386,7 +360,7 @@ analysis but aggregating by Geometric mean as described above and displays a
 similar pattern.
 
 Figure \ref{fig:errs-in-space} examines the spatial behavior over the entire
-period of the indicator-assisted models relative to the AR. For ease of
+period of the indicator models relative to the AR. For ease of
 comparison, we show the percent improvement in each HRR. Negative numbers (blue)
 mean that the indicator helped while positives (red) mean that the indicator
 hurt forecasting performance. The clear pattern is that in most HRRs, the

@@ -7,24 +7,31 @@ Sys.setenv("AWS_DEFAULT_REGION" = "us-east-2")
 s3bucket <- get_bucket("forecast-eval")
 n_keeper_weeks <- 6L
 n_keeper_locs <- 50L
-# case_scores <- s3readRDS("score_cards_state_cases.rds", s3bucket) 
-case_preds <- s3readRDS("predictions_cards.rds", s3bucket) %>%
-  filter(signal == "confirmed_incidence_num",
-         forecast_date < "2021-01-01",
-         !(geo_value %in% c("as", "gu", "pr", "vi", "mp", "us"))) %>%
-  select(-data_source, -signal, -incidence_period)
-actuals <- covidcast::covidcast_signal("jhu-csse", "confirmed_7dav_incidence_num",
-                                       geo_type = "state", as_of = "2021-05-18",
-                                       end_day = "2021-03-01") %>%
-  select(geo_value, time_value, value) %>%
-  mutate(value = value * 7) %>%
-  rename(target_end_date = time_value, actual = value)
-case_scores <- evalcast::evaluate_predictions(
-  case_preds, actuals, 
-  err_measures = list(wis = evalcast::weighted_interval_score),
-  grp_vars = c("ahead", "forecaster", "forecast_date", "geo_value")
-)
-rm(case_preds)
+case_scores <- s3readRDS("score_cards_state_cases.rds", s3bucket) 
+# case_preds <- s3readRDS("predictions_cards.rds", s3bucket) %>%
+#   filter(signal == "confirmed_incidence_num",
+#          forecast_date < "2021-01-01",
+#          !(geo_value %in% c("as", "gu", "pr", "vi", "mp", "us"))) 
+# actuals <- covidcast::covidcast_signal("jhu-csse", "confirmed_7dav_incidence_num",
+#                                        geo_type = "state", as_of = "2021-05-18",
+#                                        end_day = "2021-03-01") %>%
+#   mutate(value = value * 7) %>%
+#   rename(target_end_date = time_value, actual = value)
+# case_scores <- evalcast::evaluate_predictions(
+#   case_preds, actuals, 
+#   err_measures = list(wis = evalcast::weighted_interval_score),
+#   grp_vars = c("ahead", "forecaster", "forecast_date", "geo_value")
+# )
+# rm(case_preds)
+
+### RJT: using evalcast above leads to the following error for me. I even made 
+### sure that I'm running the latest versions of evalcast and covidcast ...
+### Error in max(target_response$end) + backfill_buffer : 
+### non-numeric argument to binary operator
+### In addition: Warning message:
+###  In evaluate_predictions_single_ahead(filter(predictions_cards, .
+###    data$ahead == : Incompatible methods ("+.Date", "Ops.data.frame") for "+"
+
 case_scores <- case_scores %>% 
   mutate(
     ahead = ahead * 7 - 2, # forecast on a Tuesday
@@ -53,7 +60,8 @@ keepers <- n_submitted %>%
   pull(forecaster)
 
 case_scores <- case_scores %>% filter(forecaster %in% keepers)
-
+case_scores <- case_scores %>% mutate(
+  forecaster = recode(forecaster, `COVIDhub-ensemble` = "Ensemble"))
 
 # Load our models ---------------------------------------------------------
 
@@ -79,7 +87,6 @@ common_fd <- as.Date(intersect(
   ours %>% select(forecast_date) %>% distinct() %>% pull()),
   "1970-01-01")
 
-
 our_models <- ours %>% filter(forecaster != "Baseline")
 baseline <- ours %>% filter(forecaster == "Baseline") %>%
   select(-forecaster) %>% rename(strawman_wis = wis)
@@ -89,78 +96,45 @@ all_models <- bind_rows(hub = case_scores, ours = our_models, .id = "source")
 Mean <- function(x) mean(x, na.rm = TRUE)
 GeoMean <- function(x) exp(mean(log(x), na.rm = TRUE))
 
-
 all_time_performance <- all_models %>%
   filter(forecast_date %in% common_fd) %>%
   group_by(forecaster, ahead, source) %>%
   summarise(rel_wis = Mean(wis) / Mean(strawman_wis),
-            geo_wis = GeoMean((wis) / (strawman_wis))) %>%
+            geo_wis = GeoMean(wis) / GeoMean(strawman_wis)) %>%
   pivot_longer(contains("wis"))
 
 our_performance <- our_models %>% 
   group_by(forecaster, ahead) %>%
   summarise(rel_wis = Mean(wis) / Mean(strawman_wis),
-            geo_wis = GeoMean((wis) / (strawman_wis))) %>%
+            geo_wis = GeoMean(wis) / GeoMean(strawman_wis)) %>%
   pivot_longer(contains("wis"))
 
-facet_labs <- c(geo_wis = "Geometric mean of WIS", rel_wis = "Mean of WIS")
-fcast_colors <- c(RColorBrewer::brewer.pal(5, "Set1"), "#000000")
-names(fcast_colors) <- c("CHNG-CLI", "CHNG-COVID", "CTIS-CLIIC", "DV-CLI",
-                         "Google-AA", "AR")
-
-ggplot(our_performance %>% filter(ahead > 6, ahead < 22),
+facet_labs <- c(geo_wis = "Geometric mean", rel_wis = "Mean")
+fcast_colors <- c("#000000", RColorBrewer::brewer.pal(5, "Set1"))
+names(fcast_colors) <- c("AR", "CHNG-CLI", "CHNG-COVID", "CTIS-CLIIC", "DV-CLI",
+                         "Google-AA")
+       
+ggplot(all_time_performance %>% filter(source == "ours"),
        aes(ahead, value, color = forecaster)) +
-  geom_line(aes(ahead, value, color = forecaster)) + 
+  geom_line(data = all_time_performance %>%
+              filter(!(forecaster %in% c("Ensemble", 
+                                         "OliverWyman-Navigator"))), 
+            # Data bug? OliverWyman has GeoMean(RelWis) = 0 at ahead = 5
+            aes(group = forecaster),
+            color = "grey80") +
+  geom_line(data = all_time_performance %>% filter(forecaster == "Ensemble"),
+            color = "lightblue", size = 1.5) +
+  geom_point(data = all_time_performance %>% filter(forecaster == "Ensemble"),
+            color = "lightblue", size = 1.5) +
+  geom_line(aes(ahead, value, color = forecaster)) +
   geom_point(aes(ahead, value, color = forecaster)) +
-  scale_color_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
-  theme_bw() +
-  ylab("Score relative to baseline") +
-  geom_hline(yintercept = 1, size = 1.5) +
+  scale_color_manual(values = c(fcast_colors, "Ensemble" = "lightblue"),
+                     guide = guide_legend(nrow = 1)) +
+  ylab("WIS (relative to baseline)") +
+  geom_hline(yintercept = 1, linetype = "dashed") +
   xlab("Days ahead") +
   facet_wrap(~ name, labeller = labeller(name = facet_labs)) +
-  theme(legend.position = "bottom", legend.title = element_blank())
-
-ggsave(here::here("paper", "fig", "state-level-performance.pdf"),
-       width = 6.5, height = 4.5)
-
-
-ggplot(all_time_performance %>% 
-         filter(source == "hub", 
-                ! (forecaster %in% c("COVIDhub-ensemble", "OliverWyman-Navigator"))),
-       aes(ahead, value, group = forecaster)) +
-  geom_line(color = "grey80") +
-  geom_line(data = all_time_performance %>% 
-              filter(forecaster %in% c("COVIDhub-ensemble", "AR")),
-            aes(color = forecaster), size = 1) +
-  geom_point(data = all_time_performance %>% 
-              filter(forecaster %in% c("COVIDhub-ensemble", "AR")),
-            aes(color = forecaster), size = 2) +
-  theme_bw() +
-  scale_color_manual(values = c("AR" = "#d95f02", "COVIDhub-ensemble" = "#7570b3")) +
-  ylab("Score relative to baseline") +
-  geom_hline(yintercept = 1, size = 1.5) +
-  xlab("Days ahead") +
-  facet_wrap(~ name, labeller = labeller(name = facet_labs)) +
-  theme(legend.position = "bottom", legend.title = element_blank())
+  theme_bw() + theme(legend.pos = "bottom", legend.title = element_blank())
 
 ggsave(here::here("paper", "fig", "compare-states-to-hub.pdf"), 
-                  width = 6.5, height = 4.5)
-
-       
-# ggplot(all_time_performance %>% filter(source == "ours"),
-#        aes(ahead, value, color = forecaster)) +
-#   geom_line(data = all_time_performance %>% 
-#               filter(! (forecaster %in% c("COVIDhub-ensemble", "OliverWyman-Navigator"))), 
-#             aes(group = forecaster),
-#             color = "grey80") +
-#   geom_line(data = all_time_performance %>% filter(forecaster == "COVIDhub-ensemble"),
-#             color = "lightblue", size = 1.5) +
-#   geom_line(aes(ahead, value, color = forecaster)) + 
-#   geom_point(aes(ahead, value, color = forecaster)) +
-#   scale_color_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
-#   theme_bw() +
-#   ylab("Score relative to baseline") +
-#   geom_hline(yintercept = 1, size = 1.5) +
-#   xlab("Days ahead") +
-#   facet_wrap(~ name, labeller = labeller(name = facet_labs)) +
-#   theme(legend.position = "bottom", legend.title = element_blank())
+       width = 6.5, height = 4.5)
