@@ -212,7 +212,7 @@ plotter(fcasts_honest,
 
 <!-- Comparison to the Hub -->
 
-```{r compare-to-hub, fig.cap="Forecast performance for AR and indicator models, each retrained at the state level, compared to models submitted to the COVID-19 Forecast Hub over the same period. The thin grey lines are individual models from the Hub; the blue line is the Hub ensemble model. (To align prediction dates as best as possible, we look at the AR and indicator model forecasts for 5, 12, 19, and 26 days ahead; this roughly corresponds to 1, 2, 3, and 4 weeks ahead, respectively, since in the Hub, models typically submit forecasts on a Tuesday for the epiweeks aligned to end on each of the following 4 Saturdays.)"}
+```{r compare-to-hub, fig.cap="Forecast performance for AR and indicator models, each retrained at the state level, compared to models submitted to the COVID-19 Forecast Hub over the same period. The thin grey lines are individual models from the Hub; the light blue line is the Hub ensemble model. To align prediction dates as best as possible, we look at the AR and indicator model forecasts for 5, 12, 19, and 26 days ahead; this roughly corresponds to 1, 2, 3, and 4 weeks ahead, respectively, since in the Hub, models typically submit forecasts on a Tuesday for the epiweeks aligned to end on each of the following 4 Saturdays."}
 knitr::include_graphics("fig/compare-states-to-hub.pdf")
 ```
 
@@ -220,7 +220,7 @@ knitr::include_graphics("fig/compare-states-to-hub.pdf")
 
 <!-- Statistical significance -->
 
-```{r sign-test, fig.cap="P-values from a one-sided sign test for equality of forecast error distributions. Each P-value corresponds a forecast date. The alternative hypothesis is that the the AR model is better (median difference between the relative WIS of the AR model and an indicator model is negative)."}
+```{r sign-test, fig.cap="P-values from a one-sided sign test for improved forecast performance of the indicator-assisted models. Each p-value corresponds to a forecast date. The alternative hypothesis is that the AR model is better (median difference between the relative WIS of the AR model and an indicator model is negative)."}
 fcast_colors2 <- fcast_colors[names(fcast_colors) != "AR"]
 
 st <- fcasts_honest %>%
@@ -280,7 +280,7 @@ dms <- all_errs %>%
 kableExtra::kable(
   bind_rows(dms) %>% 
     pivot_wider(names_from = forecaster, values_from = dm), 
-  digits = 3, booktabs = TRUE, caption = "P-values from a one-sided Diebold-Mariano test for equality of forecast error distributions. The alternative hypothesis is that the AR model is better.")
+  digits = 3, booktabs = TRUE, caption = "P-values from a one-sided Diebold-Mariano test for improvemed forecast performance when adding the indicators. The alternative hypothesis is that the AR model is better.")
 ```
 
 <!-- Bootstrap stuff -->
@@ -506,7 +506,7 @@ pct_chng_df <- comparison_df %>%
       abs(wis_ratio - 1), pct_change,method = "spearman"), .groups = "drop")
 ```
 
-```{r cor-wis-ratio, fig.cap="Histograms of the Spearman correlation between the ratio of forecaster WIS to AR WIS with the % change in case rates, relative to case rates 7 days earlier."}
+```{r cor-wis-ratio, fig.cap="Histograms of the Spearman correlation between the ratio of forecaster WIS to AR WIS with the \\% change in case rates, relative to case rates 7 days earlier."}
 ggplot(pct_chng_df %>% 
          group_by(forecaster) %>% 
          mutate(median = median(cor_wisratio_pctchange)), 
@@ -539,7 +539,7 @@ up_down_df %>%
 
 \clearpage
 
-```{r upswing-summary-remake, fig.cap="Percentage change in average WIS of the forecaster (AR or indicator assisted), relative to the baseline. All models perform poorly durning down periods, but the indicators help. During flat periods, the indicators improve slightly over the AR. During up periods, all forecasters do much better than the baseline, but only some do as well as AR."}
+```{r upswing-summary-remake, fig.cap="Percentage change in average WIS of the forecaster (AR or indicator assisted), relative to the baseline. All models perform poorly during down periods, but the indicators help. During flat periods, the indicators improve slightly over the AR. During up periods, all forecasters do much better than the baseline, but only some do as well as AR."}
 up_down_df_summary <- inner_join(
   left_join(
     corr_df, 
@@ -657,7 +657,7 @@ df2 %>%
         legend.background = element_rect(fill = "transparent"))
 ```
 
-```{r ccf-dv-finalized, fig.cap="Illustration of the cross-correlation function between DV-CLI and cases. The left panel shows the standardized signals over the period from August 1 to September 28 (as of May 15, 2021). The right panel shows $\\CCF_{\\ell}(a)$ for different values of $a$ as vertical blue bars. The orange dashed lines indicate the 95\\% significance threshold. By our leadingness/laggingness metric, DV-CLI is leading (but not lagging) cases over this period."}
+```{r ccf-dv-finalized, fig.cap="Illustration of the cross-correlation function between DV-CLI and cases. The left panel shows the standardized signals over the period from August 1 to September 28 (as of May 15, 2021). The right panel shows $\\CCF_{\\ell}(a)$ for different values of $a$ as vertical blue bars. The orange dashed line indicates the 95\\% significance threshold. By our leadingness/laggingness metric, DV-CLI is leading (but not lagging) cases over this period."}
 source(here("code", "figures", "ccf-dv-finalized.R"))
 gg
 ```
@@ -717,7 +717,7 @@ source(here("code", "figures", "trajectory.R"))
 
 <!-- Cumulative Mean -->
 
-```{r cumulative-mean, fig.cap="Cumulative sum of WIS for each forecaster divided by the cumulative sum of WIS for the baseline model. The shaded background shows national case incidence for the 14-day ahead target. Hashes along the x-axis denote weeks." }
+```{r cumulative-mean, fig.cap="Cumulative sum of WIS for each forecaster divided by the cumulative sum of WIS for the baseline model. The shaded background shows national case incidence for the 14-day ahead target. Hash marks along the x-axis denote weeks." }
 cumulatives <- fcasts_honest %>%
   group_by(forecaster, forecast_date) %>%
   summarise(mw = Mean(wis),

@@ -100,7 +100,7 @@
 
 }
 
-\caption{Forecast performance for AR and indicator models, each retrained at the state level, compared to models submitted to the COVID-19 Forecast Hub over the same period. The thin grey lines are individual models from the Hub; the blue line is the Hub ensemble model. (To align prediction dates as best as possible, we look at the AR and indicator model forecasts for 5, 12, 19, and 26 days ahead; this roughly corresponds to 1, 2, 3, and 4 weeks ahead, respectively, since in the Hub, models typically submit forecasts on a Tuesday for the epiweeks aligned to end on each of the following 4 Saturdays.)}\label{fig:compare-to-hub}
+\caption{Forecast performance for AR and indicator models, each retrained at the state level, compared to models submitted to the COVID-19 Forecast Hub over the same period. The thin grey lines are individual models from the Hub; the light blue line is the Hub ensemble model. To align prediction dates as best as possible, we look at the AR and indicator model forecasts for 5, 12, 19, and 26 days ahead; this roughly corresponds to 1, 2, 3, and 4 weeks ahead, respectively, since in the Hub, models typically submit forecasts on a Tuesday for the epiweeks aligned to end on each of the following 4 Saturdays.}\label{fig:compare-to-hub}
 \end{figure}
 
 \clearpage
@@ -111,12 +111,12 @@
 
 }
 
-\caption{P-values from a one-sided sign test for equality of forecast error distributions. Each P-value corresponds a forecast date. The alternative hypothesis is that the the AR model is better (median difference between the relative WIS of the AR model and an indicator model is negative).}\label{fig:sign-test}
+\caption{P-values from a one-sided sign test for improved forecast performance of the indicator-assisted models. Each p-value corresponds to a forecast date. The alternative hypothesis is that the AR model is better (median difference between the relative WIS of the AR model and an indicator model is negative).}\label{fig:sign-test}
 \end{figure}
 
 \begin{table}
 
-\caption{\label{tab:dm-test}P-values from a one-sided Diebold-Mariano test for equality of forecast error distributions. The alternative hypothesis is that the AR model is better.}
+\caption{\label{tab:dm-test}P-values from a one-sided Diebold-Mariano test for improvemed forecast performance when adding the indicators. The alternative hypothesis is that the AR model is better.}
 \centering
 \begin{tabular}[t]{lrrrrr}
 \toprule
@@ -181,16 +181,14 @@ Mean & 0.177 & 0.132 & 0.006 & 0.092 & 0.103\\
 \caption{Percentage change in classification error and log likelihood, relative that of the AR model, separated into up, down, and flat periods. Like the analogous forecasting analysis, the indicator models generally do better during down and flat periods.}\label{fig:hotspots-upswing-downswing}
 \end{figure}
 
-\textbackslash begin\{figure\}
+\begin{figure}
 
-\{\centering \includegraphics[width=\textwidth]{fig/cor-wis-ratio-1}
+{\centering \includegraphics[width=\textwidth]{fig/cor-wis-ratio-1} 
 
-\}
+}
 
-\textbackslash caption\{Histograms of the Spearman correlation between
-the ratio of forecaster WIS to AR WIS with the \% change in case rates,
-relative to case rates 7 days earlier.\}\label{fig:cor-wis-ratio}
-\textbackslash end\{figure\}
+\caption{Histograms of the Spearman correlation between the ratio of forecaster WIS to AR WIS with the \% change in case rates, relative to case rates 7 days earlier.}\label{fig:cor-wis-ratio}
+\end{figure}
 
 \clearpage
 
@@ -211,7 +209,7 @@ relative to case rates 7 days earlier.\}\label{fig:cor-wis-ratio}
 
 }
 
-\caption{Percentage change in average WIS of the forecaster (AR or indicator assisted), relative to the baseline. All models perform poorly durning down periods, but the indicators help. During flat periods, the indicators improve slightly over the AR. During up periods, all forecasters do much better than the baseline, but only some do as well as AR.}\label{fig:upswing-summary-remake}
+\caption{Percentage change in average WIS of the forecaster (AR or indicator assisted), relative to the baseline. All models perform poorly during down periods, but the indicators help. During flat periods, the indicators improve slightly over the AR. During up periods, all forecasters do much better than the baseline, but only some do as well as AR.}\label{fig:upswing-summary-remake}
 \end{figure}
 
 \clearpage
@@ -222,7 +220,7 @@ relative to case rates 7 days earlier.\}\label{fig:cor-wis-ratio}
 
 }
 
-\caption{Illustration of the cross-correlation function between DV-CLI and cases. The left panel shows the standardized signals over the period from August 1 to September 28 (as of May 15, 2021). The right panel shows $\CCF_{\ell}(a)$ for different values of $a$ as vertical blue bars. The orange dashed lines indicate the 95\% significance threshold. By our leadingness/laggingness metric, DV-CLI is leading (but not lagging) cases over this period.}\label{fig:ccf-dv-finalized}
+\caption{Illustration of the cross-correlation function between DV-CLI and cases. The left panel shows the standardized signals over the period from August 1 to September 28 (as of May 15, 2021). The right panel shows $\CCF_{\ell}(a)$ for different values of $a$ as vertical blue bars. The orange dashed line indicates the 95\% significance threshold. By our leadingness/laggingness metric, DV-CLI is leading (but not lagging) cases over this period.}\label{fig:ccf-dv-finalized}
 \end{figure}
 
 \clearpage
@@ -257,7 +255,7 @@ relative to case rates 7 days earlier.\}\label{fig:cor-wis-ratio}
 
 }
 
-\caption{Cumulative sum of WIS for each forecaster divided by the cumulative sum of WIS for the baseline model. The shaded background shows national case incidence for the 14-day ahead target. Hashes along the x-axis denote weeks.}\label{fig:cumulative-mean}
+\caption{Cumulative sum of WIS for each forecaster divided by the cumulative sum of WIS for the baseline model. The shaded background shows national case incidence for the 14-day ahead target. Hash marks along the x-axis denote weeks.}\label{fig:cumulative-mean}
 \end{figure}
 
 \clearpage

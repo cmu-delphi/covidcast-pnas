@@ -123,7 +123,7 @@ ggplot(all_time_performance %>% filter(source == "ours"),
   geom_line(aes(ahead, value, color = forecaster)) +
   geom_point(aes(ahead, value, color = forecaster)) +
   scale_color_manual(values = c(fcast_colors, "Ensemble" = "lightblue"),
-                     guide = guide_legend(nrow = 1)) +
+                     guide = guide_legend(nrow = 2)) +
   ylab("WIS (relative to baseline)") +
   geom_hline(yintercept = 1, linetype = "dashed") +
   xlab("Days ahead") +
