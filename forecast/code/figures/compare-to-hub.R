@@ -7,30 +7,24 @@ Sys.setenv("AWS_DEFAULT_REGION" = "us-east-2")
 s3bucket <- get_bucket("forecast-eval")
 n_keeper_weeks <- 6L
 n_keeper_locs <- 50L
-case_scores <- s3readRDS("score_cards_state_cases.rds", s3bucket) 
-# case_preds <- s3readRDS("predictions_cards.rds", s3bucket) %>%
-#   filter(signal == "confirmed_incidence_num",
-#          forecast_date < "2021-01-01",
-#          !(geo_value %in% c("as", "gu", "pr", "vi", "mp", "us"))) 
-# actuals <- covidcast::covidcast_signal("jhu-csse", "confirmed_7dav_incidence_num",
-#                                        geo_type = "state", as_of = "2021-05-18",
-#                                        end_day = "2021-03-01") %>%
-#   mutate(value = value * 7) %>%
-#   rename(target_end_date = time_value, actual = value)
-# case_scores <- evalcast::evaluate_predictions(
-#   case_preds, actuals, 
-#   err_measures = list(wis = evalcast::weighted_interval_score),
-#   grp_vars = c("ahead", "forecaster", "forecast_date", "geo_value")
-# )
-# rm(case_preds)
 
-### RJT: using evalcast above leads to the following error for me. I even made 
-### sure that I'm running the latest versions of evalcast and covidcast ...
-### Error in max(target_response$end) + backfill_buffer : 
-### non-numeric argument to binary operator
-### In addition: Warning message:
-###  In evaluate_predictions_single_ahead(filter(predictions_cards, .
-###    data$ahead == : Incompatible methods ("+.Date", "Ops.data.frame") for "+"
+case_preds <- s3readRDS("predictions_cards.rds", s3bucket) %>%
+  filter(signal == "confirmed_incidence_num",
+         forecast_date < "2021-01-01",
+         !(geo_value %in% c("as", "gu", "pr", "vi", "mp", "us")))
+actuals <- covidcast::covidcast_signal("jhu-csse", "confirmed_7dav_incidence_num",
+                                       geo_type = "state", as_of = "2021-05-18",
+                                       end_day = "2021-03-01") %>%
+  mutate(value = value * 7) %>%
+  rename(target_end_date = time_value, actual = value) %>%
+  select(geo_value, target_end_date, actual)
+case_scores <- evalcast::evaluate_predictions(
+  case_preds, actuals,
+  err_measures = list(wis = evalcast::weighted_interval_score),
+  grp_vars = c("ahead", "forecaster", "forecast_date", "geo_value")
+)
+rm(case_preds)
+
 
 case_scores <- case_scores %>% 
   mutate(
@@ -117,7 +111,7 @@ names(fcast_colors) <- c("AR", "CHNG-CLI", "CHNG-COVID", "CTIS-CLIIC", "DV-CLI",
 ggplot(all_time_performance %>% filter(source == "ours"),
        aes(ahead, value, color = forecaster)) +
   geom_line(data = all_time_performance %>%
-              filter(!(forecaster %in% c("Ensemble", 
+              filter(source == "hub", !(forecaster %in% c("Ensemble", 
                                          "OliverWyman-Navigator"))), 
             # Data bug? OliverWyman has GeoMean(RelWis) = 0 at ahead = 5
             aes(group = forecaster),

@@ -724,8 +724,8 @@ cumulatives <- fcasts_honest %>%
             smw = Mean(strawman_wis),
             gmw = GeoMean(wis / strawman_wis)) %>%
   arrange(forecast_date) %>%
-  mutate(`Cumulative Mean` = cummean(mw) / cummean(smw),
-         `Cumulative Sum` = cumsum(mw) / cumsum(smw),
+  mutate(`Cumulative mean` = cummean(mw) / cummean(smw),
+         `Cumulative sum` = cumsum(mw) / cumsum(smw),
          `Cumulative Geo Mean` = exp(cummean(log(gmw))),
          `GM Regret` = cumsum(gmw) - cumsum(smw/smw),
          `AM Regret` = cumsum(mw) - cumsum(smw),
