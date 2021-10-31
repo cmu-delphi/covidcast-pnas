@@ -9,12 +9,7 @@ params:
   flag_jumps: 15
 ---
 
-
-
-
 \input{supplement-text.tex}
-
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, fig.width = 6.5, fig.height = 4.5,
@@ -143,9 +138,6 @@ comb1 <- plot_grid(fig3 + theme(legend.position = "none"),
 plot_grid(comb1, leg, ncol = 1, rel_heights = c(1,.1))
 ```
 
-
-
-
 ```{r fcast-finalized, fig.cap="Forecasting performance using finalized data. Compare to Figure 3 in the manuscript."}
 plotter(fcasts_finalized, 
         "wis", Mean, scaler = "strawman_wis", 
@@ -153,9 +145,7 @@ plotter(fcasts_finalized,
   ylab("Mean WIS (relative to baseline)")
 ```
 
-
 \clearpage
-
 
 ```{r hot-finalized, fig.cap="Hotspot prediction performance using finalized data. Compare to Figure 4 in the manuscript."}
 plotter_hotspots(hotspots_finalized) +
@@ -163,7 +153,6 @@ plotter_hotspots(hotspots_finalized) +
 ```
 
 \clearpage
-
 
 ```{r fcast-honest-v-finalized, fig.cap="Relative forecast WIS with vintage compared to finalized data. Using finalized data leads to overly optimistic performance."}
 plotter(
@@ -176,7 +165,6 @@ plotter(
   order_of_operations = c("aggr","scale")) +
   geom_hline(yintercept = 1) +
   ylab("Mean WIS (vintage / finalized)")
-
 ```
 
 \clearpage
@@ -199,15 +187,9 @@ left_join(
   ylab("AUC (vintage / finalized)")
 ```
 
-
-
-
 \clearpage
 
-
-
 <!-- Geometric mean justifications -->
-
 
 ```{r wis-densities, fig.cap="Weighted interval score appears to more closely resemble a log-Gaussian distribution."}
 ggplot(fcasts_honest, 
@@ -243,8 +225,6 @@ knitr::include_graphics("fig/compare-states-to-hub.pdf")
 ```{r state-level-performance, fig.cap="Performance of our models re-estimated for state-level, epiweek case incidence."}
 knitr::include_graphics("fig/state-level-performance.pdf")
 ```
-
-
 
 \clearpage
 
@@ -282,9 +262,7 @@ ggplot(st, aes(p)) +
     labels = scales::percent_format(scale = 1, accuracy = 1)) +
   theme_bw() +
   theme(legend.position = "bottom")
-
 ```
-
 
 ```{r dm-test}
 errs <- fcasts_honest %>% 
@@ -309,14 +287,11 @@ dms <- all_errs %>%
   group_by(forecaster, metric) %>% 
   summarise(dm = forecast::dm.test(AR, err, "greater", h = 7 , power = 1)$p.value)
 
-
-
 kableExtra::kable(
   bind_rows(dms) %>% 
     pivot_wider(names_from = forecaster, values_from = dm), 
   digits = 3, booktabs = TRUE, caption = "$P$-values for a one-sided Diebold-Mariano test for improvement in forecast error. The test is for the null hypothesis of equal performance against the alternative that the indicator assisted model is better.")
 ```
-
 
 <!-- Bootstrap stuff -->
 
@@ -368,13 +343,7 @@ plotter_hotspots(hotspots_booted) +
   geom_hline(yintercept = 0.5)
 ```
 
-
-
 \clearpage
-
-
-
-
 
 <!-- Upswings vs. downswings -->
 
@@ -442,8 +411,6 @@ up_down_df_summary %>%
   theme(legend.position = "bottom", legend.title = element_blank())
 ```  
 
-  
-
 ```{r upswing-histogram, include=FALSE, fig.width=9, fig.height=4.5}
 # Fgure 4
 up_down_df %>% 
@@ -480,8 +447,6 @@ up_down_df %>%
 ```
 
 \clearpage
-
-
 
 ```{r hotspots-upswing-downswing, fig.cap="Classification and loglikelihood separated into periods of upswing, downswing, and flat cases. Like the analysis of the forecasting task in the main paper (see Figure 7), relative performance is better during down and flat periods."}
 hot_udf <- inner_join(
@@ -627,8 +592,6 @@ bind_rows(con_tab %>% mutate(err = "Classification error"),
 
 \clearpage
 
-
-
 <!-- Correlations with lagged actuals -->
 
 ```{r cor-with-actuals}
@@ -750,8 +713,6 @@ up_down_df_summary %>%
   theme(legend.position = "bottom", legend.title = element_blank())
 ```  
 
-
-
 \clearpage
 
 <!-- Leadingness and laggingness -->
@@ -825,7 +786,6 @@ df2 <- left_join(
   by = c("geo_value","forecaster","target_end_date" = "time_value"))
 ```
 
-
 ```{r leading-only, include=FALSE, fig.width=6, fig.height=4}
 # Figure 5 in the manuscript
 df2 %>%
@@ -849,8 +809,6 @@ df2 %>%
         plot.margin = margin(b = 20, l = 4),
         legend.background = element_rect(fill = "transparent"))
 ```
-
-
 
 ```{r leading-and-lagging, eval=FALSE}
 # Deprecated
@@ -878,7 +836,6 @@ gg
 ```
 
 \clearpage
-
 
 ```{r lagging-only, fig.cap="Correlation of the difference in WIS with the  laggingness of the indicator at the target date, stratified by up, down, or flat period. Compare to Figure 5 in the manuscript."}
 # Deprecated
@@ -917,25 +874,14 @@ df2 %>%
   theme(legend.position = "bottom", legend.title = element_blank())
 ```
 
-
-
 \clearpage
 
-
-
-
-
 <!-- Figures in the manuscript in their own scripts -->
-
 
 ```{r revisions-dv-jhu, eval=FALSE}
 # Figure 1 in the manuscript
 source(here("code", "figures", "revisions.R"))
 ```
-
-
-
-
 
 ```{r ny-trajectory, eval=FALSE}
 # Figure 2 in the manuscript
@@ -943,16 +889,7 @@ source(here("code", "figures", "trajectory.R"))
 gg
 ```
 
-
-
-
-
-
-
-
-
 \clearpage
-
 
 <!-- Cumulative Mean -->
 
@@ -1151,9 +1088,7 @@ ggplot(df2) +
   scale_y_log10()
 ```
 
-
 <!-- All code below is deprecated -->
-
 
 ```{r fcast-gs-locations, eval=FALSE}
 plotter(fcasts_gs %>% filter(period != "jm"),
@@ -1174,8 +1109,6 @@ plotter_hotspots(hotspots_gs %>% filter(period != "jm")) +
   geom_hline(yintercept = 0.5)
 ```
 
-
-
 ```{r traj-data, eval = FALSE}
 source(here("code", "deprecated", "trajectory_plot_funs.R"))
 preds <- readRDS(here("data", "predictions_honest.RDS"))
@@ -1189,4 +1122,3 @@ rm(preds)
 ```{r trajectory-plots, eval = FALSE}
 for (nm in names(traj_best)) print(trajectory_panel(nm, traj_best, traj_worst))
 ```
-

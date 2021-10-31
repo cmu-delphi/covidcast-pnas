@@ -28,22 +28,23 @@ value will be once all data has been collected). Looking at the \chngcli~and
 \dv~curves in Figure \ref{fig:fcast-finalized}, we can see that they perform
 very similarly when trained on the finalized data.  This is reassuring because
 they are, in principle, measuring the same thing (namely, the percentage of
-outpatient visits that are primarily about COVID-related symptoms).  The
-substantial difference in their curves in Figure 3 of the main paper must
-therefore reflect their having very different backfill profiles.
+outpatient visits that are primarily about COVID-related symptoms), but based on
+data from different providers.  The substantial difference in their curves in
+Figure 3 of the main paper must therefore reflect their having very different
+backfill profiles. 
   
 While using finalized rather than vintage data affects \dv~the least for
 forecasting, it is one of the most affected methods for the hotspot problem.
 This is a reminder that the forecasting and hotspot problems are fundamentally
-distinct.  For example, the hotspot problem does not measure the ability to
-distinguish between flat and downward trends.
+different problems.  For example, the hotspot problem does not measure the
+ability to distinguish between flat and downward trends.
 
 Even the \ar~model is affected by this distinction, reflecting the fact that the
 case rates themselves (i.e., the response values) are also subject to revision.
 The forecasters based on indicators are thus affected both by revisions to the
-indicators and by revisions to the case rates.  In the case of the \gs~model, in
-which we only used finalized values for the \gs~indicator, the difference in
-performance can be wholly attributed to revisions of case rates.
+indicators and by revisions to the case rates.  And in the case of the
+\gs~model, in which we only used finalized values for the \gs~indicator, the
+difference in performance can be wholly attributed to revisions of case rates. 
 
 \section{Aggregation with Geometric Mean}
 
