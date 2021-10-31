@@ -24,7 +24,7 @@ g1 <- std_sigs %>%
   geom_line() +
   theme_bw() +
   ylab("Standardized signal") +
-  xlab("") +
+  xlab("Date") +
   scale_color_viridis_d(begin=.25, end=.75, name = "") +
   theme(legend.position = "bottom")
 
@@ -36,7 +36,7 @@ g2 <- ggplot(tibble(lag = drop(cc$lag), ccf = drop(cc$acf)), aes(lag)) +
   geom_hline(yintercept = 0) +
   geom_vline(xintercept = 0) +
   ylab("Cross correlation") +
-  xlab("Lag (a)") +
+  xlab("Shift value (a)") +
   theme_bw() +
   theme(legend.position = "none")
 

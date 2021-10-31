@@ -47,18 +47,18 @@
 \leadauthor{McDonald} 
 
 % Please add a significance statement to explain the relevance of your work
-\significancestatement{Forecasting is a critical element in the public health
-  response to any fast-moving epidemic or pandemic.  Predicting the future
-  spread of some disease process, based on disease activity in the recent
-  past---say, using autoregressive modeling from the time series literature---is 
-  a basic and widely-used method.  In this paper we study whether including
-  auxiliary indicators as additional features in such an autoregressive model
-  can be useful in COVID-19 case forecasting and hotspot prediction.  We find
-  that indicators based on de-identified medical insurance claims, self-reported
-  symptoms through online surveys, and COVID-related internet search activity
-  all provide a nontrivial improvement in forecast accuracy, though their
-  utility depends on the pandemic's local dynamics (upswing, downswing, or flat
-  period) at prediction time. 
+\significancestatement{Validated forecasting methodology should be a vital  
+  element in the public health response to any fast-moving epidemic or 
+  pandemic. A widely-used model for predicting the future spread of a temporal
+  process, based on past data, is an autoregressive (AR) model. While basic,
+  such an AR model (properly trained) is already competitive with the top models
+  in operational use for COVID-19 forecasting. In this paper, we exhibit five
+  auxiliary indicators---based on de-identified medical insurance claims,
+  self-reported symptoms via online surveys, and COVID-related Google
+  searches---that further improve the predictive accuracy of an AR model in
+  COVID-19 forecasting. The most substantial gains appear to be in quiescent   
+  times; but the Google search indicator appears to also offer improvements
+  during upswings in pandemic activity.   
 }
 
 % Please include corresponding author, author contribution and author
@@ -80,27 +80,24 @@ acquired funding.}
   digital surveillance} 
 
 \begin{abstract}
-  Reliable, short-term forecasts of traditional public health reporting streams
-  (such as cases, hospitalizations, and deaths) are a key ingredient in
-  effective public health decision-making during a pandemic. Since April 2020,
-  our research group has worked with data partners to collect, curate, and make
-  publicly available numerous real-time COVID-19 indicators, providing multiple
-  views of pandemic activity.  This paper studies the utility of these
-  indicators from a forecasting perspective. We focus on five indicators,
-  derived from medical insurance claims data, web search queries, and online
-  survey responses. For each indicator, we ask whether its inclusion in a simple
-  model leads to improved predictive accuracy relative to a similar model
-  excluding it. We consider both probabilistic forecasting of confirmed COVID-19 
-  case rates and binary prediction of case ``hotspots''.  Since the values of 
-  indicators (and case rates) are commonly revised over time, we take special
-  care to ensure that the data provided to a forecaster is the version that
-  would have been available at the time the forecast was made.   
-  % We demonstrate how less careful backtesting can lead to misleading
-  % retrospective evaluations.   
-  Our  analysis shows that consistent but modest gains in predictive accuracy 
-  are obtained by using these indicators, and furthermore, these gains are
-  related to periods in which the auxiliary indicators behave as ``leading
-  indicators'' of case rates.     
+  Short-term forecasts of traditional streams from public health reporting (such 
+  as cases, hospitalizations, and deaths) are a key input to public health
+  decision-making during a pandemic. Since early 2020, our research group has
+  worked with data partners to collect, curate, and make publicly available
+  numerous real-time COVID-19 indicators, providing multiple views of pandemic
+  activity in the U.S.  This paper studies the utility of five such
+  indicators---derived from de-identified medical insurance claims,
+  self-reported symptoms from online surveys, and COVID-related Google search
+  activity---from a forecasting perspective. For each indicator, we ask whether
+  its inclusion in an autoregressive (AR) model leads to improved predictive
+  accuracy relative to the same model excluding it. Such an AR model, without
+  external features, is already competitive with many top COVID-19 forecasting
+  models in use today. Our analysis reveals that (a) inclusion of each of these
+  five indicators improves on the overall predictive accuracy of the AR model;
+  (b) predictive gains are in general most pronounced during times in which
+  COVID cases are trending in ``flat'' or ``down'' directions; (c) one
+  indicator, based on Google searches, seems to be particularly helpful
+  during ``up''  trends.      
 \end{abstract}
 
 \dates{This manuscript was compiled on \today}
@@ -114,78 +111,95 @@ acquired funding.}
 
 \dropcap{T}racking and forecasting indicators from public health reporting
 streams---such as confirmed cases and deaths in the COVID-19 pandemic---is
-crucial for understanding disease spread, formulating public policy responses,
-and anticipating future public health resource needs.  A companion paper
-\cite{Reinhart:2021} describes our research group's (Delphi's) efforts in
-curating and maintaining a database of real-time indicators that track COVID-19
-activity and other relevant phenomena. The signals (a term we use synonomously
-with ``indicators'') in this database are accessible through the COVIDcast API
-\cite{CovidcastAPI}, with associated R \cite{CovidcastR} and Python
-\cite{CovidcastPy} packages for convenient data fetching and processing
-tools. In the current paper, we aim to quantify the utility provided by a core
-set of these indicators for two fundamental prediction tasks: probabilistic
-forecasting of COVID-19 case rates and prediction of future COVID-19 case
-hotspots (defined by the event that a relative increase in COVID-19 cases
-exceeds a certain threshold).
+crucial for understanding disease spread, correctly formulating public policy
+responses, and rationally planning future public health resource needs.  A
+companion paper \cite{Reinhart:2021} describes our research group's efforts,
+beginning in April 2020, in curating, and maintaining a database of real-time
+indicators that track COVID-19 activity and other relevant phenomena. The
+signals (a term we use synonomously with ``indicators'') in this database are
+accessible through the COVIDcast API \cite{CovidcastAPI}, as well as associated
+R \cite{CovidcastR} and Python \cite{CovidcastPy} packages, for convenient data  
+fetching and processing. In the current paper, we quantify the utility provided
+by a core set of these indicators for two fundamental prediction tasks:
+probabilistic forecasting of COVID-19 case rates and prediction of future
+COVID-19 case hotspots (defined by the event that a relative increase in
+COVID-19 cases exceeds a certain threshold).  
 
- At the outset, we should be clear that our intent in this paper is \textit{not}
+At the outset, we should be clear that our intent in this paper is \textit{not}
 to provide an authoritative take on cutting-edge COVID-19 forecasting methods.
-Instead, our purpose here is to provide a rigorous, quantitative assessment of
-the utility that several auxiliary indicators---such as those derived from
-internet surveys or medical insurance claims---provide in tasks that involve
-predicting future trends in confirmed COVID-19 cases. To assess such utility in
-as simple terms as possible, we center our study in the framework of a basic
-autoregressive model (in which COVID cases in the near future are predicted from  
-a linear combination of COVID cases in the near past), and ask whether the 
-inclusion of an auxiliary indicator as an additional feature in such a model
-improves its predictions. 
+Similarly, some authors, e.g., \cite{ioannidis2020a}, have pointed out numerous
+mishaps of forecasting during the pandemic and it is not our general intent to
+fix them here. Instead, we start with a basic and yet reasonably effective
+predictive model for predicting future trends in COVID-19 cases, and present a
+rigorous, quantitative assessment of the added value provided by auxiliary
+indicators, that are derived from data sources that operate outside of 
+traditional public health streams. In particular, we consider five indicators
+derived from de-identified medical insurance claims, self-reported symptoms from
+online surveys, and COVID-related Google searches.
 
-While forecasting carries a rich literature that offers a wide range of
-techniques, see, e.g., \cite{Hyndman:2018}, we purposely constrain ourselves to 
-very simple models, avoiding common enhancements such as order selection,
-correction of outliers/anomalies in the data, and inclusion of regularization or
-nonlinearities. For the same reason, we do not account for other factors that
-may well aid in forecasting, such as age-specific effects, holiday adjustments,
-public health mandates, and so on. That said, analyses of forecasts submitted
-to the COVID-19 Forecast Hub \cite{ForecastHub} by a large community of modelers 
-have shown that simple, robust models have consistently been among the
-best-performing over the pandemic, including time series models similar the ones
-we use in this paper. See, e.g., \cite{Cramer:2021}, for a detailed study
-of death forecasting. Our internal evaluations suggest that the same is true (at
-least, if not to a greater extent) for case forecasting.   
+To assess this value in as direct terms as possible, we base our study around a
+very simple basic model: an autoregressive model, in which COVID cases in the
+near future are predicted using a linear combination of COVID cases in the near
+past. Forecasting carries a rich literature, offering a wide range of
+sophisticated techniques, see, e.g., \cite{Hyndman:2018} for a review; however,
+we purposely avoid enhancements such as order selection, correction of
+outliers/anomalies in the data, and inclusion of regularization or
+nonlinearities. Similarly, we do not account for other factors that may well aid
+in forecasting, such as age-specific effects, holiday adjustments, and the
+effects of public health mandates. All that said, despite its simplicity, the
+basic autoregressive model that we consider in this paper exhibits competitive
+performance (see the Supplementary Materials for details) with many of the top
+COVID-19 case forecasters submitted to the U.S.\ COVID-19 Forecast Hub
+\cite{ForecastHub}, which is the official source of forecasts used in public
+communications by the U.S. CDC. The strong performance of the autoregressive
+model here is in line with the fact that simple, robust models have also
+consistently been among the best-performing ones for COVID-19 death
+forecasting \cite{Cramer:2021}. 
 
 In the companion paper \cite{Reinhart:2021}, we analyze correlations between
 various indicators and COVID case rates. These correlations are natural
 summaries of the contemporaneous association between an indicator and COVID
 cases, but they fall short of delivering a satisfactory answer to the question
 that motivates the current article: is the information contained in an indicator
-demonstrably useful for the prediction tasks we care about? For such a question,
-lagged correlations (e.g., measuring the correlation between an indicator and
-COVID case rates several days in the future) move us in the right direction, but
-still do not move us all the way there. The question about \textit{utility for
-  prediction} is focused on a much higher standard than simply asking about 
-correlations; to be useful in forecast or hotspot models, an indicator must
-provide relevant information that is not otherwise contained in past values of
-the case rate series itself. We will assess this in the most direct way
-possible: by inspecting the difference in predictive performance of simple
-autoregressive models trained with and without access to past values of a
-particular indicator.
+demonstrably useful for the prediction tasks we care about? Note that even
+lagged correlations cannot deliver a complete answer. Demonstrating
+\textit{utility for prediction} is a much higher standard than simply asking
+about correlations; to be useful in forecast or hotspot models, an indicator
+must provide relevant information that is not otherwise contained in past values
+of the case rate series itself (cf.\ the pioneering work on Granger  causality
+\cite{Granger:1969, engle1987a}, as well as the further references given 
+below). We assess this directly by inspecting the difference in predictive  
+performance of simple autoregressive models trained with and without access to  
+past values of a particular indicator. 
 
-There is another, more subtle issue in evaluating predictive utility that 
-deserves explicit mention, as it will play a key role in our analysis.
-Signals computed from surveillance streams will often be subject to  
-latency and/or revision. For example, a signal based on aggregated medical
-insurance claims may be available after just a few days, but it can then be
-substantially revised over the next several weeks as additional claims are
-submitted and/or processed late. Correlations between such a signal and case
-rates calculated ``after the fact'' (i.e., computed retrospectively, using the
-finalized values of this signal) will not deliver an honest answer to the    
-question of whether this signal would have been useful in real time. Instead,
-we build predictive models using only the data that would have been available
-\textit{as of} the prediction date, and compare the ensuing predictions in terms 
-of accuracy. To do so, we leverage Delphi's \texttt{evalcast} R package 
-\cite{EvalcastR}, which plugs into the COVIDcast API's data versioning system,  
-and facilitates honest backtesting. 
+We find that each of the five indicators we consider--- two based on
+COVID-related outpatient visits from medical insurance claims, one on
+self-reported symptoms from online surveys, and one on Google searches for
+anosmia or ageusia---provide an overall improvement in accuracy when
+incorporated into the autorgressive model. This is true both for COVID-19 case 
+forecasting and hotspot prediction. Further analysis reveals that the gains in
+accuracy depend on the pandemic's dynamics at prediction time: the biggest  
+gains in accuracy appear during times in which cases are ``flat'' or trending
+``down''; but the indicator based on Google searches offers a most notable
+improvement when cases are trending ``up''.  
+
+Careful handling of data revisions plays a key role in our analysis. Signals 
+computed from surveillance streams are often subject to latency and/or 
+revision. For example, a signal based on aggregated medical insurance claims may
+be available after just a few days, but it can then be substantially revised
+over the next several weeks as additional claims are submitted and/or processed
+late. Correlations between such a signal and case rates calculated ``after the
+fact'' (i.e., computed retrospectively, using the finalized values of this
+signal) will not deliver an honest answer to the question of whether this signal
+would have been useful in real time. Instead, we build predictive models using
+only the data that would have been available \textit{as of} the prediction date,
+and compare the ensuing predictions in terms of accuracy. The necessity of
+real-time data for honest forecast evaluations has been recognized in
+econometrics for a long time, see \cite{howrey1978a, harvey1983a, mankiw1986a,
+  trivellato1986a, diebold1991a, patterson1995a, koenig2003a, croushore2006a,
+  clark2009a, faust2009a, croushore2011a}; but it is often overlooked in
+epidemic forecasting despite its critical importance, see, e.g.,
+\cite{chakraborty2018know}.  
 
 Finally, it is worth noting that examining the importance of additional features
 for prediction is a core question in inferential statistics and econometrics,
@@ -194,10 +208,10 @@ rigorous inference based on predictions, without (or with lean) assumptions, is
 an active field of research from both the applied and theoretical angles;
 see, e.g., \cite{Diebold:2002, McCraken:2007, Diebold:2015, Stokes:2017,
   Lei:2018, Rinaldo:2019, Williamsom:2020, Zhang:2020, Dai:2021, Fryer:2021}.
-Our take on this problem is in line with much of this literature; however, in
-order to avoid making any explicit assumptions, we do not attempt to make formal 
-significance statements, and instead, broadly examine the stability of our
-conclusions with respect to numerous modes of analysis.
+Our take in the current work is in line with much of this literature; however,
+in order to avoid making any explicit assumptions, we do not attempt to make
+formal  significance statements, and instead, broadly examine the stability of
+our conclusions with respect to numerous modes of analysis.
 
 \section{Methods}
 
@@ -230,10 +244,10 @@ in the API, we study the following five:
   Google search volume for queries that relate to anosmia or ageusia (loss of
   smell or taste), based on Google's COVID-19 Search Trends data set.
 \end{itemize}
-In short, we choose these indicators because, conceptually speaking, they
-measure aspects of an individual's disease progression that would plausibly
-precede the occurence of (at worst, co-occur  with) the report of a positive
-COVID-19 test, through standard public health reporting streams.
+We choose these indicators because, conceptually speaking, they measure aspects
+of an individual's disease progression that would plausibly precede the  
+occurence of (at worst, co-occur  with) the report of a positive COVID-19 test,
+through standard public health reporting streams. 
 
 For more details on the five indicators (including how these are precisely
 computed from the underlying data streams) we refer to
@@ -255,7 +269,7 @@ region. Each HRR also contains at least one city where major procedures
 (cardiovascular or neurological) are performed. The smallest HRR has a
 population of about 125,000. While some are quite large (such as the one
 containing Los Angeles, which has more than 10 million people), generally HRRs  
-are much more homogenous in size than the (approximately) 3200 counties,  
+are much more homogenous in size than the (approximately) 3200 U.S. counties,   
 and they serve as a nice middle ground in between counties and states.  
 
 HRRs, by their definition, would be most relevant for forecasting hospital
@@ -317,12 +331,12 @@ See Figure~\ref{fig:vintage} for an example.
 
 Lastly, our treatment of the Google-AA signal is different from the rest.
 Because Google's team did not start publishing this signal until early
-September, 2020, we do not have true vintage data before then.  Furthermore, the
-latency of the signal was always at least one week through 2020.  However,
-unlike the claims-based signals, there is no reason for revisions to occur after
-initial publication, and furthermore, the latency of the signal is not an
-unavoidable property of the data type, so we simply use finalized signal values,
-with zero latency, in our analysis.
+September, 2020, we do not have true vintage data before then; the latency of 
+the signal was always at least one week through 2020.  However, unlike the
+claims-based signals, there is no reason for revisions to occur after initial
+publication, and furthermore, the latency of the signal is not an unavoidable
+property of the data type, so we simply use finalized signal values, with zero
+latency, in our analysis. 
 
 \subsection{Analysis Tasks}
 
@@ -359,9 +373,9 @@ change of $Y_{\ell,t+a}$ (relative to its value one week prior,
 $Y_{\ell,t+a-7}$), again for each $a=7,\ldots,21$.   
 
 Why do we define the response variables via 7-day averaging? The short answer 
-is robustness: averaging stabilizes the case time series, and accounts for 
-uninteresting artifacts like day-of-the-week effects in the series.  Note that
-we can also equivalently view this (equivalent up to a constant factor) as
+is robustness: averaging stabilizes the case time series, and moderates
+uninteresting artifacts like day-of-the-week effects in the data.  We note
+that we can also equivalently view this (equivalent up to a constant factor) as 
 predicting the HRR-level case incidence rate \textit{summed} over some 7-day
 period in the future, and predicting a binary variable derived from this.     
 
@@ -387,10 +401,7 @@ ends up being (per our setup, with 21 days of training data and lagged values
 of signals for features, as we will detail shortly) June 9, 2020 for
 forecasting, and June 16, 2020 for hotspot prediction. (The bottleneck here is
 the CTIS-CLI-in-community signal, which does not exist before early April 2020,
-when the survey was first launched). The end date was chosen again with a 
-consideration to align both tasks as best as possible, and because very few
-hotspots exist for the several few months of 2021, due to the general and
-gradual decline of the pandemic during this period.  
+when the survey was first launched). 
 
 \paragraph{Forecasting Models}
 
@@ -436,7 +447,7 @@ training data.
 
 At prediction time, in order to avoid crossing violations (that is, for two
 levels $\tau' > \tau$, the predicted quantile at level $\tau$ exceeds the
-predicted quantile at level $\tau'$), we apply a simple post-hoc sorting.  See
+predicted quantile at level $\tau'$), we apply a simple post hoc sorting.  See 
 Figure~\ref{fig:trajectory} for an example forecast. 
 
 \begin{figure}[t]
@@ -489,7 +500,7 @@ pooling all 306 HRRs and using a 21-day trailing window for the training data.
 
 An important detail is that in hotspot prediction we remove all data from
 training and evaluation where, on average, fewer than 30 cases (this refers to a
-count, not a rate) are observed over the preceding 7 days. This avoids having to
+count, not a rate) are observed over the prior 7 days. This avoids having to
 make arbitrary calls for a hotspot (or lack thereof) based on small counts.   
 
 \subsection{Evaluation Metrics}
@@ -499,7 +510,7 @@ quantile models in \eqref{eq:forecast_ar} and \eqref{eq:forecast_ar_x} using
 \textit{weighted interval score} (WIS), a quantile-based scoring rule; see,
 e.g., \cite{Gneiting:2007}.  WIS is a proper score, which means that its
 expectation is minimized by the population quantiles of the target variable.
-The use of WIS in COVID-19 forecast scoring is discussed in \cite{Bracher:2021};
+The use of WIS in COVID-19 forecast scoring was proposed by \cite{Bracher:2021}; 
 WIS is also the main evaluation metric used in the COVID-19 Forecast Hub. More
 broadly, the specific form of WIS used here is a standard metric in the
 forecasting community for evaluating quantile-based probabilistic forecasts,
@@ -536,8 +547,8 @@ presentation, as the score nicely decouples into a ``sharpness'' component
 (first term in each summand) and an ``under/overprediction'' component (second
 term in each summand).  But the second form given in \eqref{eq:wis_quantiles} is 
 especially noteworthy in our current study because it reveals WIS to be the same
-as the quantile regression loss that we use to train our forecasting models
-(i.e., we fit by optimizing WIS averaged over the training data).
+as the quantile regression loss that we use to train our forecasting models.
+%(i.e., we fit by optimizing WIS averaged over the training data).
 
 For hotspot prediction, we evaluate the probabilistic classifiers produced by
 the logistic models in \eqref{eq:hotspot_ar} and \eqref{eq:hotspot_ar_x} using
@@ -584,15 +595,15 @@ involving claims-based signals in particular.
 Some signals have a significant amount of spatial heterogeneity, by which we
 mean their values across different geographic locations are not comparable.
 This is the case for the Google-AA signal (due to the way in which the
-underlying search trends time series is self-normalized, see
+Google search trends time series is self-normalized, see
 \cite{GoogleSymptoms}) and the claims-based signals (due to market-share 
 differences, and/or differences in health-seeking behavior).  Such spatial
 heterogeneity likely hurts the performance of the predictive models that rely on
 these signals, because we train the models on data pooled over all locations.
-In the current paper, we do not attempt to address this issue (it is again a
-topic of ongoing work in our group), and we simply note that location-specific
-effects (or pre-processing to remove spatial bias) would likely improve the
-performance of the models involving Google-AA and the claims-based indicators.
+In the current paper, we do not attempt to address this issue, and we simply
+note that location-specific effects (or pre-processing to remove spatial bias)
+would likely improve the performance of the models involving Google-AA and the
+claims-based indicators. 
 
 \section{Results}
 
@@ -603,7 +614,7 @@ always be clear from the context). We will also use the name of an auxiliary
 indicator---namely ``CHNG-CLI'',  ``CHNG-COVID'', ``CTIS-CLI-in-community'',
 ``DV-CLI'', or ``Google-AA''---interchangeably with the model in forecasting, 
 \eqref{eq:forecast_ar_x}, or hotspot prediction, \eqref{eq:hotspot_ar_x}, that
-uses this particular indicator as a feature (the meaning should be clear from
+uses this same indicator as a feature (the meaning should be clear from
 the context).  So, for example, the CHNG-CLI model in forecasting is the one in  
 \eqref{eq:forecast_ar_x} that sets $X_{\ell,t}$ to be the value of the CHNG-CLI
 indicator at location $\ell$ and time $t$.  Finally, we use the term ``indicator
@@ -611,7 +622,7 @@ model'' to refer to any one of the ten models of the form
 \eqref{eq:forecast_ar_x} or \eqref{eq:hotspot_ar_x} (five from each of the
 forecasting and hotspot prediction tasks).
 
-We begin with a summary of the high-level conclusions.  
+Below is summary of the high-level conclusions.  
 
 \begin{itemize}
 \item Stratifying predictions by the ahead value ($a=7,\ldots,21$), and
@@ -623,7 +634,7 @@ We begin with a summary of the high-level conclusions.
 
 \item In the same aggregate view, CHNG-COVID and DV-CLI offer the biggest 
   gains in both forecasting and hotspot prediction.  CHNG-CLI is
-  inconsistent: it provides a big gain in hotspot prediction, but little gain 
+  inconsistent: it provides a large gain in hotspot prediction, but little gain  
   in forecasting (it seems to be hurt by a notable lack of robustness, due
   to backfill).  CTIS-CLI-in-community and Google-AA each provide decent 
   gains in forecasting and hotspot prediction.  The former's performance in 
@@ -635,18 +646,18 @@ We begin with a summary of the high-level conclusions.
   decreasing (most notable in CHNG-COVID and CTIS-CLI-in-community), but can be
   worse than AR when case rates are increasing (this is most notable in CHNG-CLI
   and DV-CLI). More rarely does an indicator model tend to beat AR when case
-  rates are increasing, but there appears to be some evidence of this for the
-  Google-AA model.  
+  rates are increasing, but there appears to be evidence of this for the
+  Google-AA model.   
   % In an increasing period, when an indicator model is worse than AR, it tends
   % to underpredict relative to AR (its median forecast is lower).  In a flat
   % or decreasing period, when an indicator model is better than AR, AR tends
   % to overpredict relative to it (the median AR forecast is higher).   
 
-\item In this same analysis, when an indicator model performs better than AR in
-  a decreasing period, this tends to co-occur with instances in which the
+\item In this same analysis, when an indicator model performs better than AR 
+  in a decreasing period, this tends to co-occur with instances in which the 
   indicator ``leads'' case rates (meaning, roughly, on a short-time scale in a
   given location, its behavior mimics that of future case rates).  On
-  the other hand, if an an indicator model does better in periods of
+  the other hand, if an indicator model does better in periods of
   increase, or worse in periods of increase or decrease, its performance is
   not as related to leadingness.   
 \end{itemize}
@@ -668,8 +679,7 @@ The Supplement provides a number of other additional analyses; for example, we
 examine two assumption-lean methods for assessing the statistical significance
 of our main results.
 
-Code to reproduce all results (which uses the \texttt{evalcast} R package) can 
-be found at
+Code to reproduce all results can be found at
 \url{https://github.com/cmu-delphi/covidcast-pnas/tree/main/forecast/code}. 
 
 \subsection{Aggregate Results by Ahead Value}
@@ -730,29 +740,29 @@ function can absorb a lot of the variability in its input).
 
 \subsection{Implicit Regularization Hypothesis}
 
-One might ask if the benefits we observe in forecasting and hotspot
-prediction have anything to do with the actual indicator themselves. A plausible  
-alternative explanation is that the indicators are simply providing \textit{implicit
-  regularization} on top of the basic AR model, in the same way any noise
-variable might, when we include them as lagged features in
-\eqref{eq:forecast_ar_x} and \eqref{eq:hotspot_ar_x}. 
+One might ask if the benefits observed in forecasting and hotspot
+prediction have anything to do with the actual auxiliary indicators
+themselves. A plausible alternative explanation is that the indicators are
+just providing \textit{implicit regularization} on top of the basic AR model,
+in the same way any noise variable might, if we were to use it to create lagged
+features in \eqref{eq:forecast_ar_x} and \eqref{eq:hotspot_ar_x}.    
 
 To test this hypothesis, we reran all of the prediction experiments but with
-$X_{\ell,t}$ in the each indicator models replaced with suitable random noise
+$X_{\ell,t}$ in each indicator model replaced by suitable random noise
 (bootstrap samples from a signal's history).  The results, shown and explained
-more precisely in the Supplementary Materials, are vastly different (worse) than
-the original set of results.  In both forecasting and hotspot prediction, the
-``fake'' indicator models offered essentially no improvement over the pure AR
-model, which strongly rejects (informally speaking) the implicit regularization
-hypothesis.
+more precisely in the Supplement, are vastly different (i.e., worse) than the
+original set of results.  In both forecasting and hotspot prediction, the
+``fake'' indicator models offer essentially no improvement over the pure AR
+model, which---informally speaking---strongly rejects the implicit
+regularization hypothesis. 
 
 On the topic of regularization, it is also worth noting that the use of 
-$\ell_1$ regularization (tuned by cross-validation) in fitting any of the models
-in \eqref{eq:forecast_ar}, \eqref{eq:forecast_ar_x}, \eqref{eq:hotspot_ar}, or 
-\eqref{eq:hotspot_ar_x} did not generally improve their performance
-(experiments not shown).  This is likely due to the fact that the number of
-training samples is large compared to the number of features (6,426 training
-samples and only 3--6 features). 
+$\ell_1$ regularization (tuned using cross-validation) in fitting any of the
+models in \eqref{eq:forecast_ar}, \eqref{eq:forecast_ar_x},
+\eqref{eq:hotspot_ar}, or  \eqref{eq:hotspot_ar_x} did not generally improve
+their performance (experiments not shown).  This is likely due to the fact that
+the number of training samples is large compared to the number of features
+(6,426 training samples and only 3--6 features).  
 % DJM: and that proper CV requires longer training windows, exacerbating the
 % nonstationarity, a scenario in which its behavior is poorly understood.
 
@@ -783,21 +793,20 @@ AR model and each indicator model, where we stratify these differences by
 whether the target occurs during a period of increasing cases rates (up),
 decreasing case rates (down), or flat case rates (flat). To define the
 increasing period, we use the same definition we used for the hotspot task in
-Table \ref{tab:analysis_tasks}.  Therefore all hotspots are ``up'', while all
-non-hotspots are either ``flat'' or ``down''.  For the ``down'' scenario, we 
-simply use the opposite of the hotspot definition: $Y_{\ell,t}$ decreases by
-more than 20\% relative to the preceding week.  
+Table \ref{tab:analysis_tasks}.  Therefore, all hotspots are labeled ``up'',
+while all non-hotspots are either ``flat'' or ``down''.  For the ``down''
+scenario, we simply use the opposite of the hotspot definition: $Y_{\ell,t}$
+decreases by more than 20\% relative to the preceding week.  
 
-While the performance of all forecasters, including AR, will generally degrade
-in up periods, different models exhibit different and interesting patterns.
-CHNG-CLI, CHNG-COVID, Google-AA, and especially CTIS-CLI-in-community have
-large right tails (displaying improvements over AR) during the down periods. 
-Google-AA and CTIS-CLI-in-community have large right tails during the flat
-periods. CHNG-CLI and DV-CLI have large left tails (poor forecasts relative to
-AR) in flat and up periods.  Google-AA is the only model that outperforms
-the AR model, on average, over up periods.  Overall, the indicators seem to help
-more during flat or down periods than up periods, with the exception of
-Google-AA.    
+While the performance of all models, including AR, generally degrades in up
+periods, different models exhibit different and interesting patterns. CHNG-CLI,
+CHNG-COVID, Google-AA, and especially CTIS-CLI-in-community have large right
+tails (showing improvements over AR) during the down periods.  Google-AA and
+CTIS-CLI-in-community have large right tails during the flat periods. CHNG-CLI
+and DV-CLI have large left tails (poor forecasts relative to AR) in flat and up
+periods.  Google-AA is the only model that outperforms the AR model, on average,
+in up periods.  Overall, the indicators seem to help more during flat or down
+periods than during up periods, with the exception of Google-AA.
 
 The Supplement pursues this analysis further.  For example, we examine
 classification accuracy and log-likelihood for the hotspot task and find a
@@ -807,6 +816,7 @@ periods when CHNG-CLI, CHNG-COVID, and DV-CLI, in particular, lead to decreased
 performance.
 
 \subsection{Effects of Leading or Lagging Behavior}
+\label{sec:leading-lagging}
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{fig/leading-only-1.pdf}
@@ -827,19 +837,24 @@ of an indicator (degree to which it leads case activity) tends to be more
 pronounced in down or flat periods than in up periods, a plausible explanation 
 for the decreased performance in up periods noted above.
 
-In the supplement, we show how to define a quantitative score to measure the
-leadingness of an indicator, at any time $t$ and any location $\ell$, based on
+In the supplement, we define a quantitative score to measure the 
+leadingness of an indicator, at any time $t$ and any location $\ell$, based on 
 cross correlations to case rates over a short time window around $t$.
-The higher this score, the greater it ``leads'' case activity.  Figure 
-\ref{fig:leading} displays correlations between the leadingness score of an 
-indicator and the WIS difference (AR model minus an indicator model), stratified
-by whether the target is classified as up, down, or flat.  One would naturally
-expect that the WIS difference would be positively correlated with leadingness.
-Somewhat surprisingly, this relationship turns out to be strongest in down
-periods and weakest in up periods.  In fact, it is very nearly the case that for
-each indicator, the strength of correlations only decreases as we move from down
-to flat to up  periods.  In the supplement, we extend this analysis by studying 
-analogous ``laggingness'' scores, but we do not find as clear patterns. 
+The higher this score, the greater it ``leads'' case activity. This analysis is
+closely related to Granger causality \cite{engle1987a} and draws on a large
+body of prior work that measures leadingness in economic time-series, e.g., 
+\cite{mitchell1938a, koopmans1947a, shiskin1968a, granger1969a, yeats1972a, 
+  sargent1977a, auerbach1982a, koch1988a, StockWatson1989, diebold1989a,
+  lahiri1991a, emerson1996a, hamilton1996a}. Figure \ref{fig:leading} displays
+correlations between the leadingness score of an indicator and the WIS
+difference (AR model minus an indicator model), stratified by whether the target
+is classified as up, down, or flat.  One would naturally expect that the WIS
+difference would be positively correlated with leadingness.  Somewhat
+surprisingly, this relationship turns out to be strongest in down periods and
+weakest in up periods.  In fact, it is very nearly the case that for each
+indicator, the strength of correlations only decreases as we move from down to
+flat to up periods.  In the supplement, we extend this analysis by studying
+analogous ``laggingness'' scores, but we do not find as clear patterns.
 
 \section{Discussion}
 
@@ -848,15 +863,14 @@ models?  Our answer, based on analyzing five auxiliary indicators from the
 COVIDcast API (defined using from medical insurance claims, internet-based
 surveys, and internet search trends) is undoubtedly ``yes''. However, there are
 levels of nuance to such an answer that must be explained.  None of the
-indicators that we have investigated appear to be the ``silver bullet'' that one
-might have hoped for, revolutionizing the tractability of the prediction
-problem, rendering it easy when it was once hard (in the absence of auxiliary
-information).  Rather, the gains in accuracy from the indicator models (over an
+indicators that we have investigated are transformative, rendering the
+prediction problem easy when it was once hard (in the absence of auxiliary
+information). Rather, the gains in accuracy from the indicator models (over an 
 autoregressive model based only on past case rates) appear to be nontrivial, and
 consistent across modes of analysis, but modest.  In forecasting, the indicator
 models are found to be most useful in periods in which case rates are flat or
 trending down, rather than periods in which case rates are trending up (as one
-might hope to see is the benefit provided by a hypothetical ``leading
+might hope to see is the benefit being provided by a hypothetical ``leading 
 indicator'').
 
 As described previously, it is likely that we could improve the indicator models
@@ -869,32 +883,42 @@ insights. Natural directions to explore include using multiple indicators in a
 single model, allowing for interaction terms, and leveraging HRR demographics or
 mobility patterns.  That said, we are doubtful that more sophisticated modeling
 techniques would change the ``topline'' conclusion---that auxiliary indicators
-can provide nontrivial, consistent, but modest gains in forecasting and hotspot
-prediction. Whether a more sophisticated model would be able to leverage the
-indicators in such a way as to change some of the finer conclusions (e.g., by 
-offering clear improvements in periods in which cases are trending up) is less 
-clear to us.
+can provide clear but modest gains in forecasting and hotspot prediction.   
+
+However, rigorously vetting the details for more sophisticated models, as well
+as the generalizability of our findings to different geographic resolutions,
+both remain important directions for future study.  For example, in the
+Supplementary Materials we show that for forecasting at the state level, the
+benefits of including indicators in the AR model are generally less clear
+(compared to those observed at the HRR level).  A plausible explanation: at the
+state level, where the signal-to-noise ratio (SNR) is higher, AR performs better
+overall and represents a higher standard (when asking whether it can be improved
+upon using the indicators).  At the HRR level, where the SNR is lower, including
+the indicators as additional linear features in the AR model probably delivers a
+kind of variance reduction (just like averaging independent terms would) which
+contributes to improved accuracy.  But as the SNR increases, this variance
+reduction becomes less important, and perhaps we must use more sophisticated
+modeling techniques to extract comparable value from the indicators.
 
 We reiterate the importance of using vintage data for rigorous backtesting. Data
 sources that are relevant to public health surveillance are often subject to
-revision, sometimes regularly (such as medical claims data) and sometimes
+revision, sometimes regularly (as in medical claims data) and sometimes
 unpredictably (such as COVID-19 case reports).  When analyzing models that are
 designed to predict future events, if we train these models and make predictions
 using finalized data, then we are missing a big part of the story.  Not only
 will our sense of accuracy be unrealistic, but certain models may degrade by a
-greater or lesser extent when they are forced to work with vintage data, so 
-backtesting them with finalized data may lead us to make modeling decisions that
-are suboptimal for true test-time performance.    
+greater or lesser extent when they are forced to reckon with vintage data, so  
+backtesting on finalized data may lead us to make modeling decisions that are
+suboptimal for true test-time performance.     
 
 In this paper, we have chosen to consider only very simple forecasting models,
 while devoting most of our effort to accounting for as much of the complexity of
-the underlying data and evaluation as possible.  In fact, our paper is as much
-about demonstrating how one might address questions about model comparisons and
-evaluation in forecasting and hotspot prediction in general, as it is about
-providing rigorous answers to such questions in the context of COVID-19 case
-rates in particular.  We hope that others will leverage our framework, and build
-on it, so that it can be used to guide work that advances the frontier of
-predictive modeling for epidemics and pandemics.
+the underlying data and evaluation as possible. In fact, our paper is not only
+about providing rigorous answers to questions about model comparisons in
+COVID-19 forecasting and hotspot prediction, but also about demonstrating how 
+one might go about answering such questions in general. We hope that others will
+leverage our work, and build on it, to guide advances on the frontier of
+predictive modeling for epidemics and pandemics.    
 
 \acknow{We thank Matthew Biggerstaff, Logan Brooks, Johannes Bracher, Michael 
   Johansson, Evan Ray, Nicholas Reich, and Roni Rosenfeld for several

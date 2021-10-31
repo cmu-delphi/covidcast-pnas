@@ -56,7 +56,7 @@
 
 }
 
-\caption{Relative forecast WIS with vintage compared to finalized data. Using finalized data leads to overly optimistic performance.}\label{fig:fcast-honest-v-finalized}
+\caption{Forecast performance with vintage compared to finalized data. Using finalized data leads to overly optimistic performance.}\label{fig:fcast-honest-v-finalized}
 \end{figure}
 
 \clearpage
@@ -67,7 +67,7 @@
 
 }
 
-\caption{Relative AUC with vintage compared to finalized data. Using finalized data leads to overly optimistic hotspot performance.}\label{fig:hot-honest-v-finalized}
+\caption{Hotspot prediction performance with vintage compared to finalized data. Using finalized data leads to overly optimistic performance.}\label{fig:hot-honest-v-finalized}
 \end{figure}
 
 \clearpage
@@ -78,7 +78,7 @@
 
 }
 
-\caption{Weighted interval score appears to more closely resemble a log-Gaussian distribution.}\label{fig:wis-densities}
+\caption{WIS values from forecast models, which appear to be roughly log-Gaussian.}\label{fig:wis-densities}
 \end{figure}
 
 \clearpage
@@ -89,7 +89,18 @@
 
 }
 
-\caption{Relative forecast performance using vintage data and summarizing with the more robust geometric mean.}\label{fig:fcast-adjusted}
+\caption{Forecast performance (using vintage data), summarized by geometric mean.}\label{fig:fcast-adjusted}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+
+{\centering \includegraphics[width=\textwidth]{fig/compare-states-to-hub} 
+
+}
+
+\caption{Forecast performance for AR and indicator models, each retrained at the state level, compared to models submitted to the COVID-19 Forecast Hub over the same period. The thin grey lines are individual models from the Hub; the light blue line is the Hub ensemble model. To align prediction dates as best as possible, we look at the AR and indicator model forecasts for 5, 12, 19, and 26 days ahead; this roughly corresponds to 1, 2, 3, and 4 weeks ahead, respectively, since in the Hub, models typically submit forecasts on a Tuesday for the epiweeks aligned to end on each of the following 4 Saturdays.}\label{fig:compare-to-hub}
 \end{figure}
 
 \clearpage
@@ -100,19 +111,19 @@
 
 }
 
-\caption{P-values for a sign test that the WIS of the AR forecaster is smaller than that of the indicator-assisted model. Each P-value corresponds a particular forecast date.}\label{fig:sign-test}
+\caption{P-values from a one-sided sign test for improved forecast performance of the indicator-assisted models. Each p-value corresponds to a forecast date. The alternative hypothesis is that the AR model is better (median difference between the relative WIS of the AR model and an indicator model is negative).}\label{fig:sign-test}
 \end{figure}
 
 \begin{table}
 
-\caption{\label{tab:dm-test}$P$-values for a one-sided Diebold-Mariano test for improvement in forecast error. The test is for the null hypothesis of equal performance against the alternative that the indicator assisted model is better.}
+\caption{\label{tab:dm-test}P-values from a one-sided Diebold-Mariano test for improvemed forecast performance when adding the indicators. The alternative hypothesis is that the AR model is better.}
 \centering
 \begin{tabular}[t]{lrrrrr}
 \toprule
 metric & CHNG-CLI & CHNG-COVID & CTIS-CLIIC & DV-CLI & Google-AA\\
 \midrule
-Geometric Mean Relative WIS & 0.116 & 0.067 & 0.000 & 0.059 & 0.008\\
-Mean Relative WIS & 0.159 & 0.111 & 0.002 & 0.074 & 0.064\\
+Geometric mean & 0.072 & 0.036 & 0.005 & 0.032 & 0.026\\
+Mean & 0.177 & 0.132 & 0.006 & 0.092 & 0.103\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -156,7 +167,7 @@ Mean Relative WIS & 0.159 & 0.111 & 0.002 & 0.074 & 0.064\\
 
 }
 
-\caption{Average difference between the WIS of the AR model and the WIS of the other forecasters. The indicator-assisted forecasters do best during down and flat periods.}\label{fig:upswing-summary}
+\caption{Average difference between the WIS of the AR model and of the indicator models, separated into up, down, and flat periods. The indicator models generally do best during down and flat periods.}\label{fig:upswing-summary}
 \end{figure}
 
 \clearpage
@@ -167,10 +178,8 @@ Mean Relative WIS & 0.159 & 0.111 & 0.002 & 0.074 & 0.064\\
 
 }
 
-\caption{Classification and loglikelihood separated into periods of upswing, downswing, and flat cases. Like the analysis of the forecasting task in the main paper (see Figure 7), relative performance is better during down and flat periods.}\label{fig:hotspots-upswing-downswing}
+\caption{Percentage change in classification error and log likelihood, relative that of the AR model, separated into up, down, and flat periods. Like the analogous forecasting analysis, the indicator models generally do better during down and flat periods.}\label{fig:hotspots-upswing-downswing}
 \end{figure}
-
-\clearpage
 
 \begin{figure}
 
@@ -178,10 +187,8 @@ Mean Relative WIS & 0.159 & 0.111 & 0.002 & 0.074 & 0.064\\
 
 }
 
-\caption{Histograms of the Spearman correlation between the ratio of AR to AR WIS with the percent change in smoothed case rates relative to 7 days earlier.}\label{fig:cor-wis-ratio}
+\caption{Histograms of the Spearman correlation between the ratio of forecaster WIS to AR WIS with the \% change in case rates, relative to case rates 7 days earlier.}\label{fig:cor-wis-ratio}
 \end{figure}
-
-\clearpage
 
 \clearpage
 
@@ -191,7 +198,7 @@ Mean Relative WIS & 0.159 & 0.111 & 0.002 & 0.074 & 0.064\\
 
 }
 
-\caption{Correlation of the difference in WIS with the difference in median predictions for the AR model relative to the indicator-assisted forecaster. In down periods, improvements in forecast risk are highlycorrelated with lower median predictions. The opposite is true in up periods. This suggests, as one might expect that improved performance of the indicator-assisted model is attributable to being closer to the truth then the AR model. This conclusion is stronger in down periods then in up periods.}\label{fig:upswing-corr-table}
+\caption{Correlation of the difference in WIS with the difference in median predictions (each difference being between the AR model and an indicator model), separated into up, down, and flat periods. In down periods, improvements in forecast error are highly correlated with lower median predictions. The opposite is true in up periods, but the conclusion here appears to be weaker.}\label{fig:upswing-corr-table}
 \end{figure}
 
 \clearpage
@@ -202,7 +209,7 @@ Mean Relative WIS & 0.159 & 0.111 & 0.002 & 0.074 & 0.064\\
 
 }
 
-\caption{Percent change in average WIS of the forecaster (AR or indicator assisted) relative to the baseline. All models perform poorly durning down periods, but the indicators help. During flat periods, the indicators improve slightly over the AR. During up periods, all forecasters do much better than the baseline, but only some do as well as AR.}\label{fig:upswing-summary-remake}
+\caption{Percentage change in average WIS of the forecaster (AR or indicator assisted), relative to the baseline. All models perform poorly during down periods, but the indicators help. During flat periods, the indicators improve slightly over the AR. During up periods, all forecasters do much better than the baseline, but only some do as well as AR.}\label{fig:upswing-summary-remake}
 \end{figure}
 
 \clearpage
@@ -213,7 +220,7 @@ Mean Relative WIS & 0.159 & 0.111 & 0.002 & 0.074 & 0.064\\
 
 }
 
-\caption{Illustration of the cross-correlation function between DV-CLI and cases. The left panel shows the standardized signals over the period from August 1 to September 28 (as of May 15, 2021). The right panel shows $\CCF_{\ell}(a)$ for different values of $a$ as vertical blue bars. The orange dashed lines indicate the 95\% significance threshold. By our leadingness/laggingness metric, DV-CLI is leading (but notlagging) cases over this period.}\label{fig:ccf-dv-finalized}
+\caption{Illustration of the cross-correlation function between DV-CLI and cases. The left panel shows the standardized signals over the period from August 1 to September 28 (as of May 15, 2021). The right panel shows $\CCF_{\ell}(a)$ for different values of $a$ as vertical blue bars. The orange dashed line indicates the 95\% significance threshold. By our leadingness/laggingness metric, DV-CLI is leading (but not lagging) cases over this period.}\label{fig:ccf-dv-finalized}
 \end{figure}
 
 \clearpage
@@ -224,7 +231,7 @@ Mean Relative WIS & 0.159 & 0.111 & 0.002 & 0.074 & 0.064\\
 
 }
 
-\caption{Correlation of the difference in WIS with the  laggingness of the indicator at the target date, stratified by up, down, or flat period. Compare to Figure 5 in the manuscript.}\label{fig:lagging-only}
+\caption{Correlation of the difference in WIS with the laggingness of the indicator at the target date, stratified by up, down, or flat period. Compare to Figure 5 in the manuscript.}\label{fig:lagging-only}
 \end{figure}
 
 \clearpage
@@ -248,19 +255,10 @@ Mean Relative WIS & 0.159 & 0.111 & 0.002 & 0.074 & 0.064\\
 
 }
 
-\caption{This figure shows the cumulative sum of WIS for each forecaster divided by the cumulative sum of WIS for the baseline model. The shaded background shows total U.S. cases as reported by JHU-CSSE for the 14-day ahead target. Hashes along the $x$-axis denote weeks.}\label{fig:cumulative-mean}
+\caption{Cumulative sum of WIS for each forecaster divided by the cumulative sum of WIS for the baseline model. The shaded background shows national case incidence for the 14-day ahead target. Hash marks along the x-axis denote weeks.}\label{fig:cumulative-mean}
 \end{figure}
 
 \clearpage
-
-\begin{figure}
-
-{\centering \includegraphics[width=\textwidth]{fig/cumulative-geo-mean-1} 
-
-}
-
-\caption{This figure shows the cumulative geometric mean of WIS for each forecaster divided by the WIS for the baseline model. The shaded background shows total U.S. cases as reported by JHU-CSSE for the 14-day ahead target. Hashes along the $x$-axis denote weeks.}\label{fig:cumulative-geo-mean}
-\end{figure}
 
 \clearpage
 
@@ -270,12 +268,8 @@ Mean Relative WIS & 0.159 & 0.111 & 0.002 & 0.074 & 0.064\\
 
 }
 
-\caption{Percent improvement in WIS relative to the AR forecaster by region (negative numbers indicate improved performance, positives indicate worsening).}\label{fig:errs-in-space}
+\caption{Percentage improvement in WIS, relative to the AR forecaster, by HRR (negative numbers indicate improved performance, positives indicate worsening).}\label{fig:errs-in-space}
 \end{figure}
-
-\clearpage
-
-\clearpage
 
 
 \FloatBarrier

@@ -9,12 +9,7 @@ params:
   flag_jumps: 15
 ---
 
-
-
-
 \input{supplement-text.tex}
-
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, fig.width = 6.5, fig.height = 4.5,
@@ -111,11 +106,7 @@ hrr_tab <- pull(hrr_names, hrrname)
 names(hrr_tab) <- pull(hrr_names, hrrnum)
 ```
 
-
-
 <!-- All figures and tables below this line -->
-
-
 
 <!-- Finalized v. vintage -->
 
@@ -131,7 +122,7 @@ fig3
 ```{r hot, include=FALSE}
 # Figure 4 in the manuscript
 fig4 <- plotter_hotspots(hotspots_honest) + 
-  geom_hline(yintercept = 0.5)
+  geom_hline(yintercept = 0.5, linetype = "dashed")
 fig4
 ```
 
@@ -143,9 +134,6 @@ comb1 <- plot_grid(fig3 + theme(legend.position = "none"),
 plot_grid(comb1, leg, ncol = 1, rel_heights = c(1,.1))
 ```
 
-
-
-
 ```{r fcast-finalized, fig.cap="Forecasting performance using finalized data. Compare to Figure 3 in the manuscript."}
 plotter(fcasts_finalized, 
         "wis", Mean, scaler = "strawman_wis", 
@@ -153,19 +141,16 @@ plotter(fcasts_finalized,
   ylab("Mean WIS (relative to baseline)")
 ```
 
-
 \clearpage
-
 
 ```{r hot-finalized, fig.cap="Hotspot prediction performance using finalized data. Compare to Figure 4 in the manuscript."}
 plotter_hotspots(hotspots_finalized) +
-  geom_hline(yintercept = 0.5)
+  geom_hline(yintercept = 0.5, linetype = "dashed")
 ```
 
 \clearpage
 
-
-```{r fcast-honest-v-finalized, fig.cap="Relative forecast WIS with vintage compared to finalized data. Using finalized data leads to overly optimistic performance."}
+```{r fcast-honest-v-finalized, fig.cap="Forecast performance with vintage compared to finalized data. Using finalized data leads to overly optimistic performance."}
 plotter(
   left_join(
     fcasts_honest %>% select(forecaster:wis),
@@ -174,14 +159,13 @@ plotter(
     ), 
   "wis", Mean, scaler = "finalized_wis", 
   order_of_operations = c("aggr","scale")) +
-  geom_hline(yintercept = 1) +
+  geom_hline(yintercept = 1, linetype = "dashed") +
   ylab("Mean WIS (vintage / finalized)")
-
 ```
 
 \clearpage
 
-```{r hot-honest-v-finalized, fig.cap="Relative AUC with vintage compared to finalized data. Using finalized data leads to overly optimistic hotspot performance."}
+```{r hot-honest-v-finalized, fig.cap="Hotspot prediction performance with vintage compared to finalized data. Using finalized data leads to overly optimistic performance."}
 left_join(
   hotspots_honest %>%
     group_by(forecaster, ahead) %>%
@@ -195,27 +179,21 @@ left_join(
   theme_bw() + 
   scale_color_manual(values = fcast_colors, guide = guide_legend(nrow=1)) +
   theme(legend.position = "bottom", legend.title = element_blank()) +
-  geom_hline(yintercept = 1) +
+  geom_hline(yintercept = 1, linetype = "dashed") +
   ylab("AUC (vintage / finalized)")
 ```
 
-
-
-
 \clearpage
-
-
 
 <!-- Geometric mean justifications -->
 
-
-```{r wis-densities, fig.cap="Weighted interval score appears to more closely resemble a log-Gaussian distribution."}
+```{r wis-densities, fig.cap="WIS values from forecast models, which appear to be roughly log-Gaussian."}
 ggplot(fcasts_honest, 
        aes(wis, fill = forecaster)) +
   geom_density() +
   scale_x_log10() +
   theme_bw() +
-  xlab("WIS") +
+  xlab("WIS") + ylab("Density") +
   scale_fill_manual(values = fcast_colors) +
   facet_wrap(~forecaster) +
   theme(legend.position = "none")
@@ -223,19 +201,26 @@ ggplot(fcasts_honest,
 
 \clearpage
 
-```{r fcast-adjusted, fig.cap="Relative forecast performance using vintage data and summarizing with the more robust geometric mean."}
+```{r fcast-adjusted, fig.cap="Forecast performance (using vintage data), summarized by geometric mean."}
 plotter(fcasts_honest, 
         "wis", GeoMean, scaler = "strawman_wis", 
         order_of_operations = c("scale","aggr")) +
-  ylab("Geometric mean of WIS (relative to baseline)")
+  ylab("Geometric mean WIS (relative to baseline)")
 ```
 
+\clearpage
+
+<!-- Comparison to the Hub -->
+
+```{r compare-to-hub, fig.cap="Forecast performance for AR and indicator models, each retrained at the state level, compared to models submitted to the COVID-19 Forecast Hub over the same period. The thin grey lines are individual models from the Hub; the light blue line is the Hub ensemble model. To align prediction dates as best as possible, we look at the AR and indicator model forecasts for 5, 12, 19, and 26 days ahead; this roughly corresponds to 1, 2, 3, and 4 weeks ahead, respectively, since in the Hub, models typically submit forecasts on a Tuesday for the epiweeks aligned to end on each of the following 4 Saturdays."}
+knitr::include_graphics("fig/compare-states-to-hub.pdf")
+```
 
 \clearpage
 
 <!-- Statistical significance -->
 
-```{r sign-test, fig.cap="P-values for a sign test that the WIS of the AR forecaster is smaller than that of the indicator-assisted model. Each P-value corresponds a particular forecast date."}
+```{r sign-test, fig.cap="P-values from a one-sided sign test for improved forecast performance of the indicator-assisted models. Each p-value corresponds to a forecast date. The alternative hypothesis is that the AR model is better (median difference between the relative WIS of the AR model and an indicator model is negative)."}
 fcast_colors2 <- fcast_colors[names(fcast_colors) != "AR"]
 
 st <- fcasts_honest %>%
@@ -266,19 +251,15 @@ ggplot(st, aes(p)) +
   scale_y_continuous(
     labels = scales::percent_format(scale = 1, accuracy = 1)) +
   theme_bw() +
-  theme(legend.position = "bottom")
-
+  theme(legend.position = "bottom", legend.title = element_blank())
 ```
-
 
 ```{r dm-test}
 errs <- fcasts_honest %>% 
   group_by(forecaster, forecast_date) %>%
   summarise(
-    `Mean Relative WIS` = mean(wis) / mean(strawman_wis),
-    # mwis = mean(wis), 
-    `Geometric Mean Relative WIS` = GeoMean(wis / strawman_wis) #,
-    # gmwis = GeoMean(wis)
+    `Mean` = mean(wis) / mean(strawman_wis),
+    `Geometric mean` = GeoMean(wis) / GeoMean(strawman_wis),
     ) %>%
   ungroup()
 ar <- errs %>% 
@@ -287,21 +268,20 @@ ar <- errs %>%
   pivot_longer(-forecast_date, names_to = "metric", values_to = "AR")
 notar <- errs %>%
   filter(forecaster != "AR") %>% 
-  pivot_longer(-c("forecaster", "forecast_date"), names_to = "metric", values_to = "err")
+  pivot_longer(-c("forecaster", "forecast_date"), 
+               names_to = "Aggregation metric",
+               values_to = "err")
 
 all_errs <- left_join(notar, ar)
 dms <- all_errs %>% 
   group_by(forecaster, metric) %>% 
   summarise(dm = forecast::dm.test(AR, err, "greater", h = 7 , power = 1)$p.value)
 
-
-
 kableExtra::kable(
   bind_rows(dms) %>% 
     pivot_wider(names_from = forecaster, values_from = dm), 
-  digits = 3, booktabs = TRUE, caption = "$P$-values for a one-sided Diebold-Mariano test for improvement in forecast error. The test is for the null hypothesis of equal performance against the alternative that the indicator assisted model is better.")
+  digits = 3, booktabs = TRUE, caption = "P-values from a one-sided Diebold-Mariano test for improvemed forecast performance when adding the indicators. The alternative hypothesis is that the AR model is better.")
 ```
-
 
 <!-- Bootstrap stuff -->
 
@@ -343,23 +323,17 @@ plotter(fcasts_booted,
 plotter(fcasts_booted, 
         "wis", GeoMean, scaler = "strawman_wis", 
         order_of_operations = c("scale","aggr")) +
-  ylab("Geometric mean of WIS (relative to baseline)")
+  ylab("Geometric mean WIS (relative to baseline)")
 ```
 
 \clearpage
 
 ```{r hot-booted, fig.cap = "Hotspot prediction performance when indicators are replaced with samples from their empirical distribution. Performance is largely similar to the AR model."}
 plotter_hotspots(hotspots_booted) + 
-  geom_hline(yintercept = 0.5)
+  geom_hline(yintercept = 0.5, linetype = "dashed")
 ```
 
-
-
 \clearpage
-
-
-
-
 
 <!-- Upswings vs. downswings -->
 
@@ -410,7 +384,7 @@ up_down_df <- left_join(corr_df %>%
   inner_join(up_down, by = c("geo_value","target_end_date"))
 ```
 
-```{r upswing-summary, fig.cap="Average difference between the WIS of the AR model and the WIS of the other forecasters. The indicator-assisted forecasters do best during down and flat periods."}
+```{r upswing-summary, fig.cap="Average difference between the WIS of the AR model and of the indicator models, separated into up, down, and flat periods. The indicator models generally do best during down and flat periods."}
 up_down_df_summary <- up_down_df %>%
   group_by(forecaster, udf) %>%
   summarise(mean = Mean(AR_wis - wis))
@@ -418,16 +392,14 @@ up_down_df_summary %>%
   ggplot(aes(udf, mean , fill = forecaster)) +
   geom_bar(width = 0.6, position = position_dodge(width=0.6),
            stat = "identity") +
-  scale_fill_manual(values = fcast_colors[1:5], guide = guide_legend(nrow = 1)) +
+  scale_fill_manual(values = fcast_colors2, guide = guide_legend(nrow = 1)) +
   scale_y_continuous() +
   theme_bw() +
-  geom_hline(yintercept = 0) +
-  ylab("Mean of WIS(AR) - WIS(F)") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  ylab("Mean of AR WIS - forecaster WIS") +
   xlab("") +
   theme(legend.position = "bottom", legend.title = element_blank())
 ```  
-
-  
 
 ```{r upswing-histogram, include=FALSE, fig.width=9, fig.height=4.5}
 # Fgure 4
@@ -447,28 +419,9 @@ up_down_df %>%
   geom_vline(xintercept = 0)
 ```
 
-```{r upswing-histogram-logged, eval = FALSE, fig.cap="Not sure if we want this here. Similar to Figure 5 in the manuscript but taking logs. "}
-up_down_df %>% 
-  group_by(forecaster, udf) %>%
-  ggplot(aes((AR_wis + 1) / (wis + 1), fill = forecaster)) +
-  geom_histogram(bins = 100) +
-  facet_grid(udf ~ forecaster) +
-  theme_bw() +
-  ylab("Count") +
-  theme(legend.position = "none") +
-  scale_fill_manual(values = fcast_colors) +
-  scale_x_log10() +
-  scale_y_log10(breaks = c(10,1000,100000), 
-                labels = trans_format("log10", math_format(10^.x))) +
-  xlab("AR WIS - forecaster WIS") +
-  geom_vline(xintercept = 1)
-```
-
 \clearpage
 
-
-
-```{r hotspots-upswing-downswing, fig.cap="Classification and loglikelihood separated into periods of upswing, downswing, and flat cases. Like the analysis of the forecasting task in the main paper (see Figure 7), relative performance is better during down and flat periods."}
+```{r hotspots-upswing-downswing, fig.cap="Percentage change in classification error and log likelihood, relative that of the AR model, separated into up, down, and flat periods. Like the analogous forecasting analysis, the indicator models generally do better during down and flat periods."}
 hot_udf <- inner_join(
   hotspots_honest,
   up_down %>% select(geo_value, target_end_date, udf))
@@ -512,107 +465,15 @@ bind_rows(con_tab %>% mutate(err = "Classification error"),
   ggplot(aes(udf, (m - mar) / abs(mar) , fill = forecaster)) +
   geom_bar(width = 0.6, position = position_dodge(width=0.6),
            stat = "identity") +
-  scale_fill_manual(values = fcast_colors[1:5], guide = guide_legend(nrow = 1)) +
+  scale_fill_manual(values = fcast_colors2, guide = guide_legend(nrow = 1)) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   theme_bw() +
-  geom_hline(yintercept = 0) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
   facet_wrap(~err) +
-  ylab("Change relative to AR") +
+  ylab("% change relative to AR") +
   xlab("") +
   theme(legend.position = "bottom", legend.title = element_blank())
 ```
-
-```{r hotspots-upswing-downswing-remake, fig.cap="REMAKE: Classification and loglikelihood separated into periods of upswing, downswing, and flat cases. The indicator assisted models always have lower classification error relative to the null classifier, while the AR actually does worse in down and flat periods. In terms of loglikelihood, all forecasters have lower likelihood than the null classifier during up periods. In down and flat periods, the indicators generally improve over the AR, while the are worse during up periods.", eval=FALSE}
-# mycummean <- function(x) {
-#   isgood <- ! is.na(x)
-#   denom <- cumsum(isgood)
-#   x[!isgood] <- 0
-#   num <- cumsum(x)
-#   y <- num / denom
-#   y[is.na(y)] <- .5 # deal with empties at the beginning
-#   y
-# }
-# 
-# null_classifier <- readRDS(here("data", 
-#                                 "all_signals_wide_as_of_2020-05-18.RDS")) %>%
-#   rename(jhu = `value+0:jhu-csse_confirmed_7dav_incidence_prop`) %>%
-#   select(geo_value, time_value, jhu) %>%
-#   group_by(geo_value) %>%
-#   arrange(time_value) %>%
-#   mutate(lag_value = lag(jhu, 7),
-#          apc = (jhu - lag_value) / lag_value,
-#          hot = case_when(
-#            apc > .25 & lag_value > 30 ~ 1,
-#            apc <= .25 & lag_value > 30 ~ 0),
-#          null_class = mycummean(hot))
-  
-hot_udf <- inner_join(
-  hotspots_honest,
-  up_down %>% select(geo_value, target_end_date, udf))
-
-cutoff <- mean(hot_udf %>% filter(forecaster == "AR") %>% pull(actual))
-
-con_tab <- hot_udf %>% 
-  filter(!is.na(actual)) %>%
-  mutate(pred = value > .5) %>%
-  group_by(forecaster, udf) %>%
-  summarise(m = (mean(pred != actual) - cutoff) / cutoff,
-            err = mean(pred != actual)) %>%
-  ungroup()
-
-# con_tab <- left_join(
-#   con_tab %>% filter(forecaster != "AR"),
-#   con_tab %>% filter(forecaster == "AR") %>%
-#     select(-forecaster) %>%
-#     rename(mar = m))
-
-llike_tab <- hot_udf %>%
-  filter(!is.na(actual)) %>%
-  # left_join(null_classifier %>% select(geo_value, time_value, null_class) %>%
-  #             rename(target_end_date = time_value)) %>%
-  mutate( # kill prob 0-1 predictions
-    value = case_when(
-      value < 1e-8 ~ 1e-8,
-      value > 1-1e-8 ~ 1-1e-8,
-      TRUE ~ value),
-    # null_class = case_when(
-    #   null_class < 1e-8 ~ 1e-8,
-    #   null_class > 1-1e-8 ~ 1-1e-8,
-    #   TRUE ~ null_class),
-    llike = (actual == 1) * log(value) + (actual == 0) * log(1 - value),
-    nulldev = (actual == 1) * log(cutoff) + 
-      (actual == 0) * log(1 - cutoff)) %>%
-  group_by(forecaster, udf) %>%
-  summarise(m = (mean(llike) - mean(nulldev)) / abs(mean(nulldev)),
-            mm = mean(llike),
-            mmm = mean(nulldev)) %>%
-  ungroup()
-
-# llike_tab <- left_join(
-#   llike_tab %>% filter(forecaster != "AR"),
-#   llike_tab %>% filter(forecaster == "AR") %>%
-#     select(-forecaster) %>%
-#     rename(mar = m))
-
-bind_rows(con_tab %>% mutate(err = "Classification error"), 
-          llike_tab %>% mutate(err = "Log likelihood")) %>%
-  ggplot(aes(udf, m , fill = forecaster)) +
-  geom_bar(width = 0.6, position = position_dodge(width=0.6),
-           stat = "identity") +
-  scale_fill_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
-  #scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-  theme_bw() +
-  geom_hline(yintercept = 0) +
-  scale_y_continuous(labels = scales::percent_format()) +
-  facet_wrap(~err, scales = "free_y") +
-  ylab("Improvement relative to the null classifier") +
-  xlab("") +
-  theme(legend.position = "bottom", legend.title = element_blank())
-```
-
-\clearpage
-
-
 
 <!-- Correlations with lagged actuals -->
 
@@ -645,7 +506,7 @@ pct_chng_df <- comparison_df %>%
       abs(wis_ratio - 1), pct_change,method = "spearman"), .groups = "drop")
 ```
 
-```{r cor-wis-ratio, fig.cap="Histograms of the Spearman correlation between the ratio of AR to AR WIS with the percent change in smoothed case rates relative to 7 days earlier."}
+```{r cor-wis-ratio, fig.cap="Histograms of the Spearman correlation between the ratio of forecaster WIS to AR WIS with the \\% change in case rates, relative to case rates 7 days earlier."}
 ggplot(pct_chng_df %>% 
          group_by(forecaster) %>% 
          mutate(median = median(cor_wisratio_pctchange)), 
@@ -657,64 +518,28 @@ ggplot(pct_chng_df %>%
   geom_vline(aes(xintercept = median), linetype = "dotted") + 
   geom_vline(xintercept = 0) +
   facet_wrap(~forecaster) + 
-  xlab("Spearman correlation") + ylab("Relative frequency") +
+  xlab("Spearman correlation") + ylab("Frequency") +
   scale_y_continuous(labels = scales::label_percent(accuracy = .1))
 ```
 
 \clearpage
 
-```{r cor-wis-ratio-m1, eval = FALSE, fig.cap="This is Alden's second set of histograms. Here we have the correlation of the absolute value of WIS ratio - 1 with the percent change in 7dav cases relative to 7 days earlier"}
-ggplot(pct_chng_df %>% 
-         group_by(forecaster) %>% 
-         mutate(median = median(cor_abs_wisratio_minus_1_pctchange)), 
-       aes(x = cor_abs_wisratio_minus_1_pctchange)) +
-  geom_histogram(aes(y = ..count.. / sum(..count..), fill = forecaster), bins = 50) +
-  scale_fill_manual(values = fcast_colors) +
-  theme_bw() +
-  theme(legend.position = "none") +
-  geom_vline(aes(xintercept = median), linetype = "dotted") + 
-  geom_vline(xintercept = 0) +
-  facet_wrap(~forecaster) + 
-  xlab("Spearman correlation") + ylab("Relative frequency") +
-  scale_y_continuous(labels = scales::label_percent(accuracy = 1))
-```
-
-\clearpage
-
-
-```{r upswing-corr-table, fig.cap="Correlation of the difference in WIS with the difference in median predictions for the AR model relative to the indicator-assisted forecaster. In down periods, improvements in forecast risk are highlycorrelated with lower median predictions. The opposite is true in up periods. This suggests, as one might expect that improved performance of the indicator-assisted model is attributable to being closer to the truth then the AR model. This conclusion is stronger in down periods then in up periods."}
+```{r upswing-corr-table, fig.cap="Correlation of the difference in WIS with the difference in median predictions (each difference being between the AR model and an indicator model), separated into up, down, and flat periods. In down periods, improvements in forecast error are highly correlated with lower median predictions. The opposite is true in up periods, but the conclusion here appears to be weaker."}
 up_down_df %>% 
   group_by(forecaster, udf) %>%
   summarise(cor = cor(AR_wis - wis, AR_med - med)) %>%
   ggplot(aes(udf, cor , fill = forecaster)) +
   geom_bar(width = 0.6, position = position_dodge(width=0.6),
            stat = "identity") +
-  scale_fill_manual(values = fcast_colors[1:5], guide = guide_legend(nrow = 1)) +
-  theme_bw() +
-  geom_hline(yintercept = 0) +
+  scale_fill_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
+  theme_bw() + ylab("Correlation") + xlab("") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
   theme(legend.position = "bottom", legend.title = element_blank())
-
-# up_down_df %>% 
-#   filter(period != "jm") %>% 
-#   group_by(forecaster, udf) %>%
-#   summarise(cor = cor(AR_wis - wis, AR_med - med)) %>%
-#   pivot_wider(names_from = forecaster, values_from = cor) %>%
-#   kableExtra::kbl(
-#     booktabs = TRUE, digits = 2, centering = TRUE,
-#     caption = paste("Correlation of the difference in WIS between the AR",
-#                    "model with the difference in median predictions. In down",
- #                   "periods, improvements in forecast risk are highly",
-#                    "correlated with lower median predictions. The opposite",
-#                    "is true in up periods. This suggests, as one might expect",
-#                    "that improved performance of the indicator-assisted",
-#                    "model is attributable to being closer to the truth then",
-#                    "the AR model. This conclusion is stronger in down",
-#                    "periods then in up periods."))
 ```
 
 \clearpage
 
-```{r upswing-summary-remake, fig.cap="Percent change in average WIS of the forecaster (AR or indicator assisted) relative to the baseline. All models perform poorly durning down periods, but the indicators help. During flat periods, the indicators improve slightly over the AR. During up periods, all forecasters do much better than the baseline, but only some do as well as AR."}
+```{r upswing-summary-remake, fig.cap="Percentage change in average WIS of the forecaster (AR or indicator assisted), relative to the baseline. All models perform poorly during down periods, but the indicators help. During flat periods, the indicators improve slightly over the AR. During up periods, all forecasters do much better than the baseline, but only some do as well as AR."}
 up_down_df_summary <- inner_join(
   left_join(
     corr_df, 
@@ -729,13 +554,11 @@ up_down_df_summary %>%
   scale_fill_manual(values = fcast_colors, guide = guide_legend(nrow = 1)) +
   theme_bw() +
   scale_y_continuous(labels = scales::percent_format()) +
-  geom_hline(yintercept = 0) +
-  ylab("% change in Forecaster WIS\n relative to Baseline") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  ylab("% change in WIS relative to baseline") +
   xlab("") +
   theme(legend.position = "bottom", legend.title = element_blank())
 ```  
-
-
 
 \clearpage
 
@@ -810,7 +633,6 @@ df2 <- left_join(
   by = c("geo_value","forecaster","target_end_date" = "time_value"))
 ```
 
-
 ```{r leading-only, include=FALSE, fig.width=6, fig.height=4}
 # Figure 5 in the manuscript
 df2 %>%
@@ -821,8 +643,8 @@ df2 %>%
   ggplot(aes(udf, leadingness, fill = forecaster)) +
   geom_bar(width = 0.6, position = position_dodge(width=0.6),
            stat = "identity") +
-  geom_hline(yintercept = 0) +
-  scale_fill_manual(values = fcast_colors[1:5]) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_fill_manual(values = fcast_colors2) +
   guides(fill = guide_legend(nrow = 1)) +
   theme_bw() +
   ylab("Correlation") +
@@ -835,38 +657,14 @@ df2 %>%
         legend.background = element_rect(fill = "transparent"))
 ```
 
-
-
-```{r leading-and-lagging, eval=FALSE}
-# Deprecated
-df2 %>%
-  group_by(forecaster, udf) %>%
-  summarise(
-    leadingness = cor(AR_wis - wis, leading, use = "pairwise.complete.obs"),
-    laggingness = cor(AR_wis - wis, lagging, use = "pairwise.complete.obs")) %>%
-  pivot_longer(leadingness:laggingness) %>%
-  ggplot(aes(udf, value, fill = forecaster)) +
-  geom_bar(width = 0.6, position = position_dodge(width=0.6),
-           stat = "identity") +
-  geom_hline(yintercept = 0) +
-  scale_fill_manual(values = fcast_colors) +
-  facet_wrap(~name) +
-  theme_bw() +
-  ylab("Correlation") +
-  xlab("") +
-  theme(legend.position = "bottom", legend.title = element_blank())
-```
-
-```{r ccf-dv-finalized, eval=TRUE, fig.cap="Illustration of the cross-correlation function between DV-CLI and cases. The left panel shows the standardized signals over the period from August 1 to September 28 (as of May 15, 2021). The right panel shows $\\CCF_{\\ell}(a)$ for different values of $a$ as vertical blue bars. The orange dashed lines indicate the 95\\% significance threshold. By our leadingness/laggingness metric, DV-CLI is leading (but notlagging) cases over this period."}
+```{r ccf-dv-finalized, fig.cap="Illustration of the cross-correlation function between DV-CLI and cases. The left panel shows the standardized signals over the period from August 1 to September 28 (as of May 15, 2021). The right panel shows $\\CCF_{\\ell}(a)$ for different values of $a$ as vertical blue bars. The orange dashed line indicates the 95\\% significance threshold. By our leadingness/laggingness metric, DV-CLI is leading (but not lagging) cases over this period."}
 source(here("code", "figures", "ccf-dv-finalized.R"))
 gg
 ```
 
 \clearpage
 
-
-```{r lagging-only, fig.cap="Correlation of the difference in WIS with the  laggingness of the indicator at the target date, stratified by up, down, or flat period. Compare to Figure 5 in the manuscript."}
-# Deprecated
+```{r lagging-only, fig.cap="Correlation of the difference in WIS with the laggingness of the indicator at the target date, stratified by up, down, or flat period. Compare to Figure 5 in the manuscript."}
 df2 %>%
   group_by(forecaster, udf) %>%
   summarise(
@@ -875,8 +673,8 @@ df2 %>%
   ggplot(aes(udf, laggingness, fill = forecaster)) +
   geom_bar(width = 0.6, position = position_dodge(width=0.6),
            stat = "identity") +
-  geom_hline(yintercept = 0) +
-  scale_fill_manual(values = fcast_colors[1:5], guide = guide_legend(nrow = 1)) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_fill_manual(values = fcast_colors2, guide = guide_legend(nrow = 1)) +
   theme_bw() +
   ylab("Correlation") +
   xlab("") +
@@ -886,7 +684,6 @@ df2 %>%
 \clearpage
 
 ```{r diff-in-lead-lag, fig.cap = "Correlation of the difference between leadingness and laggingness with the difference in WIS. The relationship is essentially the same as described in the manuscript and shown in Figure 5."}
-# Deprecated
 df2 %>%
   group_by(forecaster, udf) %>%
   summarise(cor = cor(AR_wis - wis, leading - lagging, 
@@ -894,62 +691,41 @@ df2 %>%
   ggplot(aes(udf, cor, fill = forecaster)) +
   geom_bar(width = 0.6, position = position_dodge(width=0.6),
            stat = "identity") +
-  geom_hline(yintercept = 0) +
-  scale_fill_manual(values = fcast_colors[1:5]) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_fill_manual(values = fcast_colors2) +
   theme_bw() +
   ylab("Correlation") +
   xlab("") +
   theme(legend.position = "bottom", legend.title = element_blank())
 ```
 
-
-
 \clearpage
 
-
-
-
-
 <!-- Figures in the manuscript in their own scripts -->
-
 
 ```{r revisions-dv-jhu, eval=FALSE}
 # Figure 1 in the manuscript
 source(here("code", "figures", "revisions.R"))
 ```
 
-
-
-
-
 ```{r ny-trajectory, eval=FALSE}
 # Figure 2 in the manuscript
 source(here("code", "figures", "trajectory.R"))
-gg
 ```
-
-
-
-
-
-
-
-
 
 \clearpage
 
-
 <!-- Cumulative Mean -->
 
-```{r cumulative-mean, fig.cap="This figure shows the cumulative sum of WIS for each forecaster divided by the cumulative sum of WIS for the baseline model. The shaded background shows total U.S. cases as reported by JHU-CSSE for the 14-day ahead target. Hashes along the $x$-axis denote weeks." }
+```{r cumulative-mean, fig.cap="Cumulative sum of WIS for each forecaster divided by the cumulative sum of WIS for the baseline model. The shaded background shows national case incidence for the 14-day ahead target. Hash marks along the x-axis denote weeks." }
 cumulatives <- fcasts_honest %>%
   group_by(forecaster, forecast_date) %>%
   summarise(mw = Mean(wis),
             smw = Mean(strawman_wis),
             gmw = GeoMean(wis / strawman_wis)) %>%
   arrange(forecast_date) %>%
-  mutate(`Cumulative Mean` = cummean(mw) / cummean(smw),
-         `Cumulative Sum` = cumsum(mw) / cumsum(smw),
+  mutate(`Cumulative mean` = cummean(mw) / cummean(smw),
+         `Cumulative sum` = cumsum(mw) / cumsum(smw),
          `Cumulative Geo Mean` = exp(cummean(log(gmw))),
          `GM Regret` = cumsum(gmw) - cumsum(smw/smw),
          `AM Regret` = cumsum(mw) - cumsum(smw),
@@ -964,13 +740,13 @@ ticks <- seq(min(us_cases$time_value), max(us_cases$time_value), by = 7) - 14
 
 
 ggplot(cumulatives %>% filter(forecast_date < "2021-01-01")) + 
-  geom_line(aes(forecast_date, y = `Cumulative Sum`, color = forecaster)) +
+  geom_line(aes(forecast_date, y = `Cumulative sum`, color = forecaster)) +
   annotate(x = us_cases$time_value - 14, ymax = us_cases$value, ymin = -Inf,
            geom = "ribbon", alpha = .1) +
   annotate("segment", x=ticks, y=-Inf, xend = ticks, yend = .77, 
                color = "grey70") +
-  geom_hline(yintercept = 1) +
-  xlab("forecast date") +
+  geom_hline(yintercept = 1, linetype = "dashed") +
+  xlab("Forecast date") + ylab("Cumulative sum") +
   coord_cartesian(#ylim = c(.76, 1), 
                   xlim = ymd(c("2020-06-01", "2021-01-01"))) +
   scale_x_date(date_breaks = "2 months", date_minor_breaks = "1 week",
@@ -983,15 +759,15 @@ ggplot(cumulatives %>% filter(forecast_date < "2021-01-01")) +
 
 \clearpage
 
-```{r cumulative-geo-mean, fig.cap="This figure shows the cumulative geometric mean of WIS for each forecaster divided by the WIS for the baseline model. The shaded background shows total U.S. cases as reported by JHU-CSSE for the 14-day ahead target. Hashes along the $x$-axis denote weeks." }
+```{r cumulative-geo-mean, fig.cap="Cumulative geometric mean of WIS for each forecaster divided by WIS for the baseline model. The shaded background shows national case incidence for the 14-day ahead target. Hashes along the x-axis denote weeks." , eval=FALSE}
 ggplot(cumulatives %>% filter(forecast_date < "2021-01-01")) + 
   geom_line(aes(forecast_date, y = `Cumulative Geo Mean`, color = forecaster)) +
   annotate(x = us_cases$time_value - 14, ymax = us_cases$value, ymin = -Inf,
            geom = "ribbon", alpha = .1) +
   annotate("segment", x=ticks, y=-Inf, xend = ticks, yend = .77, 
                color = "grey70") +
-  geom_hline(yintercept = 1) +
-  xlab("forecast date") + ylab("Cumulative Geometric Mean") +
+  geom_hline(yintercept = 1, linetype = "dashed") +
+  xlab("Forecast date") + ylab("Cumulative geo mean") +
   coord_cartesian(#ylim = c(.76, 1), 
                   xlim = ymd(c("2020-06-01", "2021-01-01"))) +
   scale_x_date(date_breaks = "2 months", date_minor_breaks = "1 week",
@@ -1004,7 +780,7 @@ ggplot(cumulatives %>% filter(forecast_date < "2021-01-01")) +
 
 \clearpage
 
-```{r errs-in-space, fig.cap="Percent improvement in WIS relative to the AR forecaster by region (negative numbers indicate improved performance, positives indicate worsening)."}
+```{r errs-in-space, fig.cap="Percentage improvement in WIS, relative to the AR forecaster, by HRR (negative numbers indicate improved performance, positives indicate worsening)."}
 # fig.height = 9.6, fig.width = 6, out.width = "5in", out.height="8in", 
 by_hrr <- fcasts_honest %>% 
   group_by(forecaster, geo_value) %>% 
@@ -1042,136 +818,3 @@ map_plot <- cowplot::plot_grid(plotlist = maps, ncol = 3)
 map_leg <- get_legend(maps[[1]] + theme(legend.position = "bottom"))
 cowplot::plot_grid(map_plot, map_leg, ncol = 1, rel_heights = c(1, .1))
 ```
-
-\clearpage
-
-<!-- Comparison to submitted forecasts -->
-
-```{r grab-submitted-case-fcasts}
-library(aws.s3)
-Sys.setenv("AWS_DEFAULT_REGION" = "us-east-2")
-s3bucket <- get_bucket("forecast-eval")
-# ensure that forecasters have submitted a reasonable amount
-n_keeper_weeks <- 6L
-n_keeper_locs <- 50L
-case_scores <- s3readRDS("score_cards_state_cases.rds", s3bucket) %>% 
-  mutate(forecast_date = target_end_date - ahead * 7) %>% 
-  # fix weirdnesses about submission dates, 
-  # this is generous to the forecaster
-  filter(forecast_date < "2021-01-01", ahead < 4) %>% 
-  select(ahead, geo_value, forecaster, target_end_date, wis, forecast_date)
-
-strawman <- case_scores %>% filter(forecaster == "COVIDhub-baseline")
-case_scores <- left_join(
-  case_scores, 
-  strawman %>% 
-    select(forecast_date, target_end_date, geo_value, wis) %>% 
-    rename(strawman_wis = wis)
-) %>% filter(forecaster != "COVIDhub-baseline")
-
-# Subset to those forecasters that submitted enough 14-day ahead forecasts
-n_submitted <- case_scores %>% 
-  filter(ahead == 2) %>% 
-  group_by(forecaster) %>% 
-  summarise(nfcasts = n())
-keepers <- n_submitted %>% 
-  filter(nfcasts / n_keeper_locs > n_keeper_weeks - .0001, 
-         forecaster != "COVIDhub-4_week_ensemble") %>% # same as CH-Ensemble 
-  pull(forecaster)
-
-case_scores <- case_scores %>% 
-  filter(forecaster %in% keepers) %>%
-  group_by(forecaster, ahead) %>%
-  summarise(rel_wis = Mean(wis) / Mean(strawman_wis),
-            geo_wis1 = GeoMean((wis + 1) / (strawman_wis + 1)),
-            geo_wis = GeoMean(wis / strawman_wis))
-```
-
-```{r compare-to-hub-mean, fig.height = 8.5, fig.cap="This figure reproduces Figure 3 in the main paper but overlays scores for the forecasts submitted to the COVID-19 Forecast Hub. Grey lines correspond to the various teams that submitted during period our evaluation period. We have highlighted the COVIDhub-ensemble, which is the official forecast of the CDC.", include=FALSE}
-# Same as Fig 3 in the paper
-df <- summarizer(fcasts_honest %>%
-                   group_by(ahead, forecaster), "wis", NULL, 
-                 "strawman_wis", Mean, c("aggr","scale"))
-ggplot(df) +
-  geom_line(aes(ahead, wis, color = forecaster)) + 
-  geom_point(aes(ahead, wis, color = forecaster)) +
-  theme_bw() +
-  geom_hline(yintercept = 1, size = 1.5) +
-  xlab("Days ahead") +
-  ylab("Mean WIS (relative to baseline)") +
-  scale_color_manual(values = c(fcast_colors, "CH-ensemble" = "lightblue"),
-                     guide = guide_legend(nrow = 2)) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
-  geom_line(data = case_scores, 
-            aes(ahead * 7, rel_wis, group = forecaster),
-            color = "grey70") +
-  geom_line(data = case_scores %>% filter(forecaster == "COVIDhub-ensemble"),
-            aes(ahead * 7, rel_wis), color = "lightblue", size = 1.5) +
-  scale_y_log10()
-```
-
-\clearpage
-
-```{r compare-to-hub-geomean, fig.height = 8.5, fig.cap="This figure is similar to Figure \\ref{fig:fcast-adjusted}. In this case, we add 1 to both the forecaster WIS and the baseline WIS before scaling (to allow forecasters that achieve 0 error to appear), and we overlay scores for the forecasts submitted to the COVID-19 Forecast Hub. Grey lines correspond to the various teams that submitted during period our evaluation period. We have highlighted the COVIDhub-ensemble, which is the official forecast of the CDC.", include=FALSE}
-# Like supplement GeoMean figure, but adding 1
-df2 <- fcasts_honest %>% 
-  group_by(ahead, forecaster) %>%
-  summarise(wis = GeoMean((wis + 1) / (strawman_wis + 1)))
-
-ggplot(df2) +
-  geom_line(aes(ahead, wis, color = forecaster)) + 
-  geom_point(aes(ahead, wis, color = forecaster)) +
-  theme_bw() +
-  geom_hline(yintercept = 1, size = 1.5) +
-  xlab("Days ahead") +
-  ylab("Geometric mean of WIS (relative to baseline)") +
-  scale_color_manual(values = c(fcast_colors, "CH-ensemble" = "lightblue"),
-                     guide = guide_legend(nrow = 2)) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
-  geom_line(data = case_scores, 
-            aes(ahead * 7, geo_wis1, group = forecaster),
-            color = "grey70") +
-  geom_line(data = case_scores %>% filter(forecaster == "COVIDhub-ensemble"),
-            aes(ahead * 7, geo_wis1), color = "lightblue", size = 1.5) +
-  scale_y_log10()
-```
-
-
-<!-- All code below is deprecated -->
-
-
-```{r fcast-gs-locations, eval=FALSE}
-plotter(fcasts_gs %>% filter(period != "jm"),
-        "wis", Mean, scaler = "strawman_wis", 
-        order_of_operations = c("aggr","scale")) +
-  ylab("Mean WIS (relative to baseline)")
-```
-
-```{r fcast-gs-locations-adjusted, eval=FALSE}
-plotter(fcasts_gs %>% filter(period != "jm"), 
-        "wis", GeoMean, scaler = "strawman_wis", 
-        order_of_operations = c("scale","aggr")) +
-  ylab("Geometric mean of WIS (relative to baseline)")
-```
-
-```{r hot-gs-locations, eval=FALSE}
-plotter_hotspots(hotspots_gs %>% filter(period != "jm")) +
-  geom_hline(yintercept = 0.5)
-```
-
-
-
-```{r traj-data, eval = FALSE}
-source(here("code", "deprecated", "trajectory_plot_funs.R"))
-preds <- readRDS(here("data", "predictions_honest.RDS"))
-traj_best <- get_trajectory_plots(fcasts_honest, preds, actuals, hrr_tab, 
-                                  "only2020", "best")
-traj_worst <- get_trajectory_plots(fcasts_honest, preds, actuals, hrr_tab,
-                                   "only2020", "worst")
-rm(preds)
-```
-
-```{r trajectory-plots, eval = FALSE}
-for (nm in names(traj_best)) print(trajectory_panel(nm, traj_best, traj_worst))
-```
-
