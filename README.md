@@ -1,7 +1,9 @@
 # COVIDcast PNAS text and code
 
-Source code for Delphi's PNAS papers on our COVIDcast effort. Each directory
-contains the text, figures, and code used to produce each paper:
+Source code for Delphi's PNAS papers on our COVIDcast effort, published in the
+special issue "Beyond Cases and Deaths: The Benefit of Auxiliary Data Streams In
+Tracking the COVID-19 Pandemic". Each directory contains the text, figures, and
+code used to produce each paper:
 
 * **forecast:** Text and code for "Can Auxiliary Indicators Improve COVID-19
   Forecasting and Hotspot Prediction?", by Daniel J. McDonald, Jacob Bien, Alden
@@ -39,6 +41,5 @@ R source code is provided under the MIT license; see the `LICENSE` file for full
 text.
 
 The text of each paper, in the form of LaTeX source files and associated PDFs,
-is published under the terms of the [Creative Commons
-Attribution-NonCommercial-NoDerivatives 4.0 International
-license](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+is published under the terms of the [Creative Commons Attribution License
+4.0](https://creativecommons.org/licenses/by/4.0/).
