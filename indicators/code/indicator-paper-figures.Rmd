@@ -46,11 +46,15 @@ cs <- covidcast_signals(
   geo_type = "nation"
 )
 
-case_max <- max(cs[[1]]$value)
+Min <- function(x) min(x, na.rm = TRUE)
+Max <- function(x) max(x, na.rm = TRUE)
+case_min <- Min(cs[[1]]$value)
+case_max <- Max(cs[[1]]$value)
 
 rescaled <- aggregate_signals(cs, format = "long") %>%
   group_by(signal) %>%
-  mutate(value = value / max(value, na.rm = TRUE) * case_max) %>%
+    mutate(value = (value - Min(value)) / (Max(value) - Min(value)) * 
+             case_max + case_min) %>%
   ungroup()
 
 colors <- c("black", scales::hue_pal()(5))
