@@ -38,7 +38,7 @@ library(dplyr)
 
 \begin{figure}
 \includegraphics[width=\textwidth]{fig/severity-pyramid.pdf}
-\caption{Epidemiological ``severity pyramid'', representing the progression of disease progression, from relevant public behaviors, through infection, towards increasingly severe stages of disease. The annotations here refer the data sources available in Delphi's Epidata API.}
+\caption{Epidemiological ``severity pyramid'', representing the progression of disease progression, from relevant public behaviors, through infection, towards increasingly severe stages of disease. The annotations here refer to the data sources available in Delphi's Epidata API.}
 \label{fig:severity-pyramid}
 \end{figure}
 
