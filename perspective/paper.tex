@@ -71,54 +71,55 @@ collaborators that parallels our group's work on online surveys in the U.S.
 Here is a very brief summary of the papers in this collection.
 
 \begin{enumerate}
-\item \citet{Reinhart:2021} describes our group's (ongoing) effort in building
-  and maintaining COVIDcast: an open repository of real-time, geographically
-  detailed COVID-19 indicators in the U.S.  These indicators (a term we use
-  interchangeably with signals) are derived from a diverse set of data sources:
-  medical testing devices, medical insurance claims, internet search trends,
-  app-based mobility data, and online surveys, among others.  Many indicators
-  are demonstrated to have meaningful statistical relationships with what have
-  become the pandemic's ``topline'' numbers (reported cases, hospitalizations,
-  deaths), whereas others uniquely reflect certain activity (not available in
-  other publicly-available data sources) that may drive or affect the spread of
-  COVID-19.  The paper demonstrates through a number of examples that the
-  indicators in the COVIDcast repository can improve on the timeliness,
-  robustness, and scope of traditional public health reporting streams.   
+\item Reinhart et al.\ \citep{Reinhart:2021} describes our group's (ongoing)
+  effort in building and maintaining COVIDcast: an open repository of real-time,
+  geographically detailed COVID-19 indicators in the U.S.  These indicators (a
+  term we use interchangeably with signals) are derived from a diverse set of
+  data sources: medical testing devices, medical insurance claims, internet
+  search trends, app-based mobility data, and online surveys, among others.
+  Many indicators are demonstrated to have meaningful statistical relationships
+  with what have become the pandemic's ``topline'' numbers (reported cases,
+  hospitalizations, deaths), whereas others uniquely reflect certain activity
+  (not available in other publicly-available data sources) that may drive or
+  affect the spread of COVID-19.  The paper demonstrates through a number of
+  examples that the indicators in the COVIDcast repository can improve on the
+  timeliness, robustness, and scope of traditional public health reporting streams.   
 
-\item \citet{McDonald:2021} provides a detailed analysis of whether a core set
-  of the indicators in the COVIDcast repository can be used to improve the
-  accuracy of COVID-19 short-term forecasting and hotspot detection models.
-  This speaks to the quantitative utility of the indicators in a way that is
-  directly tied to the benefits observed in relevant downstream modeling tasks.
-  The paper finds that time series models (that are already competitive with top
-  forecasters from the COVID-19 Forecast Hub \citep{ForecastHub}) improve in
-  predictive accuracy when they are supplemented with any of the five indicators
-  under consideration.  However, the magnitude of these improvements varies with
-  the pandemic's local dynamics at prediction time, and only one indicator
-  appears to offer a nontrivial improvement during upswings.  
+\item McDonald et al.\ \citep{McDonald:2021} provides a detailed analysis of
+  whether a core set of the indicators in the COVIDcast repository can be used
+  to improve the accuracy of COVID-19 short-term forecasting and hotspot
+  detection models. This speaks to the quantitative utility of the indicators in
+  a way that is directly tied to the benefits observed in relevant downstream
+  modeling tasks. The paper finds that time series models (that are already
+  competitive with top forecasters from the COVID-19 Forecast Hub
+  \citep{ForecastHub}) improve in predictive accuracy when they are supplemented
+  with any of the five indicators under consideration, based on COVID-related
+  medical insurance claims, self-reported symptoms from surveys (in fact, from
+  CTIS, described next), and COVID-related Google searches.  
 
-\item \citet{Salomon:2021} focuses on the U.S. COVID-19 Trends and Impact Survey
-  (CTIS), an (ongoing) online survey operated by our group, in partnership with
-  Facebook.  This is a very rich source of data about the pandemic and its
-  effect on people, only partially reflected by the indicators (derived from the
-  survey) in the COVIDcast repository; the full data set of individual,
-  anonymized survey responses is available to researchers under a data use
-  agreement.  The paper presents descriptive analyses that reflect the unique
-  value of CTIS as an important supplement to public health reporting, in
-  particular, as an instrument to measure key information about behaviors,
+\item Salomon et al.\ \citep{Salomon:2021} focuses on the U.S. COVID-19 Trends 
+  and Impact Survey (CTIS), an (ongoing) online survey operated by our group, in
+  partnership with Facebook.  This is a very rich source of data about the
+  pandemic and its effect on people, only partially reflected by the indicators
+  (derived from the survey) in the COVIDcast repository; the full data set of
+  individual, anonymized survey responses is available to researchers under a
+  data use agreement.  The paper presents descriptive analyses that reflect the
+  unique value of CTIS as an important supplement to public health reporting, in
+  particular, as an instrument to measure key information about behaviors, 
   attitudes, economic impacts, and other topics not covered in traditional
   public health streams. 
 
-\item \citet{Astley:2021} focuses on the international version of CTIS, which is
-  an (ongoing) online survey operated by the University of Maryland, again in
-  partnership with Facebook.  This international survey covers over 100
-  countries, and is run in coordination with the U.S. one, so that they bear a
-  similar structure and undergo similar updates; the full data set of
-  individual, anonymized survey responses is again available to individual
-  researchers under a data use agreement.  The paper presents analyses that
-  reflect some basic and important characteristics of the international survey,
-  reflecting its value abroad, where public health reporting efforts may be more
-  limited than those in the U.S.
+\item Astley et al.\ \citep{Astley:2021} focuses on the international version of
+  CTIS, which is an (ongoing) online survey operated by the University of
+  Maryland, again in partnership with Facebook.  This international survey
+  covers over 100 countries and territories, and is run in coordination with the
+  U.S.\ one, so that the two bear similar structures and undergo similar
+  updates; the full data set of individual, anonymized international survey
+  responses is again available to individual researchers under a data use
+  agreement.  The paper presents analyses that reflect some basic and important
+  characteristics of the international survey, reflecting its value abroad,
+  where public health reporting efforts may be more limited than those in the
+  U.S. 
 \end{enumerate}
 
 \section{Lessons Learned}
@@ -296,7 +297,7 @@ effective alternative surveillance sources can be of great use: they can improve
 on the timeliness, scope, robustness, and utility of mandated reporting data,
 while being less burdensome to collect.  This is a common theme that runs
 through all four papers in the collection, but is perhaps most directly
-addressed in \citet{Reinhart:2021} (which focuses on the ecosystem of signals
+addressed in \citep{Reinhart:2021} (which focuses on the ecosystem of signals
 broadly).  That said, we have far from saturated the utility of auxiliary
 surveillance.  Much more needs to be developed in this area in order to usher
 epidemic tracking into its next phase of reliability, accuracy, and
@@ -482,7 +483,23 @@ technological goal.
 
 \subsection*{Acknowledgements} 
 
-\emph{Authors' note: to be filled out later.}
+We thank Michael Finke, Dawn Rucker, and Nigam Shah for sustained counsel over 
+the past year; Donald Rucker for educating us on Health Information Exchanges;
+and Logan Brooks and Maria Jahja for their help assembling references for this
+perspective. More broadly, we are grateful to the entire Delphi team whose work
+is described in this special issue and is the basis for the lessons we discussed
+here. Delphi's work from its inception was enabled, encouraged, and supported by 
+the CDC's Influenza Division, and we are especially indebted to Matt
+Biggerstaff, Michael Johansson, and Carrie Reed for many years of productive
+collaboration and friendship. Lastly, Delphi's work would not be possible
+without the invaluable data and support provided by our industry partners and
+friends; a detailed list is given in the acknowledgements section of
+\citep{Reinhart:2021}. 
+
+
+This material is based on work supported by gifts from Google.or and the McCune 
+Foundation; and by Centers for Disease Control and Prevention (CDC) grant
+U01IP001121.
 
 \newpage
 \bibliographystyle{unsrt}
