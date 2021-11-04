@@ -2,39 +2,62 @@
   "description": "<p>Code and data supporting Delphi's PNAS papers on our COVIDcast effort, published in the special issue \"Beyond Cases and Deaths: The Benefit of Auxiliary Data Streams In Tracking the COVID-19 Pandemic\".</p>",
   "license": "other-open",
   "title": "cmu-delphi/covidcast-pnas: COVIDcast Papers and Code",
-  "version": "v0.3",
+  "version": "v0.4",
   "upload_type": "software",
-  "publication_date": "2021-11-03",
+  "publication_date": "2021-11-04",
   "creators": [
     {
-      "name": "Ryan Tibshirani",
+      "name": "Tibshirani, Ryan",
       "affiliation": "Department of Statistics & Data Science and Machine Learning Department, Carnegie Mellon University",
       "orcid": "0000-0002-2158-8304"
     },
     {
-      "name": "Daniel McDonald",
+      "name": "McDonald, Daniel",
       "affiliation": "Department of Statistics, University of British Columbia",
       "orcid": "0000-0002-0443-4282"
     },
     {
-      "name": "Alex Reinhart",
+      "name": "Reinhart, Alex",
       "affiliation": "Department of Statistics & Data Science, Carnegie Mellon University",
       "orcid": "0000-0002-6658-514X"
     },
     {
-      "name": "Jacob Bien",
+      "name": "Bien, Jacob",
       "affiliation": "Department of Data Sciences and Operations, University of Southern California"
     },
     {
-      "name": "Logan C. Brooks",
+      "name": "Brooks, Logan C.",
       "affiliation": "Machine Learning Department, Carnegie Mellon University"
+    },
+    {
+      "name": "Green, Alden",
+      "affiliation": "Department of Statistics & Data Science, Carnegie Mellon University"
+    },
+    {
+      "name": "Hu, Addison",
+      "affiliation": "Department of Statistics & Data Science and Machine Learning Department, Carnegie Mellon University",
+      "orcid": "0000-0002-9339-7291"
+    },
+    {
+      "name": "Jahja, Maria",
+      "affiliation": "Department of Statistics & Data Science and Machine Learning Department, Carnegie Mellon University"
+    },
+    {
+      "name": "Rumack, Aaron",
+      "affiliation": "Machine Learning Department, Carnegie Mellon University",
+      "orcid": "0000-0002-9181-1794"
+    },
+    {
+      "name": "Tang, Jingjing",
+      "affiliation": "Computational Biology Department, Carnegie Mellon University",
+      "orcid": "0000-0003-1447-5018"
     }
   ],
   "access_right": "open",
   "related_identifiers": [
     {
       "scheme": "url",
-      "identifier": "https://github.com/cmu-delphi/covidcast-pnas/tree/v0.3",
+      "identifier": "https://github.com/cmu-delphi/covidcast-pnas/tree/v0.4",
       "relation": "isSupplementTo"
     },
     {
