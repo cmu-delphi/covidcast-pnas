@@ -1,9 +1,9 @@
 ---
-title: Playground for PNAS cover graphic 
+title: Playground for PNAS cover graphic
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(echo = FALSE, fig.path = "fig/", cache = TRUE, 
+knitr::opts_chunk$set(echo = FALSE, fig.path = "fig/", cache = TRUE,
                       autodep = TRUE, cache.comments = TRUE,
                       message = FALSE, warning = FALSE)
 
@@ -15,9 +15,9 @@ library(purrr)
 ```
 
 ```{r get-data, eval = FALSE}
-sources <- c("jhu-csse", 
-             "doctor-visits", 
-             "fb-survey", 
+sources <- c("jhu-csse",
+             "doctor-visits",
+             "fb-survey",
              "google-symptoms")
 
 signals <- c("confirmed_7dav_incidence_prop",
@@ -28,16 +28,16 @@ signals <- c("confirmed_7dav_incidence_prop",
 start <- as.Date("2020-04-15")
 end <- as.Date("2021-10-22")
 
-Select <- function(x, ...) { 
+Select <- function(x, ...) {
   if (nrow(x) == 0) x
-  else select(x, ...) 
+  else select(x, ...)
 }
 
 x <- covidcast_signals(
   sources, signals,
-  start, end, 
+  start, end,
   geo_type = "state"
-) %>% map(function(df) df %>% 
+) %>% map(function(df) df %>%
             Select(data_source, signal, geo_value, time_value, value))
 ```
 
@@ -50,38 +50,46 @@ load(file = "all.rda")
 ```
 
 ```{r trend-plots}
-names <- c("Reported COVID cases", 
-           "COVID symptoms in medical claims", 
-           "Self-reported COVID symptoms in surveys",
-           "Searches for COVID symptoms on Google")
+names <- c("Reported COVID cases",
+           "COVID symptoms\nin medical claims",
+           "Self-reported COVID\nsymptoms in surveys",
+           "Searches for COVID\nsymptoms on Google")
 colors <- c("#FFFFFF", "#E69F00", "#56B4E9", "#CC79A7")
+
+dates <- seq.Date(start, end, by = "1 day")
+n_days <- length(dates)
 
 g <- vector(mode = "list", length = length(x))
 delta <- 1/500
 alpha <- 0.35
-xlim <- c(start, end)
+xlim <- c(start - 10, end)
 ylim <- c(-0.05, 1.05 + 50 * delta)
-xp <- xlim[1] - 15
+xp <- xlim[1] - 8
 yp <- mean(ylim)
 
 for (i in 1:length(x)) {
-  g[[i]] <- x[[i]] %>% 
+  y <- tibble(geo_value = rep(unique(x[[i]]$geo_value), each = n_days),
+              time_value = rep(seq.Date(start, end, by = "day"),
+                               length(unique(x[[i]]$geo_value))))
+  x[[i]] <- full_join(x[[i]], y, by = c("geo_value", "time_value"))
+
+  g[[i]] <- x[[i]] %>%
     filter(geo_value %in% tolower(state.abb)) %>%
     mutate(geo_num = as.integer(as.factor(geo_value))) %>%
     group_by(geo_value) %>%
-    mutate(value = (value - Min(value)) / (Max(value) - Min(value)) + 
+    mutate(value = (value - Min(value)) / (Max(value) - Min(value)) +
              delta * (geo_num - 1)) %>%
     ungroup() %>%
     ggplot(aes(x = time_value, y = value, group = geo_value)) +
     labs(y = names[i]) + coord_cartesian(xlim = xlim, ylim = ylim) +
-    geom_line(alpha = 0.5, color = colors[i]) + theme_void() +
-    annotate("text", x = xp, y = yp, label = names[i], 
-             color = colors[i], angle = 90) +
+    geom_line(alpha = 0.5, color = colors[i], size = 0.3) +
+    theme_void() +
+    annotate("text", x = xp, y = yp, label = names[i],
+             color = colors[i], angle = 90, size = 3) +
     theme(panel.background = element_rect(fill = "black"))
-          # axis.title.y = element_text(color = colors[i], angle = 90,
-          #                             margin = margin(l = 10, r = -15)))
 }
 
 gg <- do.call(gridExtra::arrangeGrob, list(grobs = g, ncol = 1))
-ggsave(file = "cover-graphic.pdf", gg, height = 12, width = 15)
+# PNAS wants 21 cm wide by 22.5 cm high
+ggsave(file = "cover-graphic.pdf", gg, height = 22.5 / 2.54, width = 21 / 2.54)
 ```
