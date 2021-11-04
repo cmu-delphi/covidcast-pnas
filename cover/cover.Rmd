@@ -25,8 +25,8 @@ signals <- c("confirmed_7dav_incidence_prop",
              "smoothed_whh_cmnty_cli",
              "sum_anosmia_ageusia_smoothed_search")
 
-start <- "2020-04-15"
-end <- "2021-10-25"
+start <- as.Date("2020-04-15")
+end <- as.Date("2021-10-22")
 
 Select <- function(x, ...) { 
   if (nrow(x) == 0) x
@@ -59,10 +59,13 @@ colors <- c("#FFFFFF", "#E69F00", "#56B4E9", "#CC79A7")
 g <- vector(mode = "list", length = length(x))
 delta <- 1/500
 alpha <- 0.35
+xlim <- c(start, end)
 ylim <- c(-0.05, 1.05 + 50 * delta)
+xp <- xlim[1] - 15
+yp <- mean(ylim)
 
 for (i in 1:length(x)) {
-  g[[i]] <- x[[i]] %>%
+  g[[i]] <- x[[i]] %>% 
     filter(geo_value %in% tolower(state.abb)) %>%
     mutate(geo_num = as.integer(as.factor(geo_value))) %>%
     group_by(geo_value) %>%
@@ -70,14 +73,15 @@ for (i in 1:length(x)) {
              delta * (geo_num - 1)) %>%
     ungroup() %>%
     ggplot(aes(x = time_value, y = value, group = geo_value)) +
-    labs(y = names[i]) + coord_cartesian(ylim = ylim) +
+    labs(y = names[i]) + coord_cartesian(xlim = xlim, ylim = ylim) +
     geom_line(alpha = 0.5, color = colors[i]) + theme_void() +
-    theme(panel.background = element_rect(fill = "black"),
-          axis.title.y = element_text(color = colors[i], angle = 90,
-                                      margin = margin(l = 10, r = -15)))
+    annotate("text", x = xp, y = yp, label = names[i], 
+             color = colors[i], angle = 90) +
+    theme(panel.background = element_rect(fill = "black"))
+          # axis.title.y = element_text(color = colors[i], angle = 90,
+          #                             margin = margin(l = 10, r = -15)))
 }
 
-pdf(file = "cover-graphic.pdf", width = 15, height = 15)
-do.call(gridExtra::marrangeGrob, list(g, nrow = 5, ncol = 1))
-graphics.off()
+gg <- do.call(gridExtra::arrangeGrob, list(grobs = g, ncol = 1))
+ggsave(file = "cover-graphic.pdf", gg, height = 12, width = 15)
 ```
