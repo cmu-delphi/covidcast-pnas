@@ -593,7 +593,7 @@ slide_lead_lag <- function(x, y, min_len = 56, lag.max = NULL, na.len = 14) {
     outlist)
 }
 
-all_sigs <- readRDS(here("data", "all_signals_wide_as_of_2020-05-18.RDS"))
+all_sigs <- readRDS(here("data", "all_signals_wide_as_of_2021-05-18.RDS"))
 
 all_sigs_imputed <- all_sigs %>% 
   group_by(geo_value) %>% 

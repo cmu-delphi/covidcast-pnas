@@ -96,7 +96,9 @@ ny_actuals <- readRDS(here::here("data", "confirmed_7dav_incidence_prop.RDS")) %
 
 ### all signals
 
-1. `all_signals_wide.RDS`
+1. `all_signals_wide_as_of_2021-05-18.RDS`
+
+Available at https://doi.org/10.5683/SP2/PUE88I.
 
 This data is used for the leading/lagging analysis in the manuscript. It can be recreated with
 
