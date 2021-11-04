@@ -1,0 +1,46 @@
+{
+  "description": "<p>Code and data supporting Delphi's PNAS papers on our COVIDcast effort, published in the special issue \"Beyond Cases and Deaths: The Benefit of Auxiliary Data Streams In Tracking the COVID-19 Pandemic\".</p>",
+  "license": "other-open",
+  "title": "cmu-delphi/covidcast-pnas: COVIDcast Papers and Code",
+  "version": "v0.3",
+  "upload_type": "software",
+  "publication_date": "2021-11-03",
+  "creators": [
+    {
+      "name": "Ryan Tibshirani",
+      "affiliation": "Department of Statistics & Data Science and Machine Learning Department, Carnegie Mellon University",
+      "orcid": "0000-0002-2158-8304"
+    },
+    {
+      "name": "Daniel McDonald",
+      "affiliation": "Department of Statistics, University of British Columbia",
+      "orcid": "0000-0002-0443-4282"
+    },
+    {
+      "name": "Alex Reinhart",
+      "affiliation": "Department of Statistics & Data Science, Carnegie Mellon University",
+      "orcid": "0000-0002-6658-514X"
+    },
+    {
+      "name": "Jacob Bien",
+      "affiliation": "Department of Data Sciences and Operations, University of Southern California"
+    },
+    {
+      "name": "Logan C. Brooks",
+      "affiliation": "Machine Learning Department, Carnegie Mellon University"
+    }
+  ],
+  "access_right": "open",
+  "related_identifiers": [
+    {
+      "scheme": "url",
+      "identifier": "https://github.com/cmu-delphi/covidcast-pnas/tree/v0.3",
+      "relation": "isSupplementTo"
+    },
+    {
+      "scheme": "doi",
+      "identifier": "10.5281/zenodo.5639567",
+      "relation": "isVersionOf"
+    }
+  ]
+}
