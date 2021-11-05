@@ -8,13 +8,14 @@ knitr::opts_chunk$set(echo = FALSE, fig.path = "fig/", cache = TRUE,
                       message = FALSE, warning = FALSE)
 
 library(covidcast)
+library(epitools)
 library(ggplot2)
 library(dplyr)
 library(purrr)
 ```
 
 ```{r get-data, eval = FALSE}
-sources <- c("usa-facts",
+sources <- c("jhu-csse",
              "doctor-visits",
              "fb-survey",
              "google-symptoms")
@@ -46,7 +47,7 @@ save(list = ls(), file = "all.rda")
 load(file = "all.rda")
 ```
 
-```{r load-all}
+```{r missingness-checks}
 # Inspect missingness: google has lots (privacy threshold)
 do.call(rbind, x) %>%
   filter(geo_value %in% tolower(state.abb)) %>%
@@ -55,6 +56,7 @@ do.call(rbind, x) %>%
   ungroup() %>% group_by(signal) %>%
   filter(nas > 0)
 
+# Are there any days where google is missing almost everything?
 y <- tibble(geo_value = rep(geos, each = length(dates)),
             time_value = rep(dates, length(geos)))
             
