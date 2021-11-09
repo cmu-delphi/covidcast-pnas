@@ -14,7 +14,7 @@ library(dplyr)
 library(purrr)
 ```
 
-```{r get-data, eval = FALSE}
+```{r get-data}
 sources <- c("jhu-csse",
              "doctor-visits",
              "fb-survey",
@@ -43,7 +43,7 @@ x <- covidcast_signals(
 save(list = ls(), file = "all.rda")
 ```
 
-```{r load-all}
+```{r load-all, eval = FALSE}
 load(file = "all.rda")
 ```
 
