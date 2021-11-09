@@ -53,17 +53,5 @@
       "orcid": "0000-0003-1447-5018"
     }
   ],
-  "access_right": "open",
-  "related_identifiers": [
-    {
-      "scheme": "url",
-      "identifier": "https://github.com/cmu-delphi/covidcast-pnas/tree/v0.4",
-      "relation": "isSupplementTo"
-    },
-    {
-      "scheme": "doi",
-      "identifier": "10.5281/zenodo.5639567",
-      "relation": "isVersionOf"
-    }
-  ]
+  "access_right": "open"
 }

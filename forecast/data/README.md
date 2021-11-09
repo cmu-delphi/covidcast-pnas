@@ -41,11 +41,6 @@ saveRDS(df[[1]] %>%
         here::here("data", "confirmed_7dav_incidence_num.RDS"))
 ```
 
-### `offline_signals/`
-
-Created using `code/download_signals/download_signals.R`.
-
-Available at https://doi.org/10.5683/SP2/PUE88I.
 
 ### QR forecast results
 
@@ -54,10 +49,9 @@ Available at https://doi.org/10.5683/SP2/PUE88I.
 1. `results_honest_bootstrapped.RDS`
 1. `predictions_honest.RDS`
 
-The above four files
-are produced by running the scripts in `code/qr_forecast/`
+The above four files are produced by running the scripts in `code/qr_forecast/`
 
-Available at https://doi.org/10.5683/SP2/PUE88I.
+Available at https://doi.org/10.5683/SP3/UW4VTC.
 
 Additional results will also be produced, but are not necessary to reproduce 
 the manuscript.
@@ -71,7 +65,7 @@ the manuscript.
 The above three files
 are produced by running the scripts in `code/qr_forecast/`
 
-Available at https://doi.org/10.5683/SP2/PUE88I.
+Available at https://doi.org/10.5683/SP3/UW4VTC.
 
 Additional results will also be produced, but are not necessary to reproduce 
 the manuscript.
@@ -98,7 +92,7 @@ ny_actuals <- readRDS(here::here("data", "confirmed_7dav_incidence_prop.RDS")) %
 
 1. `all_signals_wide_as_of_2021-05-18.RDS`
 
-Available at https://doi.org/10.5683/SP2/PUE88I.
+Also available at https://doi.org/10.5683/SP3/UW4VTC.
 
 This data is used for the leading/lagging analysis in the manuscript. It can be recreated with
 
@@ -116,3 +110,12 @@ all_signals_wide <- covidcast_signals(
     as_of = "2021-05-18") %>%
   aggregate_signals(format = "wide")
 ```
+
+### State-level results
+
+1. `results_honest_states.RDS`
+
+Available at https://doi.org/10.5683/SP3/UW4VTC.
+
+For the comparison of state forecasts with the COVID19 Forecast Hub shown in 
+the supplement.
