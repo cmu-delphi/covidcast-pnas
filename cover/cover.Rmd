@@ -104,3 +104,24 @@ for (i in 1:length(x)) {
 gg <- do.call(gridExtra::arrangeGrob, list(grobs = g, ncol = 1))
 ggsave(file = "cover-graphic.pdf", gg, height = 22.5, width = 21, units = "cm")
 ```
+
+```{r trend-plots-no-y-labels}
+for (i in 1:length(x)) {
+  g[[i]] <- x[[i]] %>%
+    full_join(y, by = c("geo_value", "time_value")) %>%
+    mutate(geo_num = as.integer(as.factor(geo_value))) %>%
+    group_by(geo_value) %>%
+    mutate(value = (value - Min(value)) / (Max(value) - Min(value)) +
+             delta * (geo_num - 1)) %>%
+    ungroup() %>%
+    ggplot(aes(x = time_value, y = value, group = geo_value)) +
+    labs(y = names[i]) + coord_cartesian(xlim = xlim, ylim = ylim) +
+    geom_line(alpha = 0.5, color = colors[i], size = line_width) +
+    theme_void() +
+    theme(panel.background = element_rect(fill = "black"))
+}
+
+gg <- do.call(gridExtra::arrangeGrob, list(grobs = g, ncol = 1))
+ggsave(file = "cover-no-labs.pdf", gg, height = 22.5, width = 21, units = "cm")
+ggsave(file = "cover-no-labs.png", gg, height = 15.9, width = 15, units = "cm")
+```
