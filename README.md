@@ -1,9 +1,10 @@
 # COVIDcast PNAS Papers: Source Code, Data, Text
 
-Source code for Delphi's PNAS papers on our COVIDcast effort, published in the
-special issue "Beyond Cases and Deaths: The Benefits of Auxiliary Data Streams
-in Tracking the COVID-19 Pandemic". Each directory contains the text, figures,
-and code used to produce each paper:
+Source code for Delphi's papers on our COVIDcast effort, published in the
+*Proceedings of the National Academy of Sciences* special issue "Beyond Cases
+and Deaths: The Benefits of Auxiliary Data Streams in Tracking the COVID-19
+Pandemic" (vol. 118 no. 51, December 2021). Each directory contains the text,
+figures, and code used to produce each paper:
 
 * **forecast:** Text and code for "Can Auxiliary Indicators Improve COVID-19
   Forecasting and Hotspot Prediction?", by Daniel J. McDonald, Jacob Bien, Alden
@@ -26,11 +27,12 @@ and code used to produce each paper:
   Elena Tuzhilina, Ana Karina Van Nortwick, Valérie Ventura, Larry Wasserman,
   Benjamin Weaver, Jeremy C. Weiss, Spencer Whitman, Kristin Williams, Roni
   Rosenfeld, and Ryan J. Tibshirani.
-* **survey:** Text and code for "Continuous Real-Time Measurement of COVID-19
-  Symptoms, Risks, Protective Behaviors, Testing and Vaccination", by Joshua
-  A. Salomon, Alex Reinhart, Alyssa Bilinski, Eu Jing Chua, Wichada La
-  Motte-Kerr, Minttu M. Rönn, Marissa Reitsma, Katherine Ann Morris, Sarah
-  LaRocca, Tamar Farag, Frauke Kreuter, Roni Rosenfeld, and Ryan J. Tibshirani. 
+* **survey:** Text and code for "The US COVID-19 Trends and Impact Survey:
+  Continuous real-time measurement of COVID-19 symptoms, risks, protective
+  behaviors, testing, and vaccination", by Joshua A. Salomon, Alex Reinhart,
+  Alyssa Bilinski, Eu Jing Chua, Wichada La Motte-Kerr, Minttu M. Rönn, Marissa
+  Reitsma, Katherine Ann Morris, Sarah LaRocca, Tamar Farag, Frauke Kreuter,
+  Roni Rosenfeld, and Ryan J. Tibshirani.
 * **perspective:** Text for "Epidemic Tracking and Forecasting: Lessons Learned
   from a Tumultuous Year", by Roni Rosenfeld and Ryan J. Tibshirani.
 

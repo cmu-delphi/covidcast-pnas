@@ -1,7 +1,8 @@
 # An Open Repository of Real-Time COVID-19 Indicators
 
 This directory contains code, data, and text for "An Open Repository of
-Real-Time COVID-19 Indicators".
+Real-Time COVID-19 Indicators". The final published version is available at
+<https://doi.org/10.1073/pnas.2111452118>.
 
 All figures in the paper are generated using `code/indicator-paper-figures.Rmd`,
 a standard R Markdown file. It contains instructions on the packages required to
