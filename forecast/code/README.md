@@ -18,7 +18,7 @@ install.packages("covidcast")
 install.packages("glmnet")
 
 # Packages on Github
-remotes::install_github("ryantibs/quantgen", subdir="R-package/quantgen")
+remotes::install_github("ryantibs/quantgen", subdir="quantgen")
 remotes::install_github("cmu-delphi/covidcast@evalcast-0.3", subdir = "R-packages/evalcast")
 ```
 
