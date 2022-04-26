@@ -27,6 +27,7 @@ response_signal = 'confirmed_7dav_incidence_prop'
 incidence_period = "day"
 
 lags = c(0, 7, 14)
+qr_lags = lags
 qr_forecast_dates <- seq(as.Date('2020-06-09'), as.Date('2021-03-31'), by = "day")
 hotspot_forecast_dates <- seq(as.Date("2020-06-16"), as.Date("2021-03-31"), by = "day")
 
